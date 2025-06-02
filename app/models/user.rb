@@ -3,4 +3,30 @@ class User < ApplicationRecord
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
+
+  # Associations
+  has_many :posts, dependent: :destroy
+  has_many :comments, dependent: :destroy
+  has_many :tracks, dependent: :destroy
+  has_many :playlists, dependent: :destroy
+  has_many :votes, dependent: :destroy
+  has_many :messages, dependent: :destroy
+
+  has_many :conversation_participants, dependent: :destroy
+  has_many :conversations, through: :conversation_participants
+
+  # Système de "follow"
+  # L'utilisateur "suit" d'autres utilisateurs (active)
+  # La clé étrangère dans la table 'follows' pour celui qui suit est 'first_user_id'
+  has_many :active_follows, class_name: 'Follow', foreign_key: 'first_user_id', dependent: :destroy
+  # À travers 'active_follows', on trouve les utilisateurs suivis (qui sont les 'second_user' dans la table 'follows')
+  has_many :following, through: :active_follows, source: :second_user
+
+  # L'utilisateur "est suivi par" d'autres utilisateurs (passive)
+  # La clé étrangère dans la table 'follows' pour celui qui est suivi est 'second_user_id'
+  has_many :passive_follows, class_name: 'Follow', foreign_key: 'second_user_id', dependent: :destroy
+  # À travers 'passive_follows', on trouve les utilisateurs qui suivent (qui sont les 'first_user' dans la table 'follows')
+  has_many :followers, through: :passive_follows, source: :first_user
+
+
 end
