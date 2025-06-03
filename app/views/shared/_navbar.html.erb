@@ -1,7 +1,9 @@
-<div class="navbar navbar-expand-sm navbar-light navbar-lewagon">
+<%# app/views/shared/_navbar.html.erb %>
+<nav class="navbar navbar-expand-sm navbar-aurora">
   <div class="container-fluid">
-    <%= link_to "#", class: "navbar-brand" do %>
-      <%= image_tag "https://raw.githubusercontent.com/lewagon/fullstack-images/master/uikit/logo.png" %>
+    <%= link_to root_path, class: "navbar-brand d-flex align-items-center" do %>
+      <%= image_tag "https://img.notionusercontent.com/ext/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fpublic.notion-static.com%2F974621a6-c896-401b-9c9d-23ad57ee2174%2Flogo_drop_one.jpeg/size/w=70?exp=1748532281&sig=0UR8i9c0zhN8_0APBuhnAcK1570A8VIAGJwFacNe6a8&id=1d08d7b6-4e96-81e8-ac5f-00035f88e75b&table=space&userId=cad7b2d7-04fc-4adc-a196-165aa4ca6a25", alt: "DropOne Logo", class: "navbar-brand-logo-image me-2"%>
+      <%# <span class="ms-2">DropOne</span> %>
     <% end %>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -11,28 +13,58 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto">
         <% if user_signed_in? %>
-          <li class="nav-item active">
-            <%= link_to "Home", "#", class: "nav-link" %>
+          <li class="nav-item">
+            <%= link_to "Home", root_path, class: "nav-link #{'active' if current_page?(root_path)}" %>
           </li>
           <li class="nav-item">
-            <%= link_to "Messages", "#", class: "nav-link" %>
+            <%= link_to "Playlists", playlists_path, class: "nav-link #{'active' if current_page?(playlists_path)}" %>
           </li>
+          <li class="nav-item">
+            <%= link_to "Générer", new_playlist_path, class: "nav-link #{'active' if current_page?(new_playlist_path)}" %>
+          </li>
+        <% end %> <%# Fin du premier 'if user_signed_in?' %>
+      </ul>
+
+      <ul class="navbar-nav ms-auto">
+        <% if user_signed_in? %>
           <li class="nav-item dropdown">
-          <a href="#" class="avatar" id="navbarDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <%= image_tag "https://kitt.lewagon.com/placeholder/users/ssaunier", class: "avatar", alt: "dropdown menu" %>
-          </a>
-            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-              <%= link_to "Action", "#", class: "dropdown-item" %>
-              <%= link_to "Another action", "#", class: "dropdown-item" %>
-              <%= link_to "Log out", destroy_user_session_path, data: {turbo_method: :delete}, class: "dropdown-item" %>
-            </div>
+            <a href="#" class="nav-link dropdown-toggle d-flex align-items-center" id="navbarDropdownUser" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <%= image_tag current_user.avatar_url, alt: "User Avatar", class: "rounded-circle me-2", style: "width: 75px; height: 75px; object-fit: cover;" %>
+              </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownUser">
+              <li>
+                <% if current_user.respond_to?(:liked_playlist) && current_user.liked_playlist %>
+                  <%= link_to "Likes", playlist_path(current_user.liked_playlist), class: "dropdown-item" %>
+                <% end %>
+              </li>
+              <li>
+                <% if current_user.respond_to?(:disliked_playlist) && current_user.disliked_playlist %>
+                  <%= link_to "Dislikes", playlist_path(current_user.disliked_playlist), class: "dropdown-item" %>
+                <% end %>
+              </li>
+              <% if (current_user.respond_to?(:liked_playlist) && current_user.liked_playlist) || (current_user.respond_to?(:disliked_playlist) && current_user.disliked_playlist) %>
+                <li><hr class="dropdown-divider"></li>
+              <% end %>
+              <li>
+                <%= link_to "Edit Profile", edit_user_registration_path, class: "dropdown-item" %>
+              </li>
+              <li>
+
+
+                <%= link_to "Log out", destroy_user_session_path, method: :delete, data: { turbo_method: :delete }, class: "dropdown-item" %>
+
+              </li>
+            </ul>
           </li>
         <% else %>
           <li class="nav-item">
-            <%= link_to "Login", new_user_session_path, class: "nav-link" %>
+            <%= link_to "Login", new_user_session_path, class: "nav-link #{'active' if current_page?(new_user_session_path)}" %>
           </li>
-        <% end %>
+          <li class="nav-item">
+            <%= link_to "Inscription", new_user_registration_path, class: "nav-link #{'active' if current_page?(new_user_registration_path)}" %>
+          </li>
+        <% end %> <%# Fin du deuxième 'if user_signed_in?' %>
       </ul>
-    </div>
-  </div>
-</div>
+    </div> <%# Fin de .collapse .navbar-collapse %>
+  </div> <%# Fin de .container-fluid %>
+</nav> <%# Fin de nav.navbar %>
