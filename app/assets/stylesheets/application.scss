@@ -1,12 +1,30 @@
-// Graphical variables
+// Exemple de fichier app/assets/stylesheets/application.scss
+
 @import "config/fonts";
 @import "config/colors";
 @import "config/bootstrap_variables";
+@import "variables";
 
-// External libraries
+
+
 @import "bootstrap";
 @import "font-awesome";
 
-// Your CSS partials
 @import "components/index";
 @import "pages/index";
+@import "pages/home";
+
+
+
+
+body {
+  background-color: $aurora-dark-bg; // Défini dans _variables.scss
+  // Effet Aurore (exemple simple, à améliorer)
+  background-image:
+    radial-gradient(ellipse 50% 80% at 20% -10%, rgba($aurora-violet-corrected, 0.25) 0px, transparent 60%),
+    radial-gradient(ellipse 50% 70% at 80% 40%, rgba($aurora-blue, 0.2) 0px, transparent 50%),
+    radial-gradient(ellipse 50% 80% at 30% 110%, rgba($aurora-magenta, 0.2) 0px, transparent 60%);
+  background-attachment: fixed; // Pour que l'aurore ne défile pas
+  min-height: 100vh;
+  color: $aurora-text; // Défini dans _variables.scss
+}
