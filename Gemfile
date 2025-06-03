@@ -1,6 +1,9 @@
 source "https://rubygems.org"
 
 ruby "3.3.5"
+gem "ruby_llm"
+gem 'rspotify'
+gem 'rspec-rails'
 
 gem 'ostruct'
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
