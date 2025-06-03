@@ -1,26 +1,24 @@
-<h1>Post of the day!</h1>
+<h1 class="mb-4">Post of the day!</h1>
 
 <%= form_with model: Post.new, local: true do |form| %>
-  <div>
-    <label for="deezer-search">
-      Search for a song :
-    </label><br>
-    <input type="text" id="deezer-search" placeholder="Tape un titre, artiste..." autocomplete="off">
+  <div class="mb-3">
+    <%= label_tag :deezer_search, "Search for a song :", class: "form-label" %>
+    <input type="text" id="deezer-search" class="form-control" placeholder="Tape un titre, artiste..." autocomplete="off">
   </div>
 
-  <ul id="search-results" style="list-style: none; padding-left: 0;"></ul>
+  <ul id="search-results" class="list-group mb-3"></ul>
 
-  <div id="selected-track-info" style="margin-top: 20px;"></div>
+  <div id="selected-track-info" class="mb-3"></div>
 
   <%= form.hidden_field :track_id, id: "selected-track-id" %>
 
-  <div style="margin-top: 20px;">
-    <%= form.label :description, "Description of your post :" %><br>
-    <%= form.text_area :description, rows: 4, cols: 60 %>
+  <div class="mb-3">
+    <%= form.label :description, "Description of your post :", class: "form-label" %>
+    <%= form.text_area :description, class: "form-control", rows: 4, cols: 60 %>
   </div>
 
-  <div style="margin-top: 20px;">
-    <%= form.submit "DropOne" %>
+  <div>
+    <%= form.submit "DropOne", class: "btn btn-primary btn-aurora-glow" %>
   </div>
 <% end %>
 
@@ -50,16 +48,15 @@
           data.forEach(track => {
             const li = document.createElement("li");
             li.textContent = `${track.title} - ${track.artist}`;
+            li.className = "list-group-item list-group-item-action";
             li.style.cursor = "pointer";
-            li.style.padding = "5px";
-            li.style.borderBottom = "1px solid #ddd";
 
             li.addEventListener("click", () => {
               hiddenTrackId.value = track.id;
 
               trackInfoDiv.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 1em; margin-top: 15px;">
-                  <img src="${track.cover}" alt="cover" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
+                <div class="d-flex align-items-center gap-3 mt-3">
+                  <img src="${track.cover}" alt="cover" class="rounded" style="width: 100px; height: 100px; object-fit: cover;">
                   <div>
                     <p><strong>${track.title}</strong> par ${track.artist}</p>
                     <audio controls src="${track.preview}"></audio>
