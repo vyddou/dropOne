@@ -1,13 +1,11 @@
 <h1 class="d-flex justify-content-between align-items-center m-4">
   <span id="playlist-name"><%= @playlist.name %></span>
-  <% unless @playlist.name == Playlist::LIKE_PLAYLIST_NAME || @playlist.name == Playlist::DISLIKE_PLAYLIST_NAME %>
-    <button id="rename-button" class="btn btn-link" style="color: <%= raw "var(--bs-primary);" %>">
-      Renommer la playlist
-    </button>
+  <% unless [Playlist::LIKE_PLAYLIST_NAME, Playlist::DISLIKE_PLAYLIST_NAME].include?(@playlist.name) %>
+    <button id="rename-button" class="btn btn-link" style="color: var(--bs-primary);">Renommer la playlist</button>
   <% end %>
 </h1>
 
-<% unless @playlist.name == Playlist::LIKE_PLAYLIST_NAME || @playlist.name == Playlist::DISLIKE_PLAYLIST_NAME %>
+<% unless [Playlist::LIKE_PLAYLIST_NAME, Playlist::DISLIKE_PLAYLIST_NAME].include?(@playlist.name) %>
   <%= form_with(model: @playlist, url: rename_playlist_path(@playlist), method: :patch, id: "rename-form", class: "d-none") do |form| %>
     <div class="input-group mb-3">
       <%= form.text_field :name, class: "form-control", id: "playlist-name-input" %>
@@ -19,7 +17,7 @@
   <% end %>
 <% end %>
 
-<% is_special_playlist = @playlist.name == Playlist::LIKE_PLAYLIST_NAME || @playlist.name == Playlist::DISLIKE_PLAYLIST_NAME %>
+<% is_special_playlist = [Playlist::LIKE_PLAYLIST_NAME, Playlist::DISLIKE_PLAYLIST_NAME].include?(@playlist.name) %>
 
 <% unless is_special_playlist %>
   <div class="bulk-actions mt-3 mb-3 d-flex">
@@ -32,23 +30,33 @@
   <% @playlist_items.each do |playlist_item| %>
     <% track = playlist_item.track %>
     <div class="song-item d-flex justify-content-between align-items-center p-3 border-bottom">
-      <div class="song-info">
+
+      <div class="song-cover me-3">
+        <% if track.cover_url.present? %>
+          <%= image_tag(track.cover_url, alt: "#{track.title} cover", class: "img-thumbnail", style: "width: 100px; height: 100px; object-fit: cover;") %>
+        <% else %>
+          <div class="no-cover" style="width: 100px; height: 100px; background: #ccc; display: flex; align-items: center; justify-content: center;">
+            <span>Pas de pochette</span>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="song-info flex-grow-1">
         <strong><%= track.title %></strong> par <em><%= track.artist_name %></em> -
         Durée : <%= (track.duration / 1000).to_i %> secondes
 
-        <%# Lecteur audio sous le nom de l'artiste %>
-        <% audio_src = track.link_deezer.presence || track.preview_url %>
-        <% if audio_src.present? %>
+        <%# Ici on prend uniquement preview_url qui est un lien direct vers l'audio %>
+        <% if track.preview_url.present? %>
           <div class="audio-player mt-2">
             <audio controls preload="none" style="width: 100%;">
-              <source src="<%= audio_src %>" type="audio/mpeg">
+              <source src="<%= track.preview_url %>" type="audio/mpeg" />
               Votre navigateur ne supporte pas l'élément audio.
             </audio>
           </div>
         <% end %>
       </div>
 
-      <div class="song-actions d-flex flex-column">
+      <div class="song-actions d-flex flex-column ms-3">
         <% unless is_special_playlist %>
           <%= button_to "J'aime", like_playlist_item_path(playlist_item), method: :post, class: "btn-aurora-like mb-1" %>
           <%= button_to "J'aime pas", dislike_playlist_item_path(playlist_item), method: :post, class: "btn-aurora-dislike mb-1" %>
@@ -65,24 +73,24 @@
 </div>
 
 <script>
-  document.addEventListener('turbo:load', function() {
-    const renameButton = document.getElementById('rename-button');
-    const renameForm = document.getElementById('rename-form');
-    const playlistNameSpan = document.getElementById('playlist-name');
-    const cancelRenameButton = document.getElementById('cancel-rename');
+  document.addEventListener('turbo:load', () => {
+    const renameButton = document.getElementById('rename-button')
+    const renameForm = document.getElementById('rename-form')
+    const playlistNameSpan = document.getElementById('playlist-name')
+    const cancelRenameButton = document.getElementById('cancel-rename')
 
     if (renameButton && renameForm && playlistNameSpan && cancelRenameButton) {
-      renameButton.addEventListener('click', function() {
-        renameForm.classList.remove('d-none');
-        playlistNameSpan.classList.add('d-none');
-        renameButton.classList.add('d-none');
-      });
+      renameButton.addEventListener('click', () => {
+        renameForm.classList.remove('d-none')
+        playlistNameSpan.classList.add('d-none')
+        renameButton.classList.add('d-none')
+      })
 
-      cancelRenameButton.addEventListener('click', function() {
-        renameForm.classList.add('d-none');
-        playlistNameSpan.classList.remove('d-none');
-        renameButton.classList.remove('d-none');
-      });
+      cancelRenameButton.addEventListener('click', () => {
+        renameForm.classList.add('d-none')
+        playlistNameSpan.classList.remove('d-none')
+        renameButton.classList.remove('d-none')
+      })
     }
-  });
+  })
 </script>
