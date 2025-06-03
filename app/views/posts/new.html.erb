@@ -1,0 +1,79 @@
+<h1>Post of the day!</h1>
+
+<%= form_with model: Post.new, local: true do |form| %>
+  <div>
+    <label for="deezer-search">
+      Search for a song :
+    </label><br>
+    <input type="text" id="deezer-search" placeholder="Tape un titre, artiste..." autocomplete="off">
+  </div>
+
+  <ul id="search-results" style="list-style: none; padding-left: 0;"></ul>
+
+  <div id="selected-track-info" style="margin-top: 20px;"></div>
+
+  <%= form.hidden_field :track_id, id: "selected-track-id" %>
+
+  <div style="margin-top: 20px;">
+    <%= form.label :description, "Description of your post :" %><br>
+    <%= form.text_area :description, rows: 4, cols: 60 %>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <%= form.submit "DropOne" %>
+  </div>
+<% end %>
+
+<script>
+  const searchInput = document.getElementById("deezer-search");
+  const resultsList = document.getElementById("search-results");
+  const trackInfoDiv = document.getElementById("selected-track-info");
+  const hiddenTrackId = document.getElementById("selected-track-id");
+
+  let timeout = null;
+
+  searchInput.addEventListener("input", () => {
+    clearTimeout(timeout);
+    const query = searchInput.value;
+
+    if (query.length < 2) {
+      resultsList.innerHTML = "";
+      return;
+    }
+
+    timeout = setTimeout(() => {
+      fetch(`/posts/deezer_search?q=${encodeURIComponent(query)}`)
+        .then(response => response.json())
+        .then(data => {
+          resultsList.innerHTML = "";
+
+          data.forEach(track => {
+            const li = document.createElement("li");
+            li.textContent = `${track.title} - ${track.artist}`;
+            li.style.cursor = "pointer";
+            li.style.padding = "5px";
+            li.style.borderBottom = "1px solid #ddd";
+
+            li.addEventListener("click", () => {
+              hiddenTrackId.value = track.id;
+
+              trackInfoDiv.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 1em; margin-top: 15px;">
+                  <img src="${track.cover}" alt="cover" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
+                  <div>
+                    <p><strong>${track.title}</strong> par ${track.artist}</p>
+                    <audio controls src="${track.preview}"></audio>
+                  </div>
+                </div>
+              `;
+
+              resultsList.innerHTML = "";
+              searchInput.value = `${track.title} - ${track.artist}`;
+            });
+
+            resultsList.appendChild(li);
+          });
+        });
+    }, 400);
+  });
+</script>

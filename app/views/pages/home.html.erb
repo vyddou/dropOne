@@ -1,2 +1,21 @@
 <h1>Pages#home</h1>
-<p>Find me in app/views/pages/home.html.erb</p>
+
+<% if @last_post %>
+  <div style="border: 1px solid #ccc; padding: 15px; border-radius: 10px; max-width: 500px; margin: 30px auto; position: relative;">
+    <h3>Today's post :</h3>
+    <div style="display: flex; gap: 1em; align-items: center;">
+      <img src="<%= @last_post.track.cover_url %>" alt="Cover" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
+      <div>
+        <strong><%= @last_post.track.title %></strong> par <%= @last_post.track.artist_name %><br>
+        <p><%= @last_post.description %></p>
+        <% if @last_post.track.preview_url.present? %>
+          <audio controls src="<%= @last_post.track.preview_url %>"></audio>
+        <% end %>
+      </div>
+    </div>
+
+    <% if user_signed_in? && @last_post.user == current_user %>
+      <%= link_to 'Edit', edit_post_path(@last_post), style: "position: absolute; bottom: 10px; right: 10px; padding: 6px 12px; background-color: #007bff; color: white; border-radius: 4px; text-decoration: none;" %>
+    <% end %>
+  </div>
+<% end %>
