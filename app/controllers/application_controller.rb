@@ -5,10 +5,9 @@ class ApplicationController < ActionController::Base
   protected
 
   def configure_permitted_parameters
-    # Pour l'inscription (sign_up)
+ 
     devise_parameter_sanitizer.permit(:sign_up, keys: [:username, :first_name, :last_name])
 
-    # Pour la mise à jour du compte (account_update)
     devise_parameter_sanitizer.permit(:account_update, keys: [:username, :first_name, :last_name, :avatar_url, :bio]) # Ajoutez d'autres attributs que l'utilisateur peut modifier
   end
 end
