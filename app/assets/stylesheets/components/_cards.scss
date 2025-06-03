@@ -1,0 +1,12 @@
+.card {
+  // Les variables $card-bg, $card-border-color, $card-color
+  // sont déjà appliquées si vous les avez surchargées dans _variables.scss
+  transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+
+  &:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 10px 25px rgba(var(--bs-primary-rgb), 0.2); // Lueur subtile de la couleur primaire
+    // Ou une bordure qui s'illumine :
+    // border-color: var(--bs-primary);
+  }
+}

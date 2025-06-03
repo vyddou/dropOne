@@ -1,2 +1,59 @@
-<h1>Pages#home</h1>
-<p>Find me in app/views/pages/home.html.erb</p>
+<%# app/views/pages/home.html.erb %>
+
+<%# 1. Changement de 'container' à 'container-fluid' pour permettre plus de largeur %>
+<%#    Ajout de padding horizontal responsif (px-md-3 px-lg-4) pour que le contenu ne touche pas les bords sur les grands écrans %>
+<div class="container-fluid home-page-container mt-4 mb-5 px-md-3 px-lg-4">
+
+  <%# Le bloc de bienvenue reste tel que vous l'aviez (pas de "Bienvenue sur DropOne" ici) %>
+  <div class="greeting-container text-center mb-3 w-100" style="max-width: 700px;">
+    <% if user_signed_in? %>
+      <h1 class="greeting-title">Bonjour <%= current_user.username %>!</h1>
+      <p class="greeting-subtitle">Vous êtes connecté.</p>
+    <% else %>
+      <h1 class="greeting-title">Bonjour!</h1>
+      <p class="greeting-subtitle">Vous n'êtes pas connecté.</p>
+    <% end %>
+  </div>
+
+  <section class="daily-playlist-section w-100">
+    <%# Le titre "Propositions du Jour" reste tel quel (sans emojis) %>
+    <h2 class="section-title text-center mb-4"> Propositions du Jour </h2>
+
+    <% if user_signed_in? %>
+    <div class="add-track-button-container mb-5 w-100 text-center">
+      <%= link_to "Ajouter un morceau (bientôt disponible)", "#", class: "btn btn-primary btn-aurora-glow disabled" %>
+    </div>
+  <% end %>
+
+    <% if @todays_tracks.present? %>
+      <%# 2. Ajout d'un wrapper autour du carrousel. %>
+      <%# Ce wrapper sera stylisé en SCSS pour "casser" les limites du container-fluid et s'étendre. %>
+      <div class="main-carousel-wrapper">
+        <%# La classe js-flickity et l'attribut data-flickity ont été supprimés ici %>
+        <div class="main-carousel">
+
+          <% @todays_tracks.each do |track| %>
+            <div class="carousel-cell">
+              <div class="album-art-card">
+                <%# La taille du placeholder (250x250) est conservée. Le SCSS pour .carousel-cell déterminera la taille réelle. %>
+                <% cover_url = track.cover_url.presence || "https://placehold.co/250x250/0A0F1E/E0E0E0?text=#{track.title.truncate(15)}" %>
+                <%= image_tag cover_url, alt: "Cover de #{track.title}", class: "album-art-image" %>
+                <div class="album-art-overlay"></div>
+                <div class="album-art-info">
+                  <h3 class="track-title"><%= track.title %></h3>
+                  <p class="track-artist">par <%= track.artist %></p>
+                  <% if track.genre.present? %>
+                    <p class="track-genre"><%= track.genre.capitalize %></p>
+                  <% end %>
+                </div>
+              </div>
+              <%# Les boutons like/dislike ne sont pas ajoutés ici car vous avez demandé de ne modifier que la largeur %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% else %>
+      <p class="text-center text-muted mt-4">Aucune proposition pour aujourd'hui, revenez plus tard !</p>
+    <% end %>
+  </section>
+</div>
