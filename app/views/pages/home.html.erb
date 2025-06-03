@@ -19,7 +19,7 @@
 
     <% if user_signed_in? %>
     <div class="add-track-button-container mb-5 w-100 text-center">
-      <%= link_to "Ajouter un morceau (bientôt disponible)", "#", class: "btn btn-primary btn-aurora-glow disabled" %>
+     <%= link_to "Ajouter un morceau", new_post_path, class: "btn btn-primary btn-aurora-glow" %>
     </div>
   <% end %>
 
