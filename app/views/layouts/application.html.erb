@@ -3,6 +3,13 @@
   <head>
     <title>DropOne</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Favicon multiplateforme -->
+    <%= favicon_link_tag "favicon.ico" %>
+    <!-- Pour iPhone/Safari -->
+    <%= favicon_link_tag "apple-touch-icon.png", rel: "apple-touch-icon", type: "image/png" %>
+    <!-- Pour Android/Chrome -->
+    <%= favicon_link_tag "android-chrome-192x192.png", rel: "icon", type: "image/png", sizes: "192x192" %>
+    <%= favicon_link_tag "android-chrome-512x512.png", rel: "icon", type: "image/png", sizes: "512x512" %>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
