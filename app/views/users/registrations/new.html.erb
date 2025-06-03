@@ -1,0 +1,42 @@
+<%# app/views/users/registrations/new.html.erb %>
+
+<h2>Sign up</h2>
+
+<%= simple_form_for(resource, as: resource_name, url: registration_path(resource_name), data: { turbo: false }) do |f| %>
+  <%# J'ai ajouté data: { turbo: false } au cas où vous utiliseriez Turbo et pour assurer une soumission de formulaire classique avec Devise par défaut %>
+  <%= f.error_notification %>
+
+  <div class="form-inputs">
+    <%# --- AJOUT DES NOUVEAUX CHAMPS CI-DESSOUS --- %>
+    <%= f.input :username,
+                required: true,
+                input_html: { autocomplete: "username" } %>
+
+    <%= f.input :first_name,
+                required: true, <%# Mettez false si le prénom n'est pas obligatoire %>
+                input_html: { autocomplete: "given-name" } %>
+
+    <%= f.input :last_name,
+                required: true, <%# Mettez false si le nom n'est pas obligatoire %>
+                input_html: { autocomplete: "family-name" } %>
+    <%# --- FIN DES NOUVEAUX CHAMPS --- %>
+
+    <%= f.input :email,
+                required: true,
+                autofocus: true, <%# autofocus: true devrait être sur le premier champ du formulaire, par ex. username maintenant %>
+                input_html: { autocomplete: "email" }%>
+    <%= f.input :password,
+                required: true,
+                hint: ("#{@minimum_password_length} characters minimum" if @minimum_password_length),
+                input_html: { autocomplete: "new-password" } %>
+    <%= f.input :password_confirmation,
+                required: true,
+                input_html: { autocomplete: "new-password" } %>
+  </div>
+
+  <div class="form-actions">
+    <%= f.button :submit, "Sign up" %>
+  </div>
+<% end %>
+
+<%= render "users/shared/links" %>
