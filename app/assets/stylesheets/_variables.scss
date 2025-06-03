@@ -1,0 +1,49 @@
+// Palette "Aurore Numérique"
+$aurora-dark-bg: #0A0F1E;         // Fond principal très sombre (bleu/noir)
+$aurora-text: #E0E0E0;            // Texte principal clair
+$aurora-text-secondary: #A0A0A0;  // Texte secondaire plus discret
+
+// Couleurs d'accent pour les aurores et les éléments interactifs
+$aurora-violet: #5E23C3; //
+$aurora-violet-corrected: #5E23C3; // Un violet intense
+$aurora-blue: #00C6FF;           // Bleu électrique
+$aurora-magenta: #D40078;        // Magenta
+$aurora-teal: #00796B;           // Turquoise profond
+
+// Surcharge des variables Bootstrap
+// Couleurs de base
+$body-bg: $aurora-dark-bg;
+$body-color: $aurora-text;
+$link-color: $aurora-blue;
+$link-hover-color: lighten($aurora-blue, 15%);
+
+// Couleurs sémantiques (adaptez selon vos besoins)
+$primary: $aurora-blue;
+$secondary: $aurora-magenta;
+$success: $aurora-teal; // Ou une autre couleur appropriée
+// $info, $warning, $danger, $light, $dark ...
+
+// Surcharge pour les composants Bootstrap (optionnel, mais utile)
+$card-bg: rgba(20, 25, 40, 0.75); // Cartes légèrement transparentes sur le fond aurore
+$card-border-color: rgba($aurora-blue, 0.3);
+$card-color: $aurora-text;
+
+$input-bg: rgba(20, 25, 40, 0.9);
+$input-color: $aurora-text;
+$input-border-color: rgba($aurora-text-secondary, 0.5);
+$input-focus-border-color: $aurora-blue;
+$input-placeholder-color: $aurora-text-secondary;
+
+$btn-padding-y: .5rem;
+$btn-padding-x: 1.25rem;
+$btn-border-radius: .375rem; // ou var(--bs-border-radius) si vous préférez utiliser les CSS vars de BS5
+
+// Activer les ombres pour un effet de profondeur, même en mode sombre
+$enable-shadows: true;
+
+// ... autres variables que vous souhaitez surcharger (polices, espacements, etc.)
+
+$font-family-sans-serif: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+$font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+$headings-font-family: "Manrope", $font-family-sans-serif; // Pour les titres
