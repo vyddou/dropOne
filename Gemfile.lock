@@ -156,7 +156,6 @@ GEM
       sassc (~> 2.0)
     globalid (1.2.1)
       activesupport (>= 6.1)
-
     hashie (5.0.0)
     http-cookie (1.0.8)
       domain_name (~> 0.5)
@@ -164,7 +163,6 @@ GEM
       csv
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
-
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
     importmap-rails (2.1.0)
