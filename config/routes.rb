@@ -9,4 +9,23 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
+  
+  resources :playlists, only: [:index, :show, :new, :create, :destroy] do
+    member do
+      patch :rename
+    end
+  end
+
+  # resources :songmarks, only: [:destroy] do
+  resources :playlist_items, only: [:destroy] do
+    collection do
+      post :like_all_songs
+      post :dislike_all_songs
+    end
+    member do
+      post :like
+      post :dislike
+    end
+  end
+
 end

@@ -9,11 +9,14 @@ class User < ApplicationRecord
   has_many :comments, dependent: :destroy
   has_many :tracks, dependent: :destroy
   has_many :playlists, dependent: :destroy
+  has_many :playlist_items, through: :playlists
   has_many :votes, dependent: :destroy
   has_many :messages, dependent: :destroy
 
   has_many :conversation_participants, dependent: :destroy
   has_many :conversations, through: :conversation_participants
+
+
 
   # Système de "follow"
   # L'utilisateur "suit" d'autres utilisateurs (active)
