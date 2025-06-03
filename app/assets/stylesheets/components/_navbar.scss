@@ -1,12 +1,141 @@
-.navbar-lewagon {
-  justify-content: space-between;
-  background: white;
-}
+// app/assets/stylesheets/components/_navbar.scss
+@use "sass:color";
 
-.navbar-lewagon .navbar-collapse {
-  flex-grow: 0;
-}
+.navbar-aurora {
+  // Fond plus sombre et moins transparent pour mieux s'harmoniser avec un logo sur fond sombre
+  background-color: rgba(scale-color($aurora-dark-bg, $lightness: 3%), 0.95); // Encore plus sombre et opaque
+  backdrop-filter: blur(10px); // Flou un peu plus prononcé
+  -webkit-backdrop-filter: blur(10px);
 
-.navbar-lewagon .navbar-brand img {
-  width: 40px;
+  // Ajuster le padding vertical pour accommoder les éléments de 72px
+  // On met un padding minimal, la hauteur sera surtout définie par le logo/avatar
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+
+  // Supprimer l'ancienne bordure bleue
+  // border-bottom: 1px solid rgba(var(--bs-primary-rgb), 0.15); // Ancienne ligne à supprimer
+
+  // Nouvelle box-shadow pour détacher la navbar du contenu
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35); // Ombre plus prononcée
+  // Alternative : une ombre colorée subtile avec votre couleur primaire
+  // box-shadow: 0 3px 15px rgba(var(--bs-primary-rgb), 0.1);
+
+  // Styles pour la marque
+  .navbar-brand {
+    padding-top: 0; // Moins de padding si l'image est grande
+    padding-bottom: 0;
+    margin-right: 1rem; // Espace à droite du logo
+    display: flex; // Utile pour aligner le logo et le texte de la marque si vous en ajoutez
+    align-items: center; // Centre verticalement le contenu du navbar-brand
+
+    // Styles pour l'image du logo
+    .navbar-brand-logo-image {
+      height: 72px;             // Taille souhaitée (identique à l'avatar)
+      width: 72px;              // Pour forcer un conteneur carré qui deviendra un cercle
+      border-radius: 50%;       // Rend l'image ronde
+      object-fit: cover;        // Assure que l'image remplit le cercle sans être déformée
+                                // (peut rogner l'image si elle n'est pas carrée à l'origine)
+      background-color: $aurora-dark-bg; // Couleur de fond si l'image a des transparences ou si object-fit: contain est utilisé
+      // Optionnel: si vous voulez une petite bordure autour du logo circulaire
+      // border: 1px solid rgba(var(--bs-primary-rgb), 0.2);
+    }
+
+    // Styles pour le texte de la marque (si vous avez un span avec du texte à côté du logo)
+    // Par exemple, si vous aviez <span class="navbar-brand-text ms-2">DropOne</span>
+    .navbar-brand-text { // Classe optionnelle pour le texte si vous en mettez à côté du logo
+      color: var(--bs-primary);
+      font-family: $headings-font-family;
+      font-weight: 700;
+      font-size: 1.6rem; // Ajustez si vous avez du texte
+      transition: color 0.3s ease, text-shadow 0.3s ease;
+    }
+
+    // Effet de survol sur le lien de la marque (affectera .navbar-brand-text)
+    &:hover, &:focus {
+      .navbar-brand-text { // Cible le texte uniquement si vous en avez
+        color: scale-color($primary, $lightness: 15%);
+        text-shadow: 0 0 8px rgba(var(--bs-primary-rgb), 0.5);
+      }
+      // Si vous voulez un effet sur l'image du logo au survol du lien .navbar-brand
+      // .navbar-brand-logo-image {
+      //   transform: scale(1.05); // Léger zoom par exemple
+      //   box-shadow: 0 0 10px rgba(var(--bs-primary-rgb), 0.5); // Lueur sur l'image
+      // }
+    }
+  }
+
+  .navbar-nav {
+    .nav-link {
+      color: $aurora-text-secondary;
+      font-weight: 500;
+      padding: 0.75rem 1rem; // Ajustez ce padding pour l'alignement vertical des textes des liens
+      margin: 0 0.25rem;
+      position: relative;
+      transition: color 0.3s ease;
+      border-radius: $btn-border-radius;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0.5rem; // Ajustez si le padding du lien change
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 2px;
+        background-color: var(--bs-primary);
+        transition: width 0.3s ease-out;
+        border-radius: 1px;
+      }
+
+      &:hover, &:focus {
+        color: $aurora-text;
+        background-color: rgba(var(--bs-primary-rgb), 0.1);
+        &::after {
+          width: 60%;
+        }
+      }
+
+      &.active {
+        color: var(--bs-primary);
+        font-weight: 600;
+        &::after {
+          width: 80%;
+          background-color: var(--bs-primary);
+        }
+      }
+    }
+  }
+
+  .navbar-toggler {
+    border-color: rgba(var(--bs-primary-rgb), 0.3);
+    transition: box-shadow 0.2s ease-in-out;
+    padding: 0.5rem 0.75rem;
+
+    &:focus {
+      box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.4);
+    }
+  }
+
+  .dropdown-menu {
+    background-color: scale-color($aurora-dark-bg, $lightness: 10%);
+    border: 1px solid rgba(var(--bs-primary-rgb), 0.15);
+    border-radius: $border-radius;
+    margin-top: 0.5rem;
+    padding: 0.5rem 0;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+
+    .dropdown-item {
+      color: $aurora-text-secondary;
+      padding: 0.6rem 1.25rem;
+      transition: background-color 0.2s ease, color 0.2s ease;
+
+      &:hover, &:focus {
+        background-color: rgba(var(--bs-primary-rgb), 0.15);
+        color: var(--bs-primary);
+      }
+    }
+    .dropdown-divider {
+      border-top: 1px solid rgba(var(--bs-primary-rgb), 0.1);
+    }
+  }
 }

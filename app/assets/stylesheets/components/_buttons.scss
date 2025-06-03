@@ -1,0 +1,93 @@
+.btn-track-action {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  transition: all 0.25s ease-in-out;
+  border: 1px solid transparent;
+  background-color: transparent;
+  margin-bottom: 0.3rem;
+  display: block;
+  width: 100%;
+  text-align: center;
+  text-decoration: none;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.btn-aurora-like {
+  @extend .btn-track-action;
+  border-color: $primary;
+  color: $primary;
+  box-shadow: 0 0 3px rgba($primary, 0.2);
+
+  &:hover, &:focus {
+    background-color: rgba($primary, 0.15);
+    color: scale-color($primary, $lightness: 25%);
+    border-color: scale-color($primary, $lightness: 10%);
+    box-shadow: 0 0 10px rgba($primary, 0.5),
+                0 0 15px rgba($primary, 0.3);
+    transform: translateY(-1px);
+  }
+}
+
+.btn-aurora-dislike {
+  @extend .btn-track-action;
+  border-color: $secondary;
+  color: $secondary;
+  box-shadow: 0 0 3px rgba($secondary, 0.2);
+
+  &:hover, &:focus {
+    background-color: rgba($secondary, 0.15);
+    color: scale-color($secondary, $lightness: 25%);
+    border-color: scale-color($secondary, $lightness: 10%);
+    box-shadow: 0 0 10px rgba($secondary, 0.4);
+    transform: translateY(-1px);
+  }
+}
+
+.btn-aurora-delete {
+  @extend .btn-track-action;
+  background-color: rgba($secondary, 0.85);
+    color: $aurora-dark-bg;
+    border-color: $secondary;
+    box-shadow: 0 0 12px rgba($secondary, 0.6),
+                0 0 18px rgba($secondary, 0.4);
+
+  &:hover, &:focus {
+    // État au survol : fond plus plein, texte clair, glow important
+    background-color: rgba($secondary, 0.85); // Fond magenta (comme vous aviez, c'est bien)
+    color: $aurora-text; // Texte clair (votre variable pour le texte principal sur fond sombre)
+    border-color: $secondary; // La bordure peut rester de la même couleur ou s'intensifier
+    // Glow plus important : augmentez le spread (3ème valeur) et l'opacité (4ème valeur)
+    box-shadow: 0 0 15px rgba($secondary, 0.7), // Lueur plus proche et plus intense
+                0 0 25px rgba($secondary, 0.5), // Lueur plus large et diffuse
+                0 0 35px rgba($secondary, 0.3); // Lueur encore plus large et subtile
+    transform: translateY(-2px) scale(1.02); // Léger soulèvement et agrandissement
+  }
+}
+
+
+
+.btn-aurora-glow {
+  transition: all 0.3s ease-in-out;
+
+  &:hover, &:focus {
+
+    box-shadow: 0 0 10px var(--bs-primary),
+                0 0 20px rgba(var(--bs-primary-rgb), 0.5),
+                0 0 30px rgba(var(--bs-primary-rgb), 0.3);
+    transform: translateY(-2px);
+  }
+}
+
+
+.btn.btn-secondary.btn-aurora-glow {
+  &:hover, &:focus {
+    box-shadow: 0 0 10px var(--bs-secondary),
+                0 0 20px rgba(var(--bs-secondary-rgb), 0.5),
+                0 0 30px rgba(var(--bs-secondary-rgb), 0.3);
+  }
+}
