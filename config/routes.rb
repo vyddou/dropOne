@@ -1,10 +1,9 @@
-# config/routes.rb
 Rails.application.routes.draw do
   devise_for :users
   root to: "pages#home"
 
   resources :users, only: [:show] do # Pour user_path(user)
-      member do
+    member do
       post :follow
       delete :unfollow
     end
@@ -36,9 +35,13 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :conversations, only: [:index, :show, :create,:destroy] do
+  resources :conversations, only: [:index, :show, :create, :destroy] do
     resources :messages, only: [:create]
   end
+
+  # Routes pour la recherche
+  get 'search', to: 'search#index', as: 'search'
+  get 'search_suggestions', to: 'search#suggestions'
 
   get "up" => "rails/health#show", as: :rails_health_check
 end
