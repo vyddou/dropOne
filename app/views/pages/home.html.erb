@@ -20,82 +20,75 @@
     </div>
   <% end %>
 
-  <%# Section pour les posts de l'application du jour, triés par popularité %>
-  <section class="todays-app-posts-section w-100 mb-5">
-    <h2 class="section-title text-center mb-4">🔥 Les Pépites du Jour (par la communauté) 🔥</h2>
-    <% if @todays_app_posts_sorted.present? %>
-      <div class="row justify-content-center">
-        <% @todays_app_posts_sorted.each_with_index do |post, index| %>
-          <div class="col-md-8 col-lg-6 mb-4">
-            <div class="card app-post-card h-100 shadow-sm">
-              <div class="row g-0 h-100">
-                <div class="col-md-4">
-                  <% app_post_cover_url = post.track&.cover_url.presence || "https://placehold.co/200x200/1a1a1a/ffffff?text=#{post.track&.title&.truncate(10)}" %>
-                  <%= image_tag app_post_cover_url, alt: "Pochette de #{post.track&.title}", class: "img-fluid rounded-start h-100", style: "object-fit: cover;" %>
-                </div>
-                <div class="col-md-8 d-flex flex-column">
-                  <div class="card-body d-flex flex-column flex-grow-1">
-                    <h5 class="card-title">
-                      <%= link_to post.track&.title, post_path(post), class: "text-decoration-none" %>
-                      <span class="badge bg-primary rounded-pill float-end">#<%= index + 1 %></span>
-                    </h5>
-                    <p class="card-text text-muted small">par <%= post.track&.artist_name %></p>
-                    <% if post.description.present? %>
-                      <p class="card-text description-preview"><small><%= truncate(post.description, length: 100) %></small></p>
-                    <% end %>
-                    <p class="card-text mt-auto">
-                      <small class="text-muted">
-                        Posté par <%= link_to post.user.username, user_path(post.user), class: "text-decoration-none" %>
-                        le <%= l(post.created_at, format: :short) %>
-                      </small>
-                    </p>
-                    <div class="d-flex justify-content-between align-items-center mt-2">
-                      <div>
-                        <%# Placeholder pour les boutons de vote - vous devrez implémenter cette logique %>
-                        <%= button_to "🔥", vote_post_path(post, vote_type: 'hot'), method: :post, class: "btn btn-sm btn-outline-success me-1", title: "Hot" %>
-                        <%= button_to "❄️", vote_post_path(post, vote_type: 'cold'), method: :post, class: "btn btn-sm btn-outline-info", title: "Cold" %>
-                      </div>
-                      <span class="fw-bold">Score: <%= post.net_votes %></span>
-                    </div>
-                    <% if user_signed_in? && post.user == current_user %>
-                      <%= link_to 'Modifier', edit_post_path(post), class: "btn btn-sm btn-outline-secondary mt-2 align-self-start" %>
-                    <% end %>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        <% end %>
-      </div>
-    <% else %>
-      <p class="text-center text-muted mt-4">Aucun morceau partagé par la communauté aujourd'hui. Soyez le premier !</p>
-    <% end %>
-  </section>
+  <%# Section pour le Carrousel Unifié (Posts de l'app et Suggestions Deezer) %>
+  <section class="unified-carousel-section w-100">
+    <h2 class="section-title text-center mb-4">🎶 Les Sons du Moment 🎶</h2>
 
-  <%# Section pour les suggestions Deezer (carrousel) %>
-  <section class="deezer-suggestions-section w-100">
-    <h2 class="section-title text-center mb-4">🎶 Suggestions Electro Goa / Mental (par Deezer) 🎶</h2>
-    <% if @todays_tracks.present? %>
+    <%# Ligne de débogage pour voir le nombre d'items %>
+    <p class="text-center text-muted small">Debug: Nombre d'items dans le carrousel: <%= @carousel_items.try(:count) || 0 %></p>
+
+    <% if @carousel_items.present? %>
       <div class="main-carousel-wrapper">
         <div class="main-carousel"> <%# C'est sur cette classe que vous initialiserez Swiper.js %>
-          <% @todays_tracks.each do |track| %>
+          <% @carousel_items.each_with_index do |item, index| %>
             <div class="carousel-cell"> <%# Classe pour les slides Swiper %>
-              <div class="album-art-card">
-                <% deezer_cover_url = track.cover_url.presence || "https://placehold.co/250x250/0A0F1E/E0E0E0?text=#{track.title.truncate(15)}" %>
-                <%= image_tag deezer_cover_url, alt: "Pochette de #{track.title}", class: "album-art-image" %>
+              <div class="album-art-card h-100 d-flex flex-column">
+                <%# Pochette %>
+                <% cover_url = item.cover_url.presence || "https://placehold.co/250x250/0A0F1E/E0E0E0?text=#{item.title&.truncate(15)}" %>
+                <%= image_tag cover_url, alt: "Pochette de #{item.title}", class: "album-art-image" %>
+
                 <div class="album-art-overlay"></div>
-                <div class="album-art-info">
-                  <h3 class="track-title"><%= track.title %></h3>
-                  <p class="track-artist">par <%= track.artist %></p>
-                  <% if track.genre.present? %>
-                    <p class="track-genre"><%= track.genre.capitalize %></p>
+
+                <div class="album-art-info d-flex flex-column flex-grow-1 p-3">
+                  <%# Titre et Artiste %>
+                  <h3 class="track-title mb-1"><%= item.title %></h3>
+                  <p class="track-artist text-muted small mb-2">par <%= item.artist %></p>
+
+                  <%# Genre (si présent) %>
+                  <% if item.genre.present? %>
+                    <p class="track-genre small mb-2"><span class="badge bg-secondary"><%= item.genre.capitalize %></span></p>
                   <% end %>
-                  <% if track.link_deezer.present? %>
-                    <p class="track-deezer-link mt-2">
-                      <a href="<%= track.link_deezer %>" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-light">
-                        Écouter sur Deezer
+
+                  <%# Description (si c'est un post de l'app et qu'il y a une description) %>
+                  <% if item.origin == :app && item.description.present? %>
+                    <p class="card-text description-preview small mb-2"><%= truncate(item.description, length: 70) %></p>
+                  <% end %>
+
+                  <%# Informations spécifiques aux posts de l'application (utilisateur, votes, etc.) %>
+                  <% if item.origin == :app && item.user && item.db_post_object %>
+                    <div class="mt-auto">
+                      <p class="card-text mb-1">
+                        <small class="text-muted">
+                          Posté par <%= link_to item.user.username, user_path(item.user), class: "text-decoration-none" %>
+                        </small>
+                      </p>
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                          <%= button_to "🔥", vote_post_path(item.db_post_object, vote_type: 'hot'), method: :post, class: "btn btn-sm btn-outline-success me-1", title: "Hot", form_class: "d-inline" %>
+                          <%= button_to "❄️", vote_post_path(item.db_post_object, vote_type: 'cold'), method: :post, class: "btn btn-sm btn-outline-info", title: "Cold", form_class: "d-inline" %>
+                        </div>
+                        <span class="fw-bold small">Score: <%= item.net_votes %></span>
+                      </div>
+                      <% if user_signed_in? && item.user == current_user %>
+                        <%= link_to 'Modifier', edit_post_path(item.db_post_object), class: "btn btn-sm btn-outline-secondary mt-1" %>
+                      <% end %>
+                    </div>
+                  <% end %>
+
+                  <%# Lien "Écouter sur Deezer" %>
+                  <% if item.deezer_link.present? %>
+                    <p class="track-deezer-link mt-2 <%= 'mt-auto' if item.origin != :app && item.preview_url.blank? %>">
+                      <a href="<%= item.deezer_link %>" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-info">
+                        <i class="bi bi-play-circle-fill"></i> Deezer  <%# Assurez-vous d'avoir Bootstrap Icons %>
                       </a>
                     </p>
+                  <% end %>
+
+                  <%# Extrait audio %>
+                  <% if item.preview_url.present? %>
+                    <div class="mt-2 <%= 'mt-auto' if item.origin != :app %>">
+                      <audio controls controlsList="nodownload noplaybackrate" src="<%= item.preview_url %>" style="width: 100%; height: 40px;"></audio>
+                    </div>
                   <% end %>
                 </div>
               </div>
@@ -104,7 +97,7 @@
         </div>
       </div>
     <% else %>
-      <p class="text-center text-muted mt-4">Impossible de charger les suggestions Deezer pour le moment.</p>
+      <p class="text-center text-muted mt-4">Aucun son à découvrir pour le moment. Revenez plus tard ou soyez le premier à partager !</p>
     <% end %>
   </section>
 
