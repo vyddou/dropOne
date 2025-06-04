@@ -1,28 +1,20 @@
+# config/routes.rb
 Rails.application.routes.draw do
+
+
   devise_for :users
   root to: "pages#home"
 
-    resources :playlists, only: [:index, :show, :new, :create, :destroy] do
-  member do
-    patch :rename
-  end
-end
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  resources :users, only: [:show] # user path
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
-  get "up" => "rails/health#show", as: :rails_health_check
-
-  # Defines the root path route ("/")
-  # root "posts#index"
-  
+  # Définition unique pour les playlists
   resources :playlists, only: [:index, :show, :new, :create, :destroy] do
     member do
       patch :rename
     end
   end
 
-  # resources :songmarks, only: [:destroy] do
+
   resources :playlist_items, only: [:destroy] do
     collection do
       post :like_all_songs
@@ -33,7 +25,21 @@ end
       post :dislike
     end
   end
-  resources :posts, only: [:new, :create, :edit, :update]
+
+
+  resources :posts, only: [:new, :create, :edit, :update, :show] do # Ajout de :show ici
+    member do
+      post 'vote' # pour une requête POST vers /posts/:id/vote
+    end
+  end
+
+
   get 'posts/deezer_search', to: 'posts#deezer_search'
 
+  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
+  # Can be used by load balancers and uptime monitors to verify that the app is live.
+  get "up" => "rails/health#show", as: :rails_health_check
+
+  # Defines the root path route ("/")
+  # root "posts#index" # Commenté car votre root est déjà défini
 end
