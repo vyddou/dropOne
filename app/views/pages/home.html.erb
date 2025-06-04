@@ -20,76 +20,88 @@
     </div>
   <% end %>
 
-  <%# Section pour le Carrousel Unifié (Posts de l'app et Suggestions Deezer) %>
   <section class="unified-carousel-section w-100">
     <h2 class="section-title text-center mb-4">🎶 Les Sons du Moment 🎶</h2>
-
-    <%# Ligne de débogage pour voir le nombre d'items %>
-    <p class="text-center text-muted small">Debug: Nombre d'items dans le carrousel: <%= @carousel_items.try(:count) || 0 %></p>
+    <%# <p class="text-center text-muted small">Debug: Nombre d'items dans le carrousel: <%= @carousel_items.try(:count) || 0 %></p> %>
 
     <% if @carousel_items.present? %>
       <div class="main-carousel-wrapper">
-        <div class="main-carousel"> <%# C'est sur cette classe que vous initialiserez Swiper.js %>
+        <div class="main-carousel"> <%# Pour Swiper.js %>
           <% @carousel_items.each_with_index do |item, index| %>
-            <div class="carousel-cell"> <%# Classe pour les slides Swiper %>
+            <div class="carousel-cell">
               <div class="album-art-card h-100 d-flex flex-column">
-                <%# Pochette %>
                 <% cover_url = item.cover_url.presence || "https://placehold.co/250x250/0A0F1E/E0E0E0?text=#{item.title&.truncate(15)}" %>
                 <%= image_tag cover_url, alt: "Pochette de #{item.title}", class: "album-art-image" %>
-
                 <div class="album-art-overlay"></div>
-
                 <div class="album-art-info d-flex flex-column flex-grow-1 p-3">
-                  <%# Titre et Artiste %>
                   <h3 class="track-title mb-1"><%= item.title %></h3>
                   <p class="track-artist text-muted small mb-2">par <%= item.artist %></p>
 
-                  <%# Genre (si présent) %>
                   <% if item.genre.present? %>
                     <p class="track-genre small mb-2"><span class="badge bg-secondary"><%= item.genre.capitalize %></span></p>
                   <% end %>
 
-                  <%# Description (si c'est un post de l'app et qu'il y a une description) %>
                   <% if item.origin == :app && item.description.present? %>
                     <p class="card-text description-preview small mb-2"><%= truncate(item.description, length: 70) %></p>
                   <% end %>
 
-                  <%# Informations spécifiques aux posts de l'application (utilisateur, votes, etc.) %>
-                  <% if item.origin == :app && item.user && item.db_post_object %>
-                    <div class="mt-auto">
+                  <%# Section des votes et infos utilisateur %>
+                  <div class="mt-auto"> <%# Pousse le contenu suivant vers le bas %>
+                    <% if item.origin == :app && item.user && item.db_post_object %>
                       <p class="card-text mb-1">
                         <small class="text-muted">
                           Posté par <%= link_to item.user.username, user_path(item.user), class: "text-decoration-none" %>
                         </small>
                       </p>
-                      <div class="d-flex justify-content-between align-items-center mb-2">
-                        <div>
-                          <%= button_to "🔥", vote_post_path(item.db_post_object, vote_type: 'hot'), method: :post, class: "btn btn-sm btn-outline-success me-1", title: "Hot", form_class: "d-inline" %>
-                          <%= button_to "❄️", vote_post_path(item.db_post_object, vote_type: 'cold'), method: :post, class: "btn btn-sm btn-outline-info", title: "Cold", form_class: "d-inline" %>
-                        </div>
-                        <span class="fw-bold small">Score: <%= item.net_votes %></span>
+                    <% end %>
+
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <div>
+                        <% if item.origin == :app && item.db_post_object %>
+                          <%# Boutons pour un post existant de l'application %>
+                          <%= button_to vote_post_path(item.db_post_object, vote_type: 'hot'), method: :post, class: "btn btn-sm btn-outline-light border-0 p-1 me-2", title: "J'aime", form_class: "d-inline" do %>
+                            <i class="bi bi-hand-thumbs-up-fill" style="font-size: 1.3rem; color: #198754;"></i> <%# Vert Bootstrap %>
+                          <% end %>
+                          <%= button_to vote_post_path(item.db_post_object, vote_type: 'cold'), method: :post, class: "btn btn-sm btn-outline-light border-0 p-1", title: "Je n'aime pas", form_class: "d-inline" do %>
+                            <i class="bi bi-hand-thumbs-down-fill" style="font-size: 1.3rem; color: #dc3545;"></i> <%# Rouge Bootstrap %>
+                          <% end %>
+                        <% elsif item.origin == :deezer %>
+                          <%# Boutons pour une suggestion Deezer (crée un post et vote) %>
+                          <%= button_to create_post_and_vote_on_track_path(item.id_for_links, vote_type: 'hot'), method: :post, class: "btn btn-sm btn-outline-light border-0 p-1 me-2", title: "J'aime et ajoute ce son", form_class: "d-inline" do %>
+                            <i class="bi bi-hand-thumbs-up" style="font-size: 1.3rem; color: #198754;"></i> <%# Pouce non rempli %>
+                          <% end %>
+                          <%= button_to create_post_and_vote_on_track_path(item.id_for_links, vote_type: 'cold'), method: :post, class: "btn btn-sm btn-outline-light border-0 p-1", title: "Je n'aime pas ce son", form_class: "d-inline" do %>
+                            <i class="bi bi-hand-thumbs-down" style="font-size: 1.3rem; color: #dc3545;"></i> <%# Pouce non rempli %>
+                          <% end %>
+                        <% end %>
                       </div>
-                      <% if user_signed_in? && item.user == current_user %>
-                        <%= link_to 'Modifier', edit_post_path(item.db_post_object), class: "btn btn-sm btn-outline-secondary mt-1" %>
+                      <%# Affiche le score pour les posts de l'app %>
+                      <% if item.origin == :app %>
+                        <span class="fw-bold small">Score: <%= item.net_votes %></span>
+                      <% else %>
+                        <span class="small text-muted">&nbsp;</span> <%# Espace pour alignement %>
                       <% end %>
                     </div>
-                  <% end %>
 
-                  <%# Lien "Écouter sur Deezer" %>
+                    <% if item.origin == :app && user_signed_in? && item.user == current_user && item.db_post_object %>
+                      <%= link_to 'Modifier', edit_post_path(item.db_post_object), class: "btn btn-sm btn-outline-secondary mt-1" %>
+                    <% end %>
+                  </div>
+
+                  <%# Lien Deezer et Extrait Audio (poussés vers le bas si possible) %>
                   <% if item.deezer_link.present? %>
-                    <p class="track-deezer-link mt-2 <%= 'mt-auto' if item.origin != :app && item.preview_url.blank? %>">
-                      <a href="<%= item.deezer_link %>" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-info">
-                        <i class="bi bi-play-circle-fill"></i> Deezer  <%# Assurez-vous d'avoir Bootstrap Icons %>
+                    <p class="track-deezer-link mt-2 <%= 'mt-auto' if item.preview_url.blank? %>">
+                      <a href="<%= item.deezer_link %>" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-info w-100">
+                        <i class="bi bi-play-circle-fill"></i> Écouter sur Deezer
                       </a>
                     </p>
                   <% end %>
-
-                  <%# Extrait audio %>
                   <% if item.preview_url.present? %>
-                    <div class="mt-2 <%= 'mt-auto' if item.origin != :app %>">
-                      <audio controls controlsList="nodownload noplaybackrate" src="<%= item.preview_url %>" style="width: 100%; height: 40px;"></audio>
+                    <div class="mt-2 <%= 'mt-auto' unless item.deezer_link.present? %>">
+                      <audio controls controlsList="nodownload noplaybackrate" src="<%= item.preview_url %>" style="width: 100%; height: 35px;"></audio>
                     </div>
                   <% end %>
+
                 </div>
               </div>
             </div>

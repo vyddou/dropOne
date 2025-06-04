@@ -1,19 +1,17 @@
 # config/routes.rb
 Rails.application.routes.draw do
-  # Supprimez "get 'users/show'" si vous avez "resources :users, only: [:show]" ci-dessous
-  # get 'users/show'
-
   devise_for :users
   root to: "pages#home"
 
-  resources :users, only: [:show] # Pour user_path(user)
+    get 'posts/deezer_search', to: 'posts#deezer_search'
+
+  resources :users, only: [:show]
 
   resources :playlists, only: [:index, :show, :new, :create, :destroy] do
     member do
       patch :rename
     end
   end
-  # La deuxième définition de "resources :playlists" a été supprimée.
 
   resources :playlist_items, only: [:destroy] do
     collection do
@@ -26,16 +24,16 @@ Rails.application.routes.draw do
     end
   end
 
-  # Route spécifique pour la recherche Deezer avant la ressource posts générale
-  get 'posts/deezer_search', to: 'posts#deezer_search'
-
-  # Ressources pour les posts, incluant :show pour post_path et la route de vote
   resources :posts, only: [:new, :create, :edit, :update, :show] do
     member do
-      post 'vote' # Crée vote_post_path(post) pour POST /posts/:id/vote
+      post 'vote' # Pour voter sur un post existant
     end
   end
 
-  get "up" => "rails/health#show", as: :rails_health_check
+  # Route pour créer un post à partir d'un track Deezer et voter
+  # :id ici sera le deezer_track_id
+  post 'tracks/:id/create_post_and_vote', to: 'posts#create_post_from_deezer_and_vote', as: 'create_post_and_vote_on_track'
 
+
+  get "up" => "rails/health#show", as: :rails_health_check
 end
