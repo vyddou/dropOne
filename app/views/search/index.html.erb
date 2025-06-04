@@ -1,0 +1,116 @@
+<h1>Recherche</h1>
+
+<%= form_with url: search_path, method: :get, local: true, id: "search-form" do |form| %>
+  <div class="mb-3 position-relative">
+    <%= form.text_field :query, value: params[:query], placeholder: "Rechercher un morceau, playlist ou utilisateur", class: "form-control", autocomplete: "off", id: "search-input" %>
+
+    <!-- Liste des suggestions -->
+    <ul id="suggestions-list" class="list-group position-absolute" style="z-index: 1000; width: 100%; display: none;"></ul>
+  </div>
+  <%= form.submit "Rechercher", class: "btn btn-primary" %>
+<% end %>
+
+<% if @results.present? %>
+  <h2>Résultats :</h2>
+
+  <% if @results[:tracks].any? %>
+    <h3>Morceaux</h3>
+    <ul>
+      <% @results[:tracks].each do |post| %>
+        <li><%= link_to post.track.title, post_path(post) %></li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <% if @results[:playlists].any? %>
+    <h3>Playlists</h3>
+    <ul>
+      <% @results[:playlists].each do |playlist| %>
+        <li><%= link_to playlist.name, playlist_path(playlist) %></li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <% if @results[:users].any? %>
+    <h3>Utilisateurs</h3>
+    <ul>
+      <% @results[:users].each do |user| %>
+        <li><%= link_to user.username, user_path(user) %></li>
+      <% end %>
+    </ul>
+  <% end %>
+<% end %>
+
+<% if @deezer_results.present? && @deezer_results.any? %>
+  <h2>Résultats Deezer :</h2>
+  <ul>
+    <% @deezer_results.each do |item| %>
+      <li>
+        <strong><%= item["title"] %></strong> par <%= item["artist"]["name"] %>
+        <% if item["album"] && item["album"]["cover_medium"] %>
+          <br>
+          <%= image_tag item["album"]["cover_medium"], alt: item["album"]["title"], style: "width: 100px; height: 100px; object-fit: cover;" %>
+        <% end %>
+        <% if item["link"] %>
+          <br>
+          <a href="<%= item["link"] %>" target="_blank" rel="noopener noreferrer">Écouter sur Deezer</a>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById('search-input');
+  const suggestionsList = document.getElementById('suggestions-list');
+
+  input.addEventListener('input', function() {
+    const query = this.value.trim();
+    console.log('Input détecté:', query);
+
+    if (query.length < 1) {
+      suggestionsList.style.display = 'none';
+      suggestionsList.innerHTML = '';
+      return;
+    }
+
+    fetch(`/search_suggestions?query=${encodeURIComponent(query)}`)
+      .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
+      })
+      .then(data => {
+        console.log('Suggestions reçues:', data);
+
+        if (data.length > 0) {
+          suggestionsList.innerHTML = data.map(item =>
+            `<li class="list-group-item suggestion-item" style="cursor:pointer;">${item}</li>`
+          ).join('');
+          suggestionsList.style.display = 'block';
+
+          document.querySelectorAll('.suggestion-item').forEach(li => {
+            li.addEventListener('click', () => {
+              input.value = li.textContent;
+              suggestionsList.style.display = 'none';
+            });
+          });
+        } else {
+          suggestionsList.style.display = 'none';
+          suggestionsList.innerHTML = '';
+        }
+      })
+      .catch(error => {
+        console.error('Erreur lors de la récupération des suggestions:', error);
+        suggestionsList.style.display = 'none';
+        suggestionsList.innerHTML = '';
+      });
+  });
+
+  document.addEventListener('click', e => {
+    if (!e.target.closest('#search-input')) {
+      suggestionsList.style.display = 'none';
+    }
+  });
+});
+</script>

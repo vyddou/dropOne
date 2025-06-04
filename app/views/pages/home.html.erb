@@ -13,102 +13,119 @@
     <% end %>
   </div>
 
-  <%# Bouton pour ajouter un morceau si l'utilisateur est connecté %>
+  <%# --- BOUTON AJOUTER UN MORCEAU RÉINTÉGRÉ --- %>
   <% if user_signed_in? %>
     <div class="add-track-button-container mt-4 mb-5 w-100 text-center">
      <%= link_to "Ajouter un morceau", new_post_path, class: "btn btn-primary btn-aurora-glow" %>
     </div>
   <% end %>
+  <%# --- FIN DU BOUTON --- %>
 
-  <%# Section pour les posts de l'application du jour, triés par popularité %>
-  <section class="todays-app-posts-section w-100 mb-5">
-    <h2 class="section-title text-center mb-4">🔥 Les Pépites du Jour (par la communauté) 🔥</h2>
-    <% if @todays_app_posts_sorted.present? %>
-      <div class="row justify-content-center">
-        <% @todays_app_posts_sorted.each_with_index do |post, index| %>
-          <div class="col-md-8 col-lg-6 mb-4">
-            <div class="card app-post-card h-100 shadow-sm">
-              <div class="row g-0 h-100">
-                <div class="col-md-4">
-                  <% app_post_cover_url = post.track&.cover_url.presence || "https://placehold.co/200x200/1a1a1a/ffffff?text=#{post.track&.title&.truncate(10)}" %>
-                  <%= image_tag app_post_cover_url, alt: "Pochette de #{post.track&.title}", class: "img-fluid rounded-start h-100", style: "object-fit: cover;" %>
+  <section class="unified-carousel-section w-100">
+  <h2 class="section-title text-center mb-4">🎶 Les Sons du Moment 🎶</h2>
+
+  <% if @carousel_items.present? %>
+    <div class="main-carousel-wrapper" data-controller="audio-player">
+      <div class="main-carousel"> <%# Pour Swiper.js %>
+        <% @carousel_items.each_with_index do |item, index| %>
+          <div class="carousel-cell" data-preview-url="<%= item.preview_url %>">
+            <div class="album-art-card-container">
+              <div class="album-art-visual-wrapper">
+                <% cover_url = item.cover_url.presence || "https://placehold.co/280x280/0A0F1E/E0E0E0?text=#{item.title&.truncate(15)}" %>
+                <%= image_tag cover_url, alt: "Pochette de #{item.title}", class: "album-cover-image" %>
+
+                <%# Bouton Play superposé %>
+                <% if item.preview_url.present? %>
+                  <button class="btn-play-on-cover" aria-label="Lire l'extrait"
+                    data-action="click->audio-player#togglePlay">
+                    <i class="bi bi-play-fill"></i>
+                  </button>
+                <% end %>
+
+                <%# Texte Titre/Artiste superposé en bas à gauche %>
+                <div class="album-cover-text-overlay">
+                  <h5 class="album-title-on-cover" title="<%= item.title %>"><%= item.title %></h5>
+                  <p class="album-artist-on-cover" title="<%= item.artist %>"><%= item.artist %></p>
                 </div>
-                <div class="col-md-8 d-flex flex-column">
-                  <div class="card-body d-flex flex-column flex-grow-1">
-                    <h5 class="card-title">
-                      <%= link_to post.track&.title, post_path(post), class: "text-decoration-none" %>
-                      <span class="badge bg-primary rounded-pill float-end">#<%= index + 1 %></span>
-                    </h5>
-                    <p class="card-text text-muted small">par <%= post.track&.artist_name %></p>
-                    <% if post.description.present? %>
-                      <p class="card-text description-preview"><small><%= truncate(post.description, length: 100) %></small></p>
-                    <% end %>
-                    <p class="card-text mt-auto">
+
+                <%# Nouvel affichage du score sur la cover (haut droit) %>
+                <% if item.origin == :app && item.db_post_object %>
+                  <div class="album-cover-score-overlay">
+                    <span class="score-value"><%= item.net_votes %></span>
+                    <%# Pour une icône cœur à côté du score (nécessite Bootstrap Icons) : %>
+                    <%# <i class="bi bi-heart-fill"></i> <span class="score-value"><%#= item.net_votes %></span>
+                  </div>
+                <% end %>
+              </div>
+
+              <div class="album-details-section">
+                <%# Genre (si présent) %>
+                <% if item.genre.present? %>
+                  <p class="track-genre small mb-2"><span class="badge bg-secondary"><%= item.genre.capitalize %></span></p>
+                <% end %>
+
+                <%# Description (si c'est un post de l'app et qu'il y a une description) %>
+                <% if item.origin == :app && item.description.present? %>
+                  <p class="card-text description-preview small mb-2"><%= truncate(item.description, length: 70) %></p>
+                <% end %>
+
+                <div class="mt-auto"> <%# Pour pousser les éléments suivants vers le bas de la carte %>
+                  <% if item.origin == :app && item.user && item.db_post_object %>
+                    <p class="card-text mb-1">
                       <small class="text-muted">
-                        Posté par <%= link_to post.user.username, user_path(post.user), class: "text-decoration-none" %>
-                        le <%= l(post.created_at, format: :short) %>
+                        Posté par <%= link_to item.user.username, user_path(item.user), class: "text-decoration-none" %>
                       </small>
                     </p>
-                    <div class="d-flex justify-content-between align-items-center mt-2">
-                      <div>
-                        <%# Placeholder pour les boutons de vote - vous devrez implémenter cette logique %>
-                        <%= button_to "🔥", vote_post_path(post, vote_type: 'hot'), method: :post, class: "btn btn-sm btn-outline-success me-1", title: "Hot" %>
-                        <%= button_to "❄️", vote_post_path(post, vote_type: 'cold'), method: :post, class: "btn btn-sm btn-outline-info", title: "Cold" %>
-                      </div>
-                      <span class="fw-bold">Score: <%= post.net_votes %></span>
-                    </div>
-                    <% if user_signed_in? && post.user == current_user %>
-                   <div class="d-flex gap-2 mt-2 align-self-start">
-                   <%= link_to 'Modifier', edit_post_path(post), class: "btn btn-sm btn-outline-secondary" %>
-                   <%= button_to 'Supprimer', post_path(post), method: :delete, data: { confirm: "Êtes-vous sûr de vouloir supprimer ce post ?" }, class: "btn btn-sm btn-outline-danger" %>
-                   </div>
                   <% end %>
+
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div> <%# Conteneur pour les boutons de vote %>
+                      <% if item.origin == :app && item.db_post_object %>
+                        <%= button_to vote_post_path(item.db_post_object, vote_type: 'hot'), method: :post, class: "btn btn-sm btn-vote", title: "J'aime", form_class: "d-inline" do %>
+                          <i class="bi bi-hand-thumbs-up-fill"></i>
+                        <% end %>
+                        <%= button_to vote_post_path(item.db_post_object, vote_type: 'cold'), method: :post, class: "btn btn-sm btn-vote", title: "Je n'aime pas", form_class: "d-inline" do %>
+                          <i class="bi bi-hand-thumbs-down-fill"></i>
+                        <% end %>
+                      <% elsif item.origin == :deezer %>
+                        <%= button_to create_post_and_vote_on_track_path(item.id_for_links, vote_type: 'hot'), method: :post, class: "btn btn-sm btn-vote", title: "J'aime et ajoute ce son", form_class: "d-inline" do %>
+                          <i class="bi bi-hand-thumbs-up"></i>
+                        <% end %>
+                        <%= button_to create_post_and_vote_on_track_path(item.id_for_links, vote_type: 'cold'), method: :post, class: "btn btn-sm btn-vote", title: "Je n'aime pas ce son", form_class: "d-inline" do %>
+                          <i class="bi bi-hand-thumbs-down"></i>
+                        <% end %>
+                      <% end %>
+                    </div>
+                    <%# L'ancien affichage du score a été retiré d'ici, il est maintenant sur la cover %>
                   </div>
+
+                  <%# Condition pour le lien Modifier corrigée %>
+                  <% if item.origin == :app && user_signed_in? && item.user == current_user && item.db_post_object %>
+                    <%= link_to 'Modifier', edit_post_path(item.db_post_object), class: "btn btn-sm btn-outline-secondary mt-1 w-100" %>
+                  <% end %>
                 </div>
+
+                <%# Lien Deezer %>
+                <% if item.deezer_link.present? %>
+                  <p class="track-deezer-link mt-2 <%= 'mt-auto' if item.preview_url.blank? && (item.origin != :app || !(item.user && item.db_post_object)) %>">
+                    <a href="<%= item.deezer_link %>" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-info w-100">
+                      <i class="bi bi-play-circle-fill"></i> Écouter sur Deezer
+                    </a>
+                  </p>
+                <% end %>
               </div>
             </div>
           </div>
         <% end %>
       </div>
-    <% else %>
-      <p class="text-center text-muted mt-4">Aucun morceau partagé par la communauté aujourd'hui. Soyez le premier !</p>
-    <% end %>
-  </section>
+    </div>
+  <% else %>
+    <p class="text-center text-muted mt-4">Aucun son à découvrir pour le moment. Revenez plus tard ou soyez le premier à partager !</p>
+  <% end %>
+</section> <%# Fin de unified-carousel-section %>
 
-  <%# Section pour les suggestions Deezer (carrousel) %>
-  <section class="deezer-suggestions-section w-100">
-    <h2 class="section-title text-center mb-4">🎶 Suggestions Electro Goa / Mental (par Deezer) 🎶</h2>
-    <% if @todays_tracks.present? %>
-      <div class="main-carousel-wrapper">
-        <div class="main-carousel"> <%# C'est sur cette classe que vous initialiserez Swiper.js %>
-          <% @todays_tracks.each do |track| %>
-            <div class="carousel-cell"> <%# Classe pour les slides Swiper %>
-              <div class="album-art-card">
-                <% deezer_cover_url = track.cover_url.presence || "https://placehold.co/250x250/0A0F1E/E0E0E0?text=#{track.title.truncate(15)}" %>
-                <%= image_tag deezer_cover_url, alt: "Pochette de #{track.title}", class: "album-art-image" %>
-                <div class="album-art-overlay"></div>
-                <div class="album-art-info">
-                  <h3 class="track-title"><%= track.title %></h3>
-                  <p class="track-artist">par <%= track.artist %></p>
-                  <% if track.genre.present? %>
-                    <p class="track-genre"><%= track.genre.capitalize %></p>
-                  <% end %>
-                  <% if track.link_deezer.present? %>
-                    <p class="track-deezer-link mt-2">
-                      <a href="<%= track.link_deezer %>" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-light">
-                        Écouter sur Deezer
-                      </a>
-                    </p>
-                  <% end %>
-                </div>
-              </div>
-            </div>
-          <% end %>
-        </div>
-      </div>
-    <% else %>
-      <p class="text-center text-muted mt-4">Impossible de charger les suggestions Deezer pour le moment.</p>
-    <% end %>
-  </section>
+</div> <%# Fermeture du container-fluid home-page-container %>
 
-</div>
+<audio id="global-audio-player" style="display: none;"></audio>
+
+<%= render "shared/bottom_navbar" %>

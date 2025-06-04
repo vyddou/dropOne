@@ -1,5 +1,8 @@
+
+
 <div class="container mt-4">
     <style>
+
       .nav-tabs .nav-link {
         color: #495057; /* Couleur texte sombre */
       }
@@ -9,6 +12,20 @@
         border-bottom: 3px solid #0d6efd;
       }
     </style>
+
+
+    .nav-tabs .nav-link {
+      color: #495057; /* Couleur texte sombre */
+    }
+    .nav-tabs .nav-link.active {
+      font-weight: bold;
+      color: #0d6efd; /* Bleu Bootstrap */
+      border-bottom: 3px solid #0d6efd;
+    }
+  </style>
+  <% unless current_user == @user %>
+  <%= button_to "Envoyer un message", conversations_path(user_id: @user.id), method: :post, class:"btn btn-primary btn-aurora-glow" %>
+  <% end %>
 
   <!-- En-tête avec menu burger pour l'utilisateur courant -->
   <!-- En-tête username + burger -->
@@ -130,3 +147,5 @@
     </div>
   </div>
 </div>
+
+<%= render "shared/bottom_navbar" %>
