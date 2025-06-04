@@ -1,11 +1,11 @@
-<%# 1. Changement de 'container' à 'container-fluid' pour permettre plus de largeur %>
-<%#    Ajout de padding horizontal responsif (px-md-3 px-lg-4) pour que le contenu ne touche pas les bords sur les grands écrans %>
+<%# app/views/pages/home.html.erb %>
+
 <div class="container-fluid home-page-container mt-4 mb-5 px-md-3 px-lg-4">
 
-  <%# Le bloc de bienvenue reste tel que vous l'aviez (pas de "Bienvenue sur DropOne" ici) %>
+  <%# Bloc de bienvenue %>
   <div class="greeting-container text-center mb-3 w-100" style="max-width: 700px;">
     <% if user_signed_in? %>
-      <h1 class="greeting-title">Bonjour <%= current_user.username %>!</h1>
+      <h1 class="greeting-title">Bonjour <%= current_user.username.presence || current_user.first_name.presence || "Utilisateur" %>!</h1>
       <p class="greeting-subtitle">Vous êtes connecté.</p>
     <% else %>
       <h1 class="greeting-title">Bonjour!</h1>
@@ -13,51 +13,76 @@
     <% end %>
   </div>
 
-  <section class="daily-playlist-section w-100">
-    <%# Le titre "Propositions du Jour" reste tel quel (sans emojis) %>
-    <h2 class="section-title text-center mb-4"> Propositions du Jour </h2>
-
-    <% if user_signed_in? %>
-    <div class="add-track-button-container mb-5 w-100 text-center">
+  <%# Bouton pour ajouter un morceau si l'utilisateur est connecté %>
+  <% if user_signed_in? %>
+    <div class="add-track-button-container mt-4 mb-5 w-100 text-center">
      <%= link_to "Ajouter un morceau", new_post_path, class: "btn btn-primary btn-aurora-glow" %>
     </div>
   <% end %>
 
-    <%# ajout rominou%>
-
-<% if @last_post %>
-  <div style="border: 1px solid #ccc; padding: 15px; border-radius: 10px; max-width: 500px; margin: 30px auto; position: relative;">
-    <h3>Today's post :</h3>
-    <div style="display: flex; gap: 1em; align-items: center;">
-      <img src="<%= @last_post.track.cover_url %>" alt="Cover" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
-      <div>
-        <strong><%= @last_post.track.title %></strong> par <%= @last_post.track.artist_name %><br>
-        <p><%= @last_post.description %></p>
-        <% if @last_post.track.preview_url.present? %>
-          <audio controls src="<%= @last_post.track.preview_url %>"></audio>
+  <%# Section pour les posts de l'application du jour, triés par popularité %>
+  <section class="todays-app-posts-section w-100 mb-5">
+    <h2 class="section-title text-center mb-4">🔥 Les Pépites du Jour (par la communauté) 🔥</h2>
+    <% if @todays_app_posts_sorted.present? %>
+      <div class="row justify-content-center">
+        <% @todays_app_posts_sorted.each_with_index do |post, index| %>
+          <div class="col-md-8 col-lg-6 mb-4">
+            <div class="card app-post-card h-100 shadow-sm">
+              <div class="row g-0 h-100">
+                <div class="col-md-4">
+                  <% app_post_cover_url = post.track&.cover_url.presence || "https://placehold.co/200x200/1a1a1a/ffffff?text=#{post.track&.title&.truncate(10)}" %>
+                  <%= image_tag app_post_cover_url, alt: "Pochette de #{post.track&.title}", class: "img-fluid rounded-start h-100", style: "object-fit: cover;" %>
+                </div>
+                <div class="col-md-8 d-flex flex-column">
+                  <div class="card-body d-flex flex-column flex-grow-1">
+                    <h5 class="card-title">
+                      <%= link_to post.track&.title, post_path(post), class: "text-decoration-none" %>
+                      <span class="badge bg-primary rounded-pill float-end">#<%= index + 1 %></span>
+                    </h5>
+                    <p class="card-text text-muted small">par <%= post.track&.artist_name %></p>
+                    <% if post.description.present? %>
+                      <p class="card-text description-preview"><small><%= truncate(post.description, length: 100) %></small></p>
+                    <% end %>
+                    <p class="card-text mt-auto">
+                      <small class="text-muted">
+                        Posté par <%= link_to post.user.username, user_path(post.user), class: "text-decoration-none" %>
+                        le <%= l(post.created_at, format: :short) %>
+                      </small>
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                      <div>
+                        <%# Placeholder pour les boutons de vote - vous devrez implémenter cette logique %>
+                        <%= button_to "🔥", vote_post_path(post, vote_type: 'hot'), method: :post, class: "btn btn-sm btn-outline-success me-1", title: "Hot" %>
+                        <%= button_to "❄️", vote_post_path(post, vote_type: 'cold'), method: :post, class: "btn btn-sm btn-outline-info", title: "Cold" %>
+                      </div>
+                      <span class="fw-bold">Score: <%= post.net_votes %></span>
+                    </div>
+                    <% if user_signed_in? && post.user == current_user %>
+                      <%= link_to 'Modifier', edit_post_path(post), class: "btn btn-sm btn-outline-secondary mt-2 align-self-start" %>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         <% end %>
       </div>
-    </div>
-
-    <% if user_signed_in? && @last_post.user == current_user %>
-      <%= link_to 'Edit', edit_post_path(@last_post), style: "position: absolute; bottom: 10px; right: 10px; padding: 6px 12px; background-color: #007bff; color: white; border-radius: 4px; text-decoration: none;" %>
+    <% else %>
+      <p class="text-center text-muted mt-4">Aucun morceau partagé par la communauté aujourd'hui. Soyez le premier !</p>
     <% end %>
-  </div>
-<% end %>
-    <%# ajout rominou%>
-    <% if @todays_tracks.present? %>
-      <%# 2. Ajout d'un wrapper autour du carrousel. %>
-      <%# Ce wrapper sera stylisé en SCSS pour "casser" les limites du container-fluid et s'étendre. %>
-      <div class="main-carousel-wrapper">
-        <%# La classe js-flickity et l'attribut data-flickity ont été supprimés ici %>
-        <div class="main-carousel">
+  </section>
 
+  <%# Section pour les suggestions Deezer (carrousel) %>
+  <section class="deezer-suggestions-section w-100">
+    <h2 class="section-title text-center mb-4">🎶 Suggestions Electro Goa / Mental (par Deezer) 🎶</h2>
+    <% if @todays_tracks.present? %>
+      <div class="main-carousel-wrapper">
+        <div class="main-carousel"> <%# C'est sur cette classe que vous initialiserez Swiper.js %>
           <% @todays_tracks.each do |track| %>
-            <div class="carousel-cell">
+            <div class="carousel-cell"> <%# Classe pour les slides Swiper %>
               <div class="album-art-card">
-                <%# La taille du placeholder (250x250) est conservée. Le SCSS pour .carousel-cell déterminera la taille réelle. %>
-                <% cover_url = track.cover_url.presence || "https://placehold.co/250x250/0A0F1E/E0E0E0?text=#{track.title.truncate(15)}" %>
-                <%= image_tag cover_url, alt: "Cover de #{track.title}", class: "album-art-image" %>
+                <% deezer_cover_url = track.cover_url.presence || "https://placehold.co/250x250/0A0F1E/E0E0E0?text=#{track.title.truncate(15)}" %>
+                <%= image_tag deezer_cover_url, alt: "Pochette de #{track.title}", class: "album-art-image" %>
                 <div class="album-art-overlay"></div>
                 <div class="album-art-info">
                   <h3 class="track-title"><%= track.title %></h3>
@@ -65,15 +90,22 @@
                   <% if track.genre.present? %>
                     <p class="track-genre"><%= track.genre.capitalize %></p>
                   <% end %>
+                  <% if track.link_deezer.present? %>
+                    <p class="track-deezer-link mt-2">
+                      <a href="<%= track.link_deezer %>" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-light">
+                        Écouter sur Deezer
+                      </a>
+                    </p>
+                  <% end %>
                 </div>
               </div>
-              <%# Les boutons like/dislike ne sont pas ajoutés ici car vous avez demandé de ne modifier que la largeur %>
             </div>
           <% end %>
         </div>
       </div>
     <% else %>
-      <p class="text-center text-muted mt-4">Aucune proposition pour aujourd'hui, revenez plus tard !</p>
+      <p class="text-center text-muted mt-4">Impossible de charger les suggestions Deezer pour le moment.</p>
     <% end %>
   </section>
+
 </div>
