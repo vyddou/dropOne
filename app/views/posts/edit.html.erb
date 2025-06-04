@@ -3,14 +3,26 @@
 <%= form_with model: @post, url: post_path(@post), method: :patch, local: true do |form| %>
   <div class="mb-3">
     <%= label_tag :deezer_search, "Search for a song :", class: "form-label" %>
-    <input type="text" id="deezer-search" class="form-control" placeholder="Tape un titre, artiste..." autocomplete="off">
+    <input type="text" id="deezer-search" class="form-control" placeholder="Tape un titre, artiste..." autocomplete="off" value="<%= @post.track ? "#{@post.track.title} - #{@post.track.artist_name}" : '' %>">
   </div>
 
   <ul id="search-results" class="list-group mb-3"></ul>
 
-  <div id="selected-track-info" class="mb-3"></div>
+  <div id="selected-track-info" class="mb-3">
+    <% if @post.track %>
+      <div class="d-flex align-items-center gap-3 mt-3">
+        <img src="<%= @post.track.cover_url %>" alt="cover" class="rounded" style="width: 100px; height: 100px; object-fit: cover;">
+        <div>
+          <p><strong><%= @post.track.title %></strong> par <%= @post.track.artist_name %></p>
+          <% if @post.track.preview_url.present? %>
+            <audio controls src="<%= @post.track.preview_url %>"></audio>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
 
-  <%= form.hidden_field :track_id, id: "selected-track-id" %>
+  <%= form.hidden_field :track_id, id: "selected-track-id", value: (@post.track&.deezer_track_id) %>
 
   <div class="mb-3">
     <%= form.label :description, "Description of your post :", class: "form-label" %>
