@@ -22,17 +22,19 @@
           <li class="nav-item">
             <%= link_to "Générer", new_playlist_path, class: "nav-link #{'active' if current_page?(new_playlist_path)}" %>
           </li>
-        <% end %> <%# Fin du premier 'if user_signed_in?' %>
+          <li class="nav-item">
+            <%= link_to "Messagerie", conversations_path, class: "nav-link #{'active' if current_page?(conversations_path)}" %>
+          </li>
+        <% end %>
       </ul>
 
       <ul class="navbar-nav ms-auto">
         <% if user_signed_in? %>
           <li class="nav-item dropdown">
             <a href="#" class="nav-link dropdown-toggle d-flex align-items-center" id="navbarDropdownUser" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <% avatar_display_url = current_user.avatar_url.presence || "https://placehold.co/75x75/E0E0E0/000000?text=User" %>
-          <%= image_tag avatar_display_url, alt: "User Avatar", class: "rounded-circle me-2", style: "width: 75px; height: 75px; object-fit: cover;" %>
-        </a>
-              </a>
+              <% avatar_display_url = current_user.avatar_url.presence || "https://placehold.co/75x75/E0E0E0/000000?text=User" %>
+              <%= image_tag avatar_display_url, alt: "User Avatar", class: "rounded-circle me-2", style: "width: 75px; height: 75px; object-fit: cover;" %>
+            </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownUser">
               <li>
                 <% if current_user.respond_to?(:liked_playlist) && current_user.liked_playlist %>
@@ -51,10 +53,7 @@
                 <%= link_to "Edit Profile", edit_user_registration_path, class: "dropdown-item" %>
               </li>
               <li>
-
-
                 <%= link_to "Log out", destroy_user_session_path, method: :delete, data: { turbo_method: :delete }, class: "dropdown-item" %>
-
               </li>
             </ul>
           </li>
@@ -65,8 +64,8 @@
           <li class="nav-item">
             <%= link_to "Inscription", new_user_registration_path, class: "nav-link #{'active' if current_page?(new_user_registration_path)}" %>
           </li>
-        <% end %> <%# Fin du deuxième 'if user_signed_in?' %>
+        <% end %>
       </ul>
-    </div> <%# Fin de .collapse .navbar-collapse %>
-  </div> <%# Fin de .container-fluid %>
-</nav> <%# Fin de nav.navbar %>
+    </div>
+  </div>
+</nav>
