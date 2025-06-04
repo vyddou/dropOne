@@ -22,33 +22,41 @@
   <%# --- FIN DU BOUTON --- %>
 
   <section class="unified-carousel-section w-100">
-  <h2 class="section-title text-center mb-4">Les Sons du Moment</h2>
+  <h2 class="section-title text-center mb-4"> Les Sons du Moment </h2>
 
   <% if @carousel_items.present? %>
-    <%# --- MODIFICATION ICI : AJOUT DU DATA-CONTROLLER --- %>
+    <%# Le data-controller est crucial pour que StimulusJS active votre audio_player_controller.js %>
     <div class="main-carousel-wrapper" data-controller="audio-player">
       <div class="main-carousel"> <%# Pour Swiper.js %>
         <% @carousel_items.each_with_index do |item, index| %>
-          <div class="carousel-cell" data-preview-url="<%= item.preview_url %>"> <%# Ajout de data-preview-url ici %>
+          <div class="carousel-cell" data-preview-url="<%= item.preview_url %>">
             <div class="album-art-card-container">
               <div class="album-art-visual-wrapper">
                 <% cover_url = item.cover_url.presence || "https://placehold.co/280x280/0A0F1E/E0E0E0?text=#{item.title&.truncate(15)}" %>
                 <%= image_tag cover_url, alt: "Pochette de #{item.title}", class: "album-cover-image" %>
 
-                <%# --- NOUVEAU BOUTON PLAY SUPERPOSÉ --- %>
+                <%# Bouton Play superposé %>
                 <% if item.preview_url.present? %>
                   <button class="btn-play-on-cover" aria-label="Lire l'extrait"
-                    data-action="click->audio-player#togglePlay"> <%# L'action qui appelle la méthode JS %>
-                    <i class="bi bi-play-fill"></i> <%# Icône Play %>
-                    <%# L'icône changera en bi-pause-fill avec JS %>
+                    data-action="click->audio-player#togglePlay">
+                    <i class="bi bi-play-fill"></i>
                   </button>
                 <% end %>
-                <%# --- FIN DU NOUVEAU BOUTON PLAY --- %>
 
+                <%# Texte Titre/Artiste superposé en bas à gauche %>
                 <div class="album-cover-text-overlay">
                   <h5 class="album-title-on-cover" title="<%= item.title %>"><%= item.title %></h5>
                   <p class="album-artist-on-cover" title="<%= item.artist %>"><%= item.artist %></p>
                 </div>
+
+                <%# Nouvel affichage du score sur la cover (haut droit) %>
+                <% if item.origin == :app && item.db_post_object %>
+                  <div class="album-cover-score-overlay">
+                    <span class="score-value"><%= item.net_votes %></span>
+                    <%# Pour une icône cœur à côté du score (nécessite Bootstrap Icons) : %>
+                    <%# <i class="bi bi-heart-fill"></i> <span class="score-value"><%= item.net_votes %></span>
+                  </div>
+                <% end %>
               </div>
 
               <div class="album-details-section">
@@ -62,7 +70,7 @@
                   <p class="card-text description-preview small mb-2"><%= truncate(item.description, length: 70) %></p>
                 <% end %>
 
-                <div class="mt-auto">
+                <div class="mt-auto"> <%# Pour pousser les éléments suivants vers le bas de la carte %>
                   <% if item.origin == :app && item.user && item.db_post_object %>
                     <p class="card-text mb-1">
                       <small class="text-muted">
@@ -72,7 +80,7 @@
                   <% end %>
 
                   <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div>
+                    <div> <%# Conteneur pour les boutons de vote %>
                       <% if item.origin == :app && item.db_post_object %>
                         <%= button_to vote_post_path(item.db_post_object, vote_type: 'hot'), method: :post, class: "btn btn-sm btn-vote", title: "J'aime", form_class: "d-inline" do %>
                           <i class="bi bi-hand-thumbs-up-fill"></i>
@@ -89,28 +97,23 @@
                         <% end %>
                       <% end %>
                     </div>
-                    <% if item.origin == :app %>
-                      <span class="fw-bold small">Score: <%= item.net_votes %></span>
-                    <% else %>
-                      <span class="small text-muted">&nbsp;</span>
-                    <% end %>
+                    <%# L'ancien affichage du score a été retiré d'ici, il est maintenant sur la cover %>
                   </div>
 
+                  <%# Condition pour le lien Modifier corrigée %>
                   <% if item.origin == :app && user_signed_in? && item.user == current_user && item.db_post_object %>
                     <%= link_to 'Modifier', edit_post_path(item.db_post_object), class: "btn btn-sm btn-outline-secondary mt-1 w-100" %>
                   <% end %>
                 </div>
 
-                <%# Lien Deezer (poussé vers le bas si possible) %>
+                <%# Lien Deezer %>
                 <% if item.deezer_link.present? %>
-                  <p class="track-deezer-link mt-2 <%= 'mt-auto' if item.origin != :app || !(item.user && item.db_post_object) %>">
+                  <p class="track-deezer-link mt-2 <%= 'mt-auto' if item.preview_url.blank? && (item.origin != :app || !(item.user && item.db_post_object)) %>">
                     <a href="<%= item.deezer_link %>" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-info w-100">
                       <i class="bi bi-play-circle-fill"></i> Écouter sur Deezer
                     </a>
                   </p>
                 <% end %>
-
-
               </div>
             </div>
           </div>
@@ -124,6 +127,4 @@
 
 </div> <%# Fermeture du container-fluid home-page-container %>
 
-<%# --- AJOUT D'UN LECTEUR AUDIO GLOBAL ET CACHÉ --- %>
 <audio id="global-audio-player" style="display: none;"></audio>
-<%# --- FIN DU LECTEUR AUDIO GLOBAL --- %>

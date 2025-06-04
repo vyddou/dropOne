@@ -3,7 +3,7 @@
 .carousel-cell {
   display: flex;
   justify-content: center;
-  margin: 10px; // Vous pouvez ajuster ou supprimer cette marge si Swiper la gère
+  margin: 10px;
 }
 
 .album-art-card-container {
@@ -12,11 +12,11 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  height: 100%; // Important pour que Swiper puisse égaliser la hauteur des slides si besoin
+  height: 100%;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   transition: transform 0.2s ease-in-out;
   width: 100%;
-  max-width: 280px; // Limite la largeur de la carte, ajustez selon vos besoins
+  max-width: 280px;
 
   &:hover {
     transform: translateY(-5px);
@@ -24,9 +24,9 @@
 }
 
 .album-art-visual-wrapper {
-  position: relative; // Nécessaire pour positionner le bouton play et l'overlay de texte
+  position: relative; // Nécessaire pour positionner les overlays
   width: 100%;
-  aspect-ratio: 1 / 1; // Maintient la zone de l'image carrée
+  aspect-ratio: 1 / 1;
   overflow: hidden;
 
   .album-cover-image {
@@ -45,7 +45,7 @@
     color: white;
     background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.7) 30%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0) 100%);
     overflow: hidden;
-    z-index: 2; // S'assure qu'il est au-dessus de l'image mais potentiellement sous le bouton play
+    z-index: 2;
 
     .album-title-on-cover {
       font-size: 0.9rem;
@@ -67,7 +67,6 @@
     }
   }
 
-  // --- STYLES POUR LE NOUVEAU BOUTON PLAY SUPERPOSÉ ---
   .btn-play-on-cover {
     position: absolute;
     top: 50%;
@@ -84,11 +83,11 @@
     justify-content: center;
     cursor: pointer;
     transition: background-color 0.2s ease, transform 0.2s ease, opacity 0.3s ease;
-    opacity: 0; // Caché par défaut
-    z-index: 3;  // Au-dessus de l'overlay texte et de l'image
+    opacity: 0;
+    z-index: 3;
 
     i {
-      font-size: 2rem; // Taille de l'icône play/pause
+      font-size: 2rem;
       line-height: 1;
     }
 
@@ -98,17 +97,45 @@
     }
   }
 
-  // Afficher le bouton play au survol du conteneur de l'image
   &:hover .btn-play-on-cover {
     opacity: 1;
   }
 
-  // Style pour quand le morceau est en cours de lecture (classe ajoutée par JS)
   &.is-playing .btn-play-on-cover {
-    opacity: 1; // Reste visible pendant la lecture
+    opacity: 1;
   }
-  // --- FIN DES STYLES POUR LE BOUTON PLAY ---
-}
+
+  // --- STYLES POUR L'AFFICHAGE DU SCORE SUR LA COVER ---
+  // CE BLOC DOIT ÊTRE À L'INTÉRIEUR DE .album-art-visual-wrapper
+  .album-cover-score-overlay {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background-color: rgba(0, 0, 0, 0.65);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    z-index: 4; // Au-dessus du bouton play et de l'overlay texte
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    line-height: 1;
+
+    .score-value {
+      // Styles spécifiques pour le chiffre si besoin
+    }
+
+    i.bi-heart-fill {
+      margin-right: 5px;
+      color: #ff6b6b;
+      font-size: 0.9rem;
+    }
+  }
+  // --- FIN DES STYLES POUR LE SCORE ---
+
+} // Fin de .album-art-visual-wrapper
 
 .album-details-section {
   padding: 10px 12px;
@@ -117,14 +144,6 @@
   flex-grow: 1;
   background-color: #2c2f36;
 
-  // Les styles pour l'ancien tag <audio> ont été supprimés d'ici
-  // audio {
-  //   height: 30px;
-  //   max-width: 100%;
-  //   border-radius: 15px;
-  // }
-
-  // ... (vos autres styles pour .track-genre, .description-preview, .btn-vote, etc. restent ici) ...
   .track-genre .badge {
     font-size: 0.7rem;
     padding: 0.3em 0.5em;
@@ -140,7 +159,7 @@
     color: #8a8d93 !important;
   }
 
-  .btn-vote { // Rappel de vos styles pour les boutons de vote
+  .btn-vote {
     background-color: transparent;
     border: none;
     padding: 0.2rem 0.4rem;
