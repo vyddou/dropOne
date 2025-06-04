@@ -10,6 +10,7 @@ Rails.application.routes.draw do
       member do
       post :follow
       delete :unfollow
+      patch :update_description
     end
   end
 
@@ -28,6 +29,7 @@ Rails.application.routes.draw do
     member do
       post :like
       post :dislike
+      delete :remove_from_likes  # Nouvelle route spécifique
     end
   end
 

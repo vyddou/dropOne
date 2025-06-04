@@ -29,6 +29,8 @@ class User < ApplicationRecord
   # À travers 'passive_follows', on trouve les utilisateurs qui suivent (qui sont les 'first_user' dans la table 'follows')
   has_many :followers, through: :passive_follows, source: :first_user
 
+  validates :description, length: { maximum: 500 }
+  
   def follows?(user)
     following.include?(user)
   end

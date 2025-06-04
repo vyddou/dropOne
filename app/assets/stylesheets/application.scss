@@ -28,3 +28,10 @@ body {
   min-height: 100vh;
   color: $aurora-text; // Défini dans _variables.scss
 }
+
+.card.clickable:hover {
+  cursor: pointer;
+  background-color: #f8f9fa42; /* gris clair Bootstrap */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* petit effet d'ombre */
+  transition: all 0.2s ease-in-out;
+}

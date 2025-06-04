@@ -1,0 +1,45 @@
+<!-- app/views/posts/_post.html.erb -->
+<div class="card mb-3">
+  <div class="card-body">
+    <div class="d-flex align-items-center mb-2">
+      <h5 class="card-title mb-0"><%= post.track.title %></h5>
+      <small class="ms-auto text-muted">
+        <%= post.formatted_date %>
+      </small>
+    </div>
+    
+    <h6 class="card-subtitle mb-2 text-muted">
+      <%= post.track.artist_name %>
+    </h6>
+    
+    <% if post.description.present? %>
+      <p class="card-text"><%= post.description %></p>
+    <% end %>
+    
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <%= button_tag class: "btn btn-sm btn-outline-primary" do %>
+          <i class="bi bi-heart"></i> <%= post.votes.count %>
+        <% end %>
+        <%= button_tag class: "btn btn-sm btn-outline-secondary ms-2" do %>
+          <i class="bi bi-chat"></i> <%= post.comments.count %>
+        <% end %>
+      </div>
+      
+      <% if current_user == post.user %>
+        <div>
+          <%= link_to edit_post_path(post), class: "btn btn-sm btn-outline-success" do %>
+            <i class="bi bi-pencil"></i>
+          <% end %>
+          
+          <%= link_to post_path(post), 
+                      method: :delete, 
+                      data: { confirm: "Supprimer ce post ?" }, 
+                      class: "btn btn-sm btn-outline-danger ms-2" do %>
+            <i class="bi bi-trash"></i>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

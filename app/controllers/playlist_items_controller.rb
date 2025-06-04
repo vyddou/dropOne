@@ -20,6 +20,16 @@ class PlaylistItemsController < ApplicationController
     result = handle_playlist_item_action(playlist_item, disliked_playlist, "dislikée", "likée")
     redirect_to playlist_item.playlist, result
   end
+
+  def remove_from_likes
+    @playlist_item = current_user.playlist_items.find(params[:id])
+    @playlist_item.destroy
+    
+    respond_to do |format|
+      format.html { redirect_to user_path(current_user), notice: "Musique retirée des likes" }
+      format.turbo_stream  # Optionnel si vous utilisez Hotwire
+    end
+  end
   
   def dislike_all_songs
     playlist = Playlist.find(params[:playlist_id])
