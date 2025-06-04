@@ -1,7 +1,7 @@
 <nav class="navbar navbar-dark bg-dark fixed-bottom bottom-navbar">
   <div class="container d-flex justify-content-around align-items-center">
     <% if user_signed_in? %>
-      <%= link_to '#', class: "nav-link text-white" do %>
+      <%= link_to conversations_path, class: "nav-link text-white #{'active' if current_page?(conversations_path)}" do %>
         <i class="bi bi-chat-dots-fill"></i>
         <span>Messages</span>
       <% end %>
