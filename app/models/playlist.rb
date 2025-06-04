@@ -4,7 +4,8 @@ class Playlist < ApplicationRecord
   has_many :playlist_items, dependent: :destroy
   # has_many :songmarks, dependent: :destroy  # ancienne version IA
   has_many :tracks, through: :songmarks
-  
+  has_many :tracks, through: :playlist_items
+
   # Validations
   validates :name, presence: true
   validates :name, uniqueness: { scope: :user_id, message: "Cet intitulé existe déja parmis vos playlists" }
