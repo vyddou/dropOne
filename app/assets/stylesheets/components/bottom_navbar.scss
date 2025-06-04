@@ -46,6 +46,10 @@
       border: 1.5px solid transparent;
       transition: border-color 0.3s ease;
     }
+    .bottom-navbar .nav-link i.bi-plus-circle {
+    font-size: 1.6rem;  // un peu plus grand que les autres icônes
+    color: #0d6efd;     // couleur bleue pour se démarquer
+    }
 
     &:hover,
     &.active {
