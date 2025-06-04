@@ -1,0 +1,11 @@
+<h1>Mes conversations</h1>
+
+<ul>
+  <% @conversations.each do |conversation| %>
+    <li>
+      <%= link_to "Conversation ##{conversation.id}", conversation_path(conversation) %>
+
+      <%= button_to "Supprimer", conversation_path(conversation), method: :delete, data: { confirm: "Êtes-vous sûr de vouloir supprimer cette conversation ?" }, class: "btn btn-aurora-delete " %>
+    </li>
+  <% end %>
+</ul>

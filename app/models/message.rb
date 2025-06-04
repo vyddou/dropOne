@@ -6,4 +6,8 @@ class Message < ApplicationRecord
 
   # Pour que les messages s'affichent dans l'ordre
   default_scope { order(created_at: :asc) }
+
+  def read?
+    read_at.present?
+  end
 end
