@@ -1,6 +1,8 @@
-<div class="card my-2">
-  <div class="card-body">
-    <h5 class="card-title"><%= playlist.name %></h5>
-    <p class="card-text"><%= playlist.tracks.count %> titres</p>
+<%= link_to playlist_path(playlist), class: "text-decoration-none text-dark" do %>
+  <div class="card my-2 clickable">
+    <div class="card-body">
+      <h5 class="card-title"><%= playlist.name %></h5>
+      <p class="card-text"><%= playlist.tracks.count %> titres</p>
+    </div>
   </div>
-</div>
+<% end %>

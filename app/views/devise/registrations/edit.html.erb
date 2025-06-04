@@ -17,6 +17,10 @@
     <%= f.input :avatar_url, as: :url, placeholder: 'http://example.com/avatar.jpg' %>
     <%# 'as: :url' suggère au navigateur que c'est un champ URL, mais c'est un champ texte standard %>
     <%# Vous pouvez ajouter un aperçu de l'avatar ici avec un peu de JavaScript si vous le souhaitez %>
+    <div class="mb-3">
+      <%= f.label :description, "Description (max 500 caractères)" %>
+      <%= f.text_area :description, class: "form-control", rows: 4, maxlength: 500 %>
+    </div>
 
     <%# --- FIN DES NOUVEAUX CHAMPS --- %>
 

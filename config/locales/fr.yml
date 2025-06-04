@@ -1,0 +1,14 @@
+fr:
+  date:
+    formats:
+      default: "%d/%m/%Y"
+    day_names: [Dimanche, Lundi, Mardi, Mercredi, Jeudi, Vendredi, Samedi]
+    abbr_day_names: [Dim, Lun, Mar, Mer, Jeu, Ven, Sam]
+    month_names: [~, Janvier, Février, Mars, Avril, Mai, Juin, Juillet, Août, Septembre, Octobre, Novembre, Décembre]
+    abbr_month_names: [~, Janv, Févr, Mars, Avr, Mai, Juin, Juil, Août, Sept, Oct, Nov, Déc]
+  
+  time:
+    formats:
+      default: "%d %B %Y à %H:%M"
+      short: "%d/%m/%Y %H:%M"  # Ajoutez cette ligne
+      long: "%d %B %Y à %H:%M:%S"
