@@ -1,12 +1,17 @@
 <nav class="navbar navbar-dark bg-dark fixed-bottom bottom-navbar">
   <div class="container d-flex justify-content-around align-items-center">
     <% if user_signed_in? %>
-      <%= link_to '#', class: "nav-link text-white d-flex flex-column align-items-center" do %>
+      <%= link_to '#', class: "nav-link text-white" do %>
         <i class="bi bi-chat-dots-fill"></i>
         <span>Messages</span>
       <% end %>
 
-      <%= link_to '#', class: "nav-link text-white d-flex flex-column align-items-center" do %>
+      <%= link_to new_post_path, class: "nav-link text-white" do %>
+        <i class="bi bi-plus-circle"></i>
+        <span>Ajouter</span>
+      <% end %>
+
+      <%= link_to '#', class: "nav-link text-white" do %>
         <i class="bi bi-search"></i>
         <span>Recherche</span>
       <% end %>
@@ -17,7 +22,7 @@
         <span>Profil</span>
       <% end %>
     <% else %>
-      <%= link_to new_user_session_path, class: "nav-link text-white d-flex flex-column align-items-center" do %>
+      <%= link_to new_user_session_path, class: "nav-link text-white" do %>
         <i class="bi bi-box-arrow-in-right"></i>
         <span>Login</span>
       <% end %>
