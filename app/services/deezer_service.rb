@@ -1,39 +1,40 @@
 # app/services/deezer_service.rb
 require 'httparty'
-require 'ostruct' # Pour créer des objets flexibles facilement
+require 'ostruct'
 
 class DeezerService
   include HTTParty
   base_uri 'https://api.deezer.com'
 
-  # Récupère les morceaux d'une playlist Deezer (par défaut "Hits du Moment France")
-  # id d'une playlist publique , flaflamobile tu peux nous mettre une playslist metal si tu veux
-  def self.fetch_playlist_tracks(playlist_id: 1111141961, limit: 5)
+  # playlist_id par défaut est moins important si on le passe toujours depuis le controller
+  def self.fetch_playlist_tracks(playlist_id: 1313621735, limit: 30) # Limite par défaut à 30
+    Rails.logger.info "DeezerService: Fetching playlist ID #{playlist_id} with limit #{limit}"
     response = get("/playlist/#{playlist_id}/tracks", query: { limit: limit, index: 0 })
 
     if response.success? && response.parsed_response["data"]
+      Rails.logger.info "DeezerService: Successfully fetched #{response.parsed_response['data'].length} tracks."
       response.parsed_response["data"].map do |track_data|
-        # Nous créons un OpenStruct pour que l'objet ressemble à ce que votre vue attend
-        # pour un 'track' (avec cover_url, title, artist, genre, link_deezer).
         OpenStruct.new(
-          id: track_data["id"], # ID Deezer du morceau
+          id: track_data["id"],
           title: track_data["title_short"] || track_data["title"],
           artist: track_data["artist"]["name"],
-          cover_url: track_data["album"]["cover_medium"], # Ou track_data["album"]["cover_big"] pour une meilleure qualité
-          genre: "Pop / Variété", # Placeholder, car le genre exact par morceau est complexe à obtenir efficacement ici.
-                                # Vous pourriez utiliser le genre principal de la playlist si elle est thématique.
-          link_deezer: track_data["link"] # Lien direct vers le morceau sur Deezer
+          cover_url: track_data["album"]["cover_medium"],
+          # Le genre ici est un fallback, le contrôleur peut le surcharger.
+          # Pour une playlist "Top", il est difficile d'assigner un genre unique ici.
+          genre: track_data.dig("album", "genres", "data", 0, "name") || "Musique", # Essaye de prendre le premier genre de l'album
+          link_deezer: track_data["link"],
+          preview_url: track_data["preview"]
         )
       end
     else
-      Rails.logger.error "Deezer API Error (Playlist Tracks): #{response.code} - #{response.message}"
-      [] # Retourne un tableau vide en cas d'erreur pour ne pas planter la page
+      Rails.logger.error "DeezerService API Error (Playlist Tracks): #{response.code} - #{response.message}. Body: #{response.body}"
+      []
     end
   rescue HTTParty::Error => e
-    Rails.logger.error "Deezer HTTParty Error (Playlist Tracks): #{e.message}"
+    Rails.logger.error "DeezerService HTTParty Error (Playlist Tracks): #{e.message}"
     []
   rescue StandardError => e
-    Rails.logger.error "Deezer Service Error (Playlist Tracks): #{e.message}"
+    Rails.logger.error "DeezerService Service Error (Playlist Tracks): #{e.message}"
     []
   end
 end

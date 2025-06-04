@@ -2,6 +2,10 @@ Rails.application.routes.draw do
   devise_for :users
   root to: "pages#home"
 
+
+    get 'posts/deezer_search', to: 'posts#deezer_search'
+
+
   resources :users, only: [:show] do # Pour user_path(user)
     member do
       post :follow
@@ -26,14 +30,15 @@ Rails.application.routes.draw do
     end
   end
 
-  # Route spécifique pour la recherche Deezer avant les posts
-  get 'posts/deezer_search', to: 'posts#deezer_search'
-
   resources :posts, only: [:new, :create, :edit, :update, :show, :destroy] do
     member do
-      post :vote # Crée vote_post_path(post) pour POST /posts/:id/vote
+      post 'vote' # Pour voter sur un post existant
     end
   end
+
+  # Route pour créer un post à partir d'un track Deezer et voter
+  # :id ici sera le deezer_track_id
+  post 'tracks/:id/create_post_and_vote', to: 'posts#create_post_from_deezer_and_vote', as: 'create_post_and_vote_on_track'
 
   resources :conversations, only: [:index, :show, :create, :destroy] do
     resources :messages, only: [:create]
