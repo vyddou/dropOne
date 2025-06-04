@@ -6,7 +6,12 @@ Rails.application.routes.draw do
   devise_for :users
   root to: "pages#home"
 
-  resources :users, only: [:show] # Pour user_path(user)
+  resources :users, only: [:show] do # Pour user_path(user)
+      member do
+      post :follow
+      delete :unfollow
+    end
+  end
 
   resources :playlists, only: [:index, :show, :new, :create, :destroy] do
     member do
@@ -30,7 +35,7 @@ Rails.application.routes.draw do
   get 'posts/deezer_search', to: 'posts#deezer_search'
 
   # Ressources pour les posts, incluant :show pour post_path et la route de vote
-  resources :posts, only: [:new, :create, :edit, :update, :show] do
+  resources :posts, only: [:new, :create, :edit, :update, :show, :destroy] do
     member do
       post 'vote' # Crée vote_post_path(post) pour POST /posts/:id/vote
     end

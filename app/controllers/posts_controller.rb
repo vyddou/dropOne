@@ -1,17 +1,26 @@
 # app/controllers/posts_controller.rb
 class PostsController < ApplicationController
   before_action :authenticate_user!, except: [:show]
-  before_action :set_post, only: [:show, :edit, :update]
+  before_action :set_post, only: [:show, :edit, :update, :destroy]
 
   def show
     # @post est déjà défini par le before_action :set_post
   end
 
   def new
+    if Post.exists?(user: current_user, created_at: Time.zone.today.all_day)
+      redirect_to root_path, alert: "Vous avez déjà publié un morceau aujourd'hui."
+      return
+    end
     @post = current_user.posts.build
   end
 
   def create
+    if Post.exists?(user: current_user, created_at: Time.zone.today.all_day)
+      redirect_to root_path, alert: "Vous avez déjà publié un morceau aujourd'hui."
+      return
+    end
+
     deezer_track_id_param = params.dig(:post, :track_id)
     Rails.logger.debug "--- Post Create Action ---"
     Rails.logger.debug "Received Deezer Track ID param: #{deezer_track_id_param.inspect}" # LOG IMPORTANT
@@ -30,7 +39,6 @@ class PostsController < ApplicationController
       track_data = fetch_deezer_track(deezer_track_id_param)
 
       unless track_data
-        # C'est ici que votre message d'erreur est déclenché
         flash.now[:alert] = "Erreur lors de la récupération des infos Deezer pour le morceau (ID: #{deezer_track_id_param}). Vérifiez l'ID ou réessayez."
         @post = current_user.posts.build(description: params.dig(:post, :description))
         render :new, status: :unprocessable_entity and return
@@ -119,6 +127,15 @@ class PostsController < ApplicationController
     end
   end
 
+  def destroy
+    if @post.user != current_user
+      redirect_to root_path, alert: "Accès refusé" and return
+    end
+
+    @post.destroy
+    redirect_to root_path, notice: "Post supprimé avec succès."
+  end
+
   def deezer_search
     query = params[:q]
     if query.blank?
@@ -167,20 +184,19 @@ class PostsController < ApplicationController
 
     if response.success?
       parsed = response.parsed_response
-      if parsed.is_a?(Hash) && parsed["id"] # Vérifie si c'est une réponse de track valide
+      if parsed.is_a?(Hash) && parsed["id"]
         Rails.logger.debug "Deezer track API success for ID #{track_id}. Data (extrait): id=#{parsed['id']}, title=#{parsed['title_short'] || parsed['title']}" # LOG IMPORTANT
-        # Vérifie la clé "error" spécifique de Deezer DANS une réponse réussie
         if parsed["error"]
-            Rails.logger.warn "Deezer API returned an error in a successful response for track ID #{track_id}: #{parsed['error']}" # LOG IMPORTANT
-            return nil # Si Deezer dit qu'il y a une erreur, on considère que c'est un échec
+          Rails.logger.warn "Deezer API returned an error in a successful response for track ID #{track_id}: #{parsed['error']}" # LOG IMPORTANT
+          return nil
         end
-        return parsed # Pas d'erreur Deezer, on retourne les données
+        return parsed
       else
         Rails.logger.error "Réponse Deezer inattendue (pas un Hash valide ou pas d'ID de morceau) pour track #{track_id}: #{parsed.inspect}" # LOG IMPORTANT
       end
     else
       Rails.logger.error "Deezer API Error (HTTParty) for track #{track_id}: Code=#{response.code}, Message=#{response.message}, Body=#{response.body}" # LOG IMPORTANT
     end
-    nil # Retourne nil si l'appel échoue ou si Deezer retourne une erreur
+    nil
   end
 end
