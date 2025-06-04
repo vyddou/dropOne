@@ -1,0 +1,18 @@
+<h2>Conversation</h2>
+
+<div id="messages">
+  <% @messages.each do |msg| %>
+    <div class="<%= msg.user == current_user ? 'text-end' : 'text-start' %> mb-2">
+      <strong><%= msg.user.username %></strong><br>
+      <%= msg.content %><br>
+      <small><%= msg.created_at.strftime("%H:%M") %></small>
+    </div>
+  <% end %>
+</div>
+
+<%= form_with model: [@conversation, @message], local: true do |form| %>
+  <div class="mb-2">
+    <%= form.text_area :content, rows: 3, class: "form-control" %>
+  </div>
+  <%= form.submit "Envoyer", class: "btn btn-primary btn-aurora-glow" %>
+<% end %>

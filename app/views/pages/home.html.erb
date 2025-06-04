@@ -77,6 +77,7 @@
                         Posté par <%= link_to item.user.username, user_path(item.user), class: "text-decoration-none" %>
                       </small>
                     </p>
+
                   <% end %>
 
                   <div class="d-flex justify-content-between align-items-center mb-2">
@@ -119,6 +120,7 @@
           </div>
         <% end %>
       </div>
+
     </div>
   <% else %>
     <p class="text-center text-muted mt-4">Aucun son à découvrir pour le moment. Revenez plus tard ou soyez le premier à partager !</p>
@@ -128,3 +130,48 @@
 </div> <%# Fermeture du container-fluid home-page-container %>
 
 <audio id="global-audio-player" style="display: none;"></audio>
+
+    <% else %>
+      <p class="text-center text-muted mt-4">Aucun morceau partagé par la communauté aujourd'hui. Soyez le premier !</p>
+    <% end %>
+  </section>
+
+  <%# Section pour les suggestions Deezer (carrousel) %>
+  <section class="deezer-suggestions-section w-100">
+    <h2 class="section-title text-center mb-4">🎶 Suggestions Electro Goa / Mental (par Deezer) 🎶</h2>
+    <% if @todays_tracks.present? %>
+      <div class="main-carousel-wrapper">
+        <div class="main-carousel">
+          <% @todays_tracks.each do |track| %>
+            <div class="carousel-cell">
+              <div class="album-art-card">
+                <% deezer_cover_url = track.cover_url.presence || "https://placehold.co/250x250/0A0F1E/E0E0E0?text=#{track.title.truncate(15)}" %>
+                <%= image_tag deezer_cover_url, alt: "Pochette de #{track.title}", class: "album-art-image" %>
+                <div class="album-art-overlay"></div>
+                <div class="album-art-info">
+                  <h3 class="track-title"><%= track.title %></h3>
+                  <p class="track-artist">par <%= track.artist %></p>
+                  <% if track.genre.present? %>
+                    <p class="track-genre"><%= track.genre.capitalize %></p>
+                  <% end %>
+                  <% if track.link_deezer.present? %>
+                    <p class="track-deezer-link mt-2">
+                      <a href="<%= track.link_deezer %>" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-light">
+                        Écouter sur Deezer
+                      </a>
+                    </p>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% else %>
+      <p class="text-center text-muted mt-4">Impossible de charger les suggestions Deezer pour le moment.</p>
+    <% end %>
+  </section>
+
+</div>
+
+<%= render "shared/bottom_navbar" %>

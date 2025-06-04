@@ -1,17 +1,28 @@
 # app/controllers/posts_controller.rb
 class PostsController < ApplicationController
+
   before_action :authenticate_user!, except: [:show, :deezer_search] # Permet la recherche et de voir un post
-  before_action :set_post, only: [:show, :edit, :update, :vote] # vote est maintenant une action sur un post existant
+  before_action :set_post, only: [:show, :edit, :update, :vote, :destroy] # vote est maintenant une action sur un post existant
+
 
   def show
     # @post est défini par set_post
   end
 
   def new
+    if Post.exists?(user: current_user, created_at: Time.zone.today.all_day)
+      redirect_to root_path, alert: "Vous avez déjà publié un morceau aujourd'hui."
+      return
+    end
     @post = current_user.posts.build
   end
 
   def create
+    if Post.exists?(user: current_user, created_at: Time.zone.today.all_day)
+      redirect_to root_path, alert: "Vous avez déjà publié un morceau aujourd'hui."
+      return
+    end
+
     deezer_track_id_param = params.dig(:post, :track_id)
     Rails.logger.debug "--- Post Create Action ---"
     Rails.logger.debug "Received Deezer Track ID param: #{deezer_track_id_param.inspect}"
@@ -120,6 +131,7 @@ class PostsController < ApplicationController
     end
   end
 
+
   def vote
     # @post est déjà défini par set_post
     vote_type_param = params[:vote_type]
@@ -227,6 +239,15 @@ class PostsController < ApplicationController
   end
 
 
+  def destroy
+    if @post.user != current_user
+      redirect_to root_path, alert: "Accès refusé" and return
+    end
+
+    @post.destroy
+    redirect_to root_path, notice: "Post supprimé avec succès."
+  end
+
   def deezer_search
     # ... (votre logique de recherche existante, qui semble correcte) ...
     query = params[:q]
@@ -278,10 +299,12 @@ class PostsController < ApplicationController
     if response.success?
       parsed = response.parsed_response
       if parsed.is_a?(Hash) && parsed["id"]
+
         Rails.logger.debug "Deezer track API success for ID #{track_id}. Data (extrait): id=#{parsed['id']}, title=#{parsed['title_short'] || parsed['title']}"
         if parsed["error"]
             Rails.logger.warn "Deezer API returned an error in a successful response for track ID #{track_id}: #{parsed['error']}"
             return nil
+
         end
         return parsed
       else
