@@ -1,59 +1,45 @@
 <h1 class="mb-4">Post of the day!</h1>
-
 <%= form_with model: Post.new, local: true do |form| %>
   <div class="mb-3">
     <%= label_tag :deezer_search, "Search for a song :", class: "form-label" %>
     <input type="text" id="deezer-search" class="form-control" placeholder="Tape un titre, artiste..." autocomplete="off">
   </div>
-
   <ul id="search-results" class="list-group mb-3"></ul>
-
   <div id="selected-track-info" class="mb-3"></div>
-
   <%= form.hidden_field :track_id, id: "selected-track-id" %>
-
   <div class="mb-3">
     <%= form.label :description, "Description of your post :", class: "form-label" %>
     <%= form.text_area :description, class: "form-control", rows: 4, cols: 60 %>
   </div>
-
   <div>
     <%= form.submit "DropOne", class: "btn btn-primary btn-aurora-glow" %>
   </div>
 <% end %>
-
 <script>
   const searchInput = document.getElementById("deezer-search");
   const resultsList = document.getElementById("search-results");
   const trackInfoDiv = document.getElementById("selected-track-info");
   const hiddenTrackId = document.getElementById("selected-track-id");
-
   let timeout = null;
-
   searchInput.addEventListener("input", () => {
     clearTimeout(timeout);
     const query = searchInput.value;
-
     if (query.length < 2) {
       resultsList.innerHTML = "";
       return;
     }
-
     timeout = setTimeout(() => {
       fetch(`/posts/deezer_search?q=${encodeURIComponent(query)}`)
         .then(response => response.json())
         .then(data => {
           resultsList.innerHTML = "";
-
           data.forEach(track => {
             const li = document.createElement("li");
             li.textContent = `${track.title} - ${track.artist}`;
             li.className = "list-group-item list-group-item-action";
             li.style.cursor = "pointer";
-
             li.addEventListener("click", () => {
               hiddenTrackId.value = track.id;
-
               trackInfoDiv.innerHTML = `
                 <div class="d-flex align-items-center gap-3 mt-3">
                   <img src="${track.cover}" alt="cover" class="rounded" style="width: 100px; height: 100px; object-fit: cover;">
@@ -63,11 +49,9 @@
                   </div>
                 </div>
               `;
-
               resultsList.innerHTML = "";
               searchInput.value = `${track.title} - ${track.artist}`;
             });
-
             resultsList.appendChild(li);
           });
         });
