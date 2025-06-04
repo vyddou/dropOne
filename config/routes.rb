@@ -3,7 +3,12 @@ Rails.application.routes.draw do
   devise_for :users
   root to: "pages#home"
 
-  resources :users, only: [:show] # Pour user_path(user)
+  resources :users, only: [:show] do # Pour user_path(user)
+      member do
+      post :follow
+      delete :unfollow
+    end
+  end
 
   resources :playlists, only: [:index, :show, :new, :create, :destroy] do
     member do

@@ -51,7 +51,6 @@
                     </p>
                     <div class="d-flex justify-content-between align-items-center mt-2">
                       <div>
-                        <%# Placeholder pour les boutons de vote - vous devrez implémenter cette logique %>
                         <%= button_to "🔥", vote_post_path(post, vote_type: 'hot'), method: :post, class: "btn btn-sm btn-outline-success me-1", title: "Hot" %>
                         <%= button_to "❄️", vote_post_path(post, vote_type: 'cold'), method: :post, class: "btn btn-sm btn-outline-info", title: "Cold" %>
                       </div>
@@ -80,9 +79,9 @@
     <h2 class="section-title text-center mb-4">🎶 Suggestions Electro Goa / Mental (par Deezer) 🎶</h2>
     <% if @todays_tracks.present? %>
       <div class="main-carousel-wrapper">
-        <div class="main-carousel"> <%# C'est sur cette classe que vous initialiserez Swiper.js %>
+        <div class="main-carousel">
           <% @todays_tracks.each do |track| %>
-            <div class="carousel-cell"> <%# Classe pour les slides Swiper %>
+            <div class="carousel-cell">
               <div class="album-art-card">
                 <% deezer_cover_url = track.cover_url.presence || "https://placehold.co/250x250/0A0F1E/E0E0E0?text=#{track.title.truncate(15)}" %>
                 <%= image_tag deezer_cover_url, alt: "Pochette de #{track.title}", class: "album-art-image" %>
@@ -112,3 +111,5 @@
   </section>
 
 </div>
+
+<%= render "shared/bottom_navbar" %>

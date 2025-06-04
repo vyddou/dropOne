@@ -10,4 +10,5 @@ class Follow < ApplicationRecord
 
   def cannot_follow_self
     errors.add(:base, "You cannot follow yourself") if first_user_id == second_user_id
+  end
 end
