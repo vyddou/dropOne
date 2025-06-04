@@ -91,3 +91,50 @@
                 0 0 30px rgba(var(--bs-secondary-rgb), 0.3);
   }
 }
+
+.btn-vote {
+  background-color: transparent; // Fond transparent pour le bouton
+  border: none;                // Pas de bordure pour le bouton
+  padding: 0.2rem 0.4rem;      // Petit padding autour de l'icône
+  cursor: pointer;
+  line-height: 1;              // Aide à l'alignement vertical
+
+  i { // Styles pour les icônes Bootstrap (bi-...) à l'intérieur du bouton
+    font-size: 1.2rem;         // Taille de l'icône, ajustez si besoin
+    vertical-align: middle;    // Pour un meilleur alignement vertical de l'icône
+    transition: color 0.15s ease-in-out, transform 0.15s ease-in-out; // Transition douce
+
+    // Couleur de base pour les icônes NON remplies (celles sur les suggestions Deezer avant vote)
+    &.bi-hand-thumbs-up {   // Pouce en haut non rempli
+      color: #6c757d;       // Un gris standard (couleur "secondary" de Bootstrap)
+    }
+    &.bi-hand-thumbs-down { // Pouce en bas non rempli
+      color: #6c757d;       // Un gris standard
+    }
+
+    // Couleur de base pour les icônes REMPLIES (celles sur les posts de l'app, ou après un vote)
+    &.bi-hand-thumbs-up-fill { // Pouce en haut rempli
+      color: #198754;          // Vert (couleur "success" de Bootstrap)
+    }
+    &.bi-hand-thumbs-down-fill { // Pouce en bas rempli
+      color: #dc3545;           // Rouge (couleur "danger" de Bootstrap)
+    }
+  }
+
+  // Effet au survol du bouton .btn-vote
+  &:hover {
+    // Pour les icônes "pouce en haut" (qu'elles soient .bi-hand-thumbs-up ou .bi-hand-thumbs-up-fill)
+    i.bi-hand-thumbs-up,
+    i.bi-hand-thumbs-up-fill {
+      color: #146c43; // Un vert un peu plus foncé pour le survol, ou gardez #198754
+      transform: scale(1.15); // Légère augmentation de taille
+    }
+
+    // Pour les icônes "pouce en bas" (qu'elles soient .bi-hand-thumbs-down ou .bi-hand-thumbs-down-fill)
+    i.bi-hand-thumbs-down,
+    i.bi-hand-thumbs-down-fill {
+      color: #b02a37; // Un rouge un peu plus foncé pour le survol, ou gardez #dc3545
+      transform: scale(1.15); // Légère augmentation de taille
+    }
+  }
+}

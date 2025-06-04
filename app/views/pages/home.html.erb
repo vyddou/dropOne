@@ -13,30 +13,35 @@
     <% end %>
   </div>
 
-  <%# Bouton pour ajouter un morceau si l'utilisateur est connecté %>
+  <%# --- BOUTON AJOUTER UN MORCEAU RÉINTÉGRÉ --- %>
   <% if user_signed_in? %>
     <div class="add-track-button-container mt-4 mb-5 w-100 text-center">
      <%= link_to "Ajouter un morceau", new_post_path, class: "btn btn-primary btn-aurora-glow" %>
     </div>
   <% end %>
+  <%# --- FIN DU BOUTON --- %>
 
   <section class="unified-carousel-section w-100">
     <h2 class="section-title text-center mb-4">🎶 Les Sons du Moment 🎶</h2>
-    <%# <p class="text-center text-muted small">Debug: Nombre d'items dans le carrousel: <%= @carousel_items.try(:count) || 0 %></p> %>
+
+    <%# Le %> parasite a été supprimé de la ligne où il pouvait être (avant la condition @carousel_items.present?) %>
 
     <% if @carousel_items.present? %>
       <div class="main-carousel-wrapper">
         <div class="main-carousel"> <%# Pour Swiper.js %>
           <% @carousel_items.each_with_index do |item, index| %>
             <div class="carousel-cell">
-              <div class="album-art-card h-100 d-flex flex-column">
-                <% cover_url = item.cover_url.presence || "https://placehold.co/250x250/0A0F1E/E0E0E0?text=#{item.title&.truncate(15)}" %>
-                <%= image_tag cover_url, alt: "Pochette de #{item.title}", class: "album-art-image" %>
-                <div class="album-art-overlay"></div>
-                <div class="album-art-info d-flex flex-column flex-grow-1 p-3">
-                  <h3 class="track-title mb-1"><%= item.title %></h3>
-                  <p class="track-artist text-muted small mb-2">par <%= item.artist %></p>
+              <div class="album-art-card-container">
+                <div class="album-art-visual-wrapper">
+                  <% cover_url = item.cover_url.presence || "https://placehold.co/280x280/0A0F1E/E0E0E0?text=#{item.title&.truncate(15)}" %>
+                  <%= image_tag cover_url, alt: "Pochette de #{item.title}", class: "album-cover-image" %>
+                  <div class="album-cover-text-overlay">
+                    <h5 class="album-title-on-cover" title="<%= item.title %>"><%= item.title %></h5>
+                    <p class="album-artist-on-cover" title="<%= item.artist %>"><%= item.artist %></p>
+                  </div>
+                </div>
 
+                <div class="album-details-section">
                   <% if item.genre.present? %>
                     <p class="track-genre small mb-2"><span class="badge bg-secondary"><%= item.genre.capitalize %></span></p>
                   <% end %>
@@ -45,8 +50,7 @@
                     <p class="card-text description-preview small mb-2"><%= truncate(item.description, length: 70) %></p>
                   <% end %>
 
-                  <%# Section des votes et infos utilisateur %>
-                  <div class="mt-auto"> <%# Pousse le contenu suivant vers le bas %>
+                  <div class="mt-auto">
                     <% if item.origin == :app && item.user && item.db_post_object %>
                       <p class="card-text mb-1">
                         <small class="text-muted">
@@ -58,46 +62,44 @@
                     <div class="d-flex justify-content-between align-items-center mb-2">
                       <div>
                         <% if item.origin == :app && item.db_post_object %>
-                          <%# Boutons pour un post existant de l'application %>
-                          <%= button_to vote_post_path(item.db_post_object, vote_type: 'hot'), method: :post, class: "btn btn-sm btn-outline-light border-0 p-1 me-2", title: "J'aime", form_class: "d-inline" do %>
-                            <i class="bi bi-hand-thumbs-up-fill" style="font-size: 1.3rem; color: #198754;"></i> <%# Vert Bootstrap %>
+                          <%= button_to vote_post_path(item.db_post_object, vote_type: 'hot'), method: :post, class: "btn btn-sm btn-vote", title: "J'aime", form_class: "d-inline" do %>
+                            <i class="bi bi-hand-thumbs-up-fill"></i>
                           <% end %>
-                          <%= button_to vote_post_path(item.db_post_object, vote_type: 'cold'), method: :post, class: "btn btn-sm btn-outline-light border-0 p-1", title: "Je n'aime pas", form_class: "d-inline" do %>
-                            <i class="bi bi-hand-thumbs-down-fill" style="font-size: 1.3rem; color: #dc3545;"></i> <%# Rouge Bootstrap %>
+                          <%= button_to vote_post_path(item.db_post_object, vote_type: 'cold'), method: :post, class: "btn btn-sm btn-vote", title: "Je n'aime pas", form_class: "d-inline" do %>
+                            <i class="bi bi-hand-thumbs-down-fill"></i>
                           <% end %>
                         <% elsif item.origin == :deezer %>
-                          <%# Boutons pour une suggestion Deezer (crée un post et vote) %>
-                          <%= button_to create_post_and_vote_on_track_path(item.id_for_links, vote_type: 'hot'), method: :post, class: "btn btn-sm btn-outline-light border-0 p-1 me-2", title: "J'aime et ajoute ce son", form_class: "d-inline" do %>
-                            <i class="bi bi-hand-thumbs-up" style="font-size: 1.3rem; color: #198754;"></i> <%# Pouce non rempli %>
+                          <%= button_to create_post_and_vote_on_track_path(item.id_for_links, vote_type: 'hot'), method: :post, class: "btn btn-sm btn-vote", title: "J'aime et ajoute ce son", form_class: "d-inline" do %>
+                            <i class="bi bi-hand-thumbs-up"></i>
                           <% end %>
-                          <%= button_to create_post_and_vote_on_track_path(item.id_for_links, vote_type: 'cold'), method: :post, class: "btn btn-sm btn-outline-light border-0 p-1", title: "Je n'aime pas ce son", form_class: "d-inline" do %>
-                            <i class="bi bi-hand-thumbs-down" style="font-size: 1.3rem; color: #dc3545;"></i> <%# Pouce non rempli %>
+                          <%= button_to create_post_and_vote_on_track_path(item.id_for_links, vote_type: 'cold'), method: :post, class: "btn btn-sm btn-vote", title: "Je n'aime pas ce son", form_class: "d-inline" do %>
+                            <i class="bi bi-hand-thumbs-down"></i>
                           <% end %>
                         <% end %>
                       </div>
-                      <%# Affiche le score pour les posts de l'app %>
                       <% if item.origin == :app %>
                         <span class="fw-bold small">Score: <%= item.net_votes %></span>
                       <% else %>
-                        <span class="small text-muted">&nbsp;</span> <%# Espace pour alignement %>
+                        <span class="small text-muted">&nbsp;</span>
                       <% end %>
                     </div>
 
+                    <%# --- CONDITION POUR LE LIEN MODIFIER CORRIGÉE --- %>
                     <% if item.origin == :app && user_signed_in? && item.user == current_user && item.db_post_object %>
-                      <%= link_to 'Modifier', edit_post_path(item.db_post_object), class: "btn btn-sm btn-outline-secondary mt-1" %>
+                      <%= link_to 'Modifier', edit_post_path(item.db_post_object), class: "btn btn-sm btn-outline-secondary mt-1 w-100" %>
                     <% end %>
+                    <%# --- FIN DE LA CORRECTION POUR MODIFIER --- %>
                   </div>
 
-                  <%# Lien Deezer et Extrait Audio (poussés vers le bas si possible) %>
                   <% if item.deezer_link.present? %>
-                    <p class="track-deezer-link mt-2 <%= 'mt-auto' if item.preview_url.blank? %>">
+                    <p class="track-deezer-link mt-2 <%= 'mt-auto' if item.preview_url.blank? && (item.origin != :app || !(item.user && item.db_post_object)) %>">
                       <a href="<%= item.deezer_link %>" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-info w-100">
                         <i class="bi bi-play-circle-fill"></i> Écouter sur Deezer
                       </a>
                     </p>
                   <% end %>
                   <% if item.preview_url.present? %>
-                    <div class="mt-2 <%= 'mt-auto' unless item.deezer_link.present? %>">
+                    <div class="mt-2 <%= 'mt-auto' unless item.deezer_link.present? || (item.origin == :app && item.user && item.db_post_object) %>">
                       <audio controls controlsList="nodownload noplaybackrate" src="<%= item.preview_url %>" style="width: 100%; height: 35px;"></audio>
                     </div>
                   <% end %>

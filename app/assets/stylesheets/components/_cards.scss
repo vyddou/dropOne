@@ -1,12 +1,98 @@
-.card {
-  // Les variables $card-bg, $card-border-color, $card-color
-  // sont déjà appliquées si vous les avez surchargées dans _variables.scss
-  transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+// Dans votre fichier SCSS, par exemple _cards.scss
+
+.carousel-cell { // C'est la classe de votre slide Swiper
+  // Swiper gère la largeur des slides, mais on peut s'assurer
+  // que le contenu à l'intérieur ne s'étire pas inutilement si Swiper
+  // donne plus d'espace que souhaité pour la carte elle-même.
+  // Ou, si vous voulez que les cartes soient plus petites que la largeur de la slide :
+  display: flex;
+  justify-content: center;
+  margin: 10px; 
+}
+
+.album-art-card-container {
+  background-color: #2c2f36;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease-in-out;
+
+  // Ajout d'une largeur maximale pour contrôler la taille globale de la carte
+  // Ajustez cette valeur pour obtenir la taille souhaitée.
+  // Par exemple, si vos slides sont larges, cela limitera la carte.
+  width: 100%; // Prend la largeur de la slide par défaut
+  max-width: 280px; // LIMITE LA LARGEUR MAXIMALE DE LA CARTE - AJUSTEZ CECI
+                    // Si vous avez plusieurs slidesPerView, cette valeur
+                    // doit être compatible avec la largeur de la slide calculée par Swiper.
+                    // Si vous voulez que les cartes soient plus petites que la largeur de la slide:
+                    // width: 280px; // ou une autre valeur fixe
 
   &:hover {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 10px 25px rgba(var(--bs-primary-rgb), 0.2); // Lueur subtile de la couleur primaire
-    // Ou une bordure qui s'illumine :
-    // border-color: var(--bs-primary);
+    transform: translateY(-5px);
+  }
+}
+
+.album-art-visual-wrapper {
+  position: relative;
+  width: 100%; // Prendra la largeur de .album-art-card-container
+  aspect-ratio: 1 / 1; // Maintient la zone de l'image carrée
+  overflow: hidden;    // S'assure que rien ne déborde
+
+  .album-cover-image {
+    display: block;
+    width: 100%;
+    height: 100%; // Remplit le conteneur parent qui a un aspect-ratio
+    object-fit: cover;
+  }
+
+  .album-cover-text-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px 12px;
+    color: white;
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.7) 30%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0) 100%);
+    overflow: hidden;
+
+    .album-title-on-cover {
+      font-size: 0.9rem; // Peut-être réduire un peu si la carte est plus petite
+      font-weight: 600;
+      margin-bottom: 2px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .album-artist-on-cover {
+      font-size: 0.75rem; // Peut-être réduire un peu
+      margin-bottom: 0;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+.album-details-section {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  background-color: #2c2f36;
+  // overflow-y: auto; // Peut être utile si le contenu est variable
+
+  // ... (vos autres styles pour .track-genre, .description-preview, etc.) ...
+  // Si la carte est plus petite, vous pourriez vouloir réduire la taille des polices ici aussi.
+
+  audio {
+    height: 30px;
+    max-width: 100%;
+    border-radius: 15px;
   }
 }
