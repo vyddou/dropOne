@@ -16,8 +16,6 @@ class User < ApplicationRecord
   has_many :conversation_participants, dependent: :destroy
   has_many :conversations, through: :conversation_participants
 
-
-
   # Système de "follow"
   # L'utilisateur "suit" d'autres utilisateurs (active)
   # La clé étrangère dans la table 'follows' pour celui qui suit est 'first_user_id'
@@ -31,5 +29,8 @@ class User < ApplicationRecord
   # À travers 'passive_follows', on trouve les utilisateurs qui suivent (qui sont les 'first_user' dans la table 'follows')
   has_many :followers, through: :passive_follows, source: :first_user
 
+  def follows?(user)
+    following.include?(user)
+  end
 
 end
