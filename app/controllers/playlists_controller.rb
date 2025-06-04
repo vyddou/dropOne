@@ -1,32 +1,31 @@
 class PlaylistsController < ApplicationController
   before_action :authenticate_user!
+  require 'net/http'
+  require 'uri'
+  require 'json'
+  require 'set'
 
-  # Affiche les playlists de l'utilisateur, sauf celles de like/dislike
   def index
     @playlists = current_user.playlists
                              .where.not(name: [Playlist::LIKE_PLAYLIST_NAME, Playlist::DISLIKE_PLAYLIST_NAME])
                              .order(created_at: :desc)
   end
 
-  # Affiche une playlist et ses morceaux
   def show
     @playlist = current_user.playlists.find(params[:id])
     @playlist_items = @playlist.playlist_items.includes(:track)
   end
 
-  # Formulaire nouvelle playlist
   def new
     @playlist = Playlist.new
   end
 
-  # Suppression d'une playlist
   def destroy
     playlist = current_user.playlists.find(params[:id])
     playlist.destroy
     redirect_to playlists_path, notice: "Playlist supprimée."
   end
 
-  # Renommage d'une playlist
   def rename
     @playlist = current_user.playlists.find(params[:id])
     if @playlist.update(name: params[:playlist][:name])
@@ -36,7 +35,6 @@ class PlaylistsController < ApplicationController
     end
   end
 
-  # Création d'une playlist générée automatiquement
   def create
     user_provided_prompt = params[:user_prompt].to_s.strip
     Rails.logger.debug "[Playlist#create] user_provided_prompt: #{user_provided_prompt.inspect}"
@@ -50,19 +48,20 @@ class PlaylistsController < ApplicationController
     search_query = generate_search_query(user_provided_prompt)
     Rails.logger.debug "[Playlist#create] search_query: #{search_query.inspect}"
 
-    all_tracks = fetch_tracks_with_fallback(search_query, excluded_deezer_track_ids, 100, max_retries: 5)
+    all_tracks = fetch_deezer_tracks_with_fallback(search_query, excluded_deezer_track_ids, 100, max_retries: 5)
 
     selected_tracks = []
     cumulative_duration = 0
+    artist_counts = Hash.new(0)
 
     all_tracks.each do |track|
       break if cumulative_duration >= total_duration_ms
-
-      # Ignore les tracks sans durée définie (par sécurité)
-      next unless track.duration_ms.present?
+      next unless track[:duration].present?
+      next if artist_counts[track[:artist_name].downcase] >= 2
 
       selected_tracks << track
-      cumulative_duration += track.duration_ms
+      cumulative_duration += track[:duration]
+      artist_counts[track[:artist_name].downcase] += 1
     end
 
     if selected_tracks.blank?
@@ -80,15 +79,8 @@ class PlaylistsController < ApplicationController
     playlist_name = generate_playlist_name(user_provided_prompt, total_duration_minutes)
 
     ActiveRecord::Base.transaction do
-      # raise
-      playlist = current_user.playlists.create!(
-        # generated_at: Time.current,
-        # user_id: current_user,
-        name: playlist_name
-      )
-      create_playlist_tracks(playlist, selected_tracks).each do |pt|
-        Rails.logger.debug "[Playlist#create] Ajout Track ##{pt.track_id} à Playlist ##{playlist.id}"
-      end
+      playlist = current_user.playlists.create!(name: playlist_name)
+      create_playlist_tracks(playlist, selected_tracks)
       redirect_to playlist_path(playlist), notice: message
     end
   rescue => e
@@ -97,72 +89,80 @@ class PlaylistsController < ApplicationController
     redirect_to new_playlist_path, alert: "Échec de la génération : #{e.message}"
   end
 
-
   private
 
   def generate_search_query(user_prompt = nil)
-    prompt_for_llm = if user_prompt.present?
-      <<~PROMPT
-        Extrait 1 à 5 mots-clés pertinents pour une recherche musicale à partir du texte suivant.
-        Texte de l'utilisateur : "#{user_prompt}"
-        Donne uniquement les mots-clés, sans explication.
-        Par contre attention on ne veut aucun doublon de morceaux ni d'artiste
-      PROMPT
-    else
-      <<~PROMPT
-        Génère une requête de recherche musicale courte et pertinente en 1 à 3 mots-clés.
-        Donne uniquement la requête, sans explication.
-        Par contre attention on ne veut aucun doublon de morceaux ni d'artiste
-      PROMPT
-    end
+    style_list = %w[
+      Pop Rap Rock Jazz Blues Classical Electro Metal Funk Soul Disco Reggae Dancehall
+      RnB House Techno Trance Chillout Ambient Dub K-pop J-pop Afrobeat Salsa Reggaeton
+      Trap Grime Drill Country Folk Punk Gospel New\ Wave Indie\ Rock Hard\ Rock Synthwave
+      Lofi World\ Music
+    ].join(', ')
 
-    begin
-      chat = RubyLLM.chat
-      response = chat.ask(prompt_for_llm)
-      query = response.respond_to?(:content) ? response.content : response
-      query = query.strip.downcase.gsub(/["']/, '')
-      Rails.logger.info "[Playlist#create] LLM generated search query: #{query.inspect}"
-      query.presence || fallback_query
-    rescue => e
-      Rails.logger.error "[Playlist#create] LLM Error: #{e.class} #{e.message}"
-      fallback_query
-    end
+    base_prompt = <<~PROMPT
+      Tu es un expert en musique et en classification musicale.
+
+      À partir de cette demande utilisateur :
+      "#{user_prompt}"
+
+      Ta tâche est de générer une requête musicale très précise pour une recherche sur Deezer.
+
+      ### Contraintes :
+      - Ne donne que la requête. Aucune explication, aucun commentaire.
+      - Inclue obligatoirement un style musical clair parmi ceux disponibles sur Deezer.
+      - La requête doit être courte (3 à 6 mots), et contenir si possible une époque (ex: années 90) ou un adjectif d’ambiance (ex: mélancolique, chill, énervé, joyeux).
+      - N'invente pas de genre.
+      - Ne propose jamais un style qui mélange plusieurs genres non compatibles.
+      - Ne cite jamais d’artiste sauf si l’utilisateur le fait explicitement.
+      - Si la durée est mentionnée (ex: "30 min"), prends-la en compte comme objectif, mais ne l'inclus pas dans la requête.
+
+      Liste de styles valides (Deezer) : #{style_list}
+
+      Donne uniquement la requête finale.
+    PROMPT
+
+    chat = RubyLLM.chat
+    response = chat.ask(base_prompt)
+    query = response.respond_to?(:content) ? response.content : response
+    query.strip.downcase.gsub(/["']/, '').presence || fallback_query
+  rescue => e
+    Rails.logger.error "[generate_search_query] LLM Error: #{e.class} #{e.message}"
+    fallback_query
   end
 
   def fallback_query
-    ['jazz', 'pop', 'rock', 'electronic', 'indie', 'lofi', 'chill'].sample(2).join(' ')
+    ['jazz', 'pop', 'rock', 'electro', 'indie', 'chill'].sample(2).join(' ')
   end
 
-  # Recherche de morceaux avec tentative de fallback si résultats insuffisants
-  def fetch_tracks_with_fallback(query, excluded_ids, desired_number = 100, max_retries: 3)
-    
+  def fetch_deezer_tracks_with_fallback(query, excluded_ids, desired_number = 100, max_retries: 3)
     retries = 0
     tracks = []
-    seen = Set.new
-    current_query = query.dup
+    seen_tracks = Set.new
 
     while tracks.size < desired_number && retries < max_retries
-      search_results = RSpotify::Track.search(current_query, limit: 50, market: 'FR')
-      
-      filtered = search_results.reject do |t|
-        # Normalisation pour éviter les doublons sur nom + artistes
-        key = [t.name.downcase.strip, t.artists.map(&:name).join(',').downcase.strip]
-        excluded_ids.include?(t.id) || seen.include?(key)
-      end
+      url = URI("https://api.deezer.com/search?q=#{URI.encode_www_form_component(query)}&limit=50")
+      response = Net::HTTP.get(url)
+      results = JSON.parse(response)["data"] || []
 
-      filtered.each do |t|
+      results.each do |t|
+        next if excluded_ids.include?(t["id"])
+        key = [t["title"].downcase.strip, t["artist"]["name"].downcase.strip]
+        next if seen_tracks.include?(key)
+
+        tracks << {
+          id: t["id"],
+          title: t["title"],
+          artist_name: t["artist"]["name"],
+          duration: t["duration"] * 1000,
+          preview_url: t["preview"],
+          cover_url: t.dig("album", "cover_medium")
+        }
+        seen_tracks << key
         break if tracks.size >= desired_number
-        key = [t.name.downcase.strip, t.artists.map(&:name).join(',').downcase.strip]
-        
-        unless seen.include?(key)
-          tracks << t
-          seen << key
-        end
       end
 
-      if filtered.empty? && tracks.size < desired_number
-        Rails.logger.info "[Playlist#create] Fallback query activated for '#{current_query}'"
-        current_query = fallback_query
+      if results.empty? && tracks.size < desired_number
+        query = fallback_query
       end
 
       retries += 1
@@ -171,98 +171,56 @@ class PlaylistsController < ApplicationController
     tracks.first(desired_number)
   end
 
-
   def excluded_track_ids
-   current_user.playlists
+    current_user.playlists
                 .joins(playlist_items: :track)
-                # .pluck('tracks.deezer_track_id')
+                .pluck('tracks.deezer_track_id')
                 .uniq
   end
 
-  # --- Intégration Deezer pour preview alternative ---
-  require 'net/http'
-  require 'uri'
-  require 'json'
-
-  def fetch_deezer_preview(track_title, artist_name)
-    query = URI.encode_www_form_component("track:\"#{track_title}\" artist:\"#{artist_name}\"")
-    url = URI("https://api.deezer.com/search?q=#{query}&limit=1")
-    response = Net::HTTP.get(url)
-    data = JSON.parse(response)
-    if data["data"] && data["data"].any?
-      return data["data"][0]["preview"] # 30s mp3
-    else
-      return nil
-    end
-  rescue => e
-    Rails.logger.error("[Deezer] Error fetching preview: #{e.message}")
-    nil
-  end
-
-  # Création des morceaux et ajout à la playlist, avec preview Deezer si disponible
   def create_playlist_tracks(playlist, tracks)
-    Rails.logger.debug "Creating PlaylistItem with playlist.user_id = #{playlist.user_id}"
-
-    tracks.map do |spotify_track|
-      track = Track.find_or_initialize_by(deezer_track_id: spotify_track.id).tap do |t|
-        # raise
-        t.title = spotify_track.name
-        t.artist_name = spotify_track.artists.map(&:name).join(', ')
-        t.duration = spotify_track.duration_ms
-        t.preview_url = spotify_track.preview_url
+    tracks.map do |deezer_track|
+      track = Track.find_or_initialize_by(deezer_track_id: deezer_track[:id]).tap do |t|
+        t.title = deezer_track[:title]
+        t.artist_name = deezer_track[:artist_name]
+        t.duration = deezer_track[:duration]
+        t.preview_url = deezer_track[:preview_url]
+        t.cover_url = deezer_track[:cover_url]
         t.user_id = playlist.user_id
-        deezer_preview = fetch_deezer_preview(t.title, t.artist_name)
-        t.link_deezer = deezer_preview if deezer_preview.present?
-
+        t.link_deezer = "https://www.deezer.com/track/#{deezer_track[:id]}"
         t.save!
       end
       playlist.playlist_items.create!(track: track)
     end
   end
 
-  # Extraction durée depuis prompt utilisateur (ex: "20 minutes", "1h", etc.)
   def extract_duration_from_prompt(prompt)
     return nil if prompt.blank?
-
     duration_match = prompt.downcase.match(/(\d+)\s*(minutes?|mins?|h|heures?|hours?)/)
     return nil unless duration_match
-
     value = duration_match[1].to_i
     unit = duration_match[2]
-
-    case unit
-    when /h|heures?|hours?/ then value * 60
-    else value
-    end
+    unit =~ /h|heures?|hours?/ ? value * 60 : value
   end
 
   def generate_playlist_name(user_prompt, total_duration_minutes)
     duration_text = "(#{total_duration_minutes} min)"
-
     return "Ma Playlist #{Time.current.strftime('%d/%m/%Y %H:%M')} #{duration_text}" if user_prompt.blank?
 
     prompt = <<~PROMPT
-      Résume en quelques mots (de 3 à 8 maximum) ce sujet de manière concise et musicale :
+      Résume en quelques mots (3 à 8) ce sujet de manière concise et musicale :
       "#{user_prompt}"
-      Donne uniquement le résumé, sans explication mais avec des emoticones (pas seul) si pertinent.
+      Donne uniquement le résumé, sans explication, avec éventuellement des emojis si pertinent.
     PROMPT
 
     begin
       response = RubyLLM.chat.ask(prompt)
       summary = response.respond_to?(:content) ? response.content : response
-      # summary = summary.strip.gsub(/[^\w\s]/, '').split.take(5).join(' ')
       summary = summary.capitalize
-
-      # Si la durée semble déjà présente dans le résumé, on l'ajoute pas
-      if summary.match?(/\b\d+\s*(min|minutes|h|heures?)\b/i)
-        summary
-      else
-        "#{summary} #{duration_text}"
-      end
+      summary.match?(/\b\d+\s*(min|minutes|h|heures?)\b/i) ? summary : "#{summary} #{duration_text}"
     rescue => e
       Rails.logger.error "[generate_playlist_name] LLM Error: #{e.class} #{e.message}"
       "Ma Playlist #{Time.current.strftime('%d/%m/%Y %H:%M')} #{duration_text}"
     end
   end
-
 end

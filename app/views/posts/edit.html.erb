@@ -23,54 +23,63 @@
 <% end %>
 
 <script>
-  const searchInput = document.getElementById("deezer-search");
-  const resultsList = document.getElementById("search-results");
-  const trackInfoDiv = document.getElementById("selected-track-info");
-  const hiddenTrackId = document.getElementById("selected-track-id");
+  document.addEventListener('turbo:load', () => {
+    const searchInput = document.getElementById("deezer-search");
+    if (!searchInput) return; // si la page ne contient pas ce champ, on stoppe
 
-  let timeout = null;
+    const resultsList = document.getElementById("search-results");
+    const trackInfoDiv = document.getElementById("selected-track-info");
+    const hiddenTrackId = document.getElementById("selected-track-id");
 
-  searchInput.addEventListener("input", () => {
-    clearTimeout(timeout);
-    const query = searchInput.value;
+    let timeout = null;
 
-    if (query.length < 2) {
-      resultsList.innerHTML = "";
-      return;
-    }
+    // Pour éviter d'attacher plusieurs fois l'événement si turbo:load est déclenché plusieurs fois,
+    // on supprime d'abord les anciens écouteurs :
+    searchInput.replaceWith(searchInput.cloneNode(true));
+    const newSearchInput = document.getElementById("deezer-search");
 
-    timeout = setTimeout(() => {
-      fetch(`/posts/deezer_search?q=${encodeURIComponent(query)}`)
-        .then(response => response.json())
-        .then(data => {
-          resultsList.innerHTML = "";
+    newSearchInput.addEventListener("input", () => {
+      clearTimeout(timeout);
+      const query = newSearchInput.value;
 
-          data.forEach(track => {
-            const li = document.createElement("li");
-            li.textContent = `${track.title} - ${track.artist}`;
-            li.className = "list-group-item list-group-item-action";
-            li.style.cursor = "pointer";
+      if (query.length < 2) {
+        resultsList.innerHTML = "";
+        return;
+      }
 
-            li.addEventListener("click", () => {
-              hiddenTrackId.value = track.id;
+      timeout = setTimeout(() => {
+        fetch(`/posts/deezer_search?q=${encodeURIComponent(query)}`)
+          .then(response => response.json())
+          .then(data => {
+            resultsList.innerHTML = "";
 
-              trackInfoDiv.innerHTML = `
-                <div class="d-flex align-items-center gap-3 mt-3">
-                  <img src="${track.cover}" alt="cover" class="rounded" style="width: 100px; height: 100px; object-fit: cover;">
-                  <div>
-                    <p><strong>${track.title}</strong> par ${track.artist}</p>
-                    <audio controls src="${track.preview}"></audio>
+            data.forEach(track => {
+              const li = document.createElement("li");
+              li.textContent = `${track.title} - ${track.artist}`;
+              li.className = "list-group-item list-group-item-action";
+              li.style.cursor = "pointer";
+
+              li.addEventListener("click", () => {
+                hiddenTrackId.value = track.id;
+
+                trackInfoDiv.innerHTML = `
+                  <div class="d-flex align-items-center gap-3 mt-3">
+                    <img src="${track.cover}" alt="cover" class="rounded" style="width: 100px; height: 100px; object-fit: cover;">
+                    <div>
+                      <p><strong>${track.title}</strong> par ${track.artist}</p>
+                      <audio controls src="${track.preview}"></audio>
+                    </div>
                   </div>
-                </div>
-              `;
+                `;
 
-              resultsList.innerHTML = "";
-              searchInput.value = `${track.title} - ${track.artist}`;
+                resultsList.innerHTML = "";
+                newSearchInput.value = `${track.title} - ${track.artist}`;
+              });
+
+              resultsList.appendChild(li);
             });
-
-            resultsList.appendChild(li);
           });
-        });
-    }, 400);
+      }, 400);
+    });
   });
 </script>
