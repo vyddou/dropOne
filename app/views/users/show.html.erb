@@ -1,3 +1,5 @@
+
+
 <div class="container mt-4">
     <style>
     .nav-tabs .nav-link {
@@ -9,7 +11,9 @@
       border-bottom: 3px solid #0d6efd;
     }
   </style>
-  
+  <% unless current_user == @user %>
+  <%= button_to "Envoyer un message", conversations_path(user_id: @user.id), method: :post, class:"btn btn-primary btn-aurora-glow" %>
+  <% end %>
   <!-- En-tête avec menu burger pour l'utilisateur courant -->
   <div class="d-flex justify-content-between align-items-center">
     <h1><%= @user.email %></h1>
@@ -78,4 +82,3 @@
 </div>
 
 <%= render "shared/bottom_navbar" %>
-
