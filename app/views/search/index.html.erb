@@ -66,7 +66,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const suggestionsList = document.getElementById('suggestions-list');
 
   input.addEventListener('input', function() {
-    const query = this.value;
+    const query = this.value.trim();
+    console.log('Input détecté:', query);
 
     if (query.length < 1) {
       suggestionsList.style.display = 'none';
@@ -75,10 +76,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     fetch(`/search_suggestions?query=${encodeURIComponent(query)}`)
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
+      })
       .then(data => {
+        console.log('Suggestions reçues:', data);
+
         if (data.length > 0) {
-          suggestionsList.innerHTML = data.map(item => `<li class="list-group-item suggestion-item" style="cursor:pointer;">${item}</li>`).join('');
+          suggestionsList.innerHTML = data.map(item =>
+            `<li class="list-group-item suggestion-item" style="cursor:pointer;">${item}</li>`
+          ).join('');
           suggestionsList.style.display = 'block';
 
           document.querySelectorAll('.suggestion-item').forEach(li => {
@@ -91,6 +99,11 @@ document.addEventListener('DOMContentLoaded', () => {
           suggestionsList.style.display = 'none';
           suggestionsList.innerHTML = '';
         }
+      })
+      .catch(error => {
+        console.error('Erreur lors de la récupération des suggestions:', error);
+        suggestionsList.style.display = 'none';
+        suggestionsList.innerHTML = '';
       });
   });
 
