@@ -30,7 +30,7 @@ Rails.application.routes.draw do
   get 'posts/deezer_search', to: 'posts#deezer_search'
 
   # Ressources pour les posts, incluant :show pour post_path et la route de vote
-  resources :posts, only: [:new, :create, :edit, :update, :show] do
+  resources :posts, only: [:new, :create, :edit, :update, :show, :destroy] do
     member do
       post 'vote' # Crée vote_post_path(post) pour POST /posts/:id/vote
     end
