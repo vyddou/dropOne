@@ -1,5 +1,6 @@
 # config/routes.rb
 Rails.application.routes.draw do
+  get 'search/index'
   # Supprimez "get 'users/show'" si vous avez "resources :users, only: [:show]" ci-dessous
   # get 'users/show'
 
@@ -42,5 +43,7 @@ Rails.application.routes.draw do
   end
 
   get "up" => "rails/health#show", as: :rails_health_check
+  get 'search', to: 'search#index', as: 'search'
+  get 'search_suggestions', to: 'search#suggestions'
 
 end
