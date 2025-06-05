@@ -11,7 +11,8 @@ Rails.application.routes.draw do
       post :follow
       delete :unfollow
       patch :update_description
-    end
+      get :activity
+    end 
   end
 
   resources :playlists, only: [:index, :show, :new, :create, :destroy] do
