@@ -5,7 +5,9 @@ class UsersController < ApplicationController
     
     # Initialisation des variables
     @user_posts = @user.posts.order(created_at: :desc)
-    @user_playlists = @user.playlists.order(created_at: :desc)
+    
+    # Exclure la playlist "Like" des playlists affichées
+    @user_playlists = @user.playlists.where.not(name: "Like").order(created_at: :desc)
     
     # Gestion des tracks likées
     @like_playlist = @user.playlists.find_by(name: "Like") ######## s ou pas ??
