@@ -11,14 +11,7 @@
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto">
-        <% if user_signed_in? %>
-          <li class="nav-item">
-            <%= link_to "Home", root_path, class: "nav-link #{'active' if current_page?(root_path)}" %>
-          </li>
-          <li class="nav-item">
-            <%= link_to "Playlists", playlists_path, class: "nav-link #{'active' if current_page?(playlists_path)}" %>
-          </li>
-        <% end %>
+        
       </ul>
 
       <ul class="navbar-nav ms-auto">

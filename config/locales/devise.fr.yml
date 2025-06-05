@@ -1,0 +1,18 @@
+fr:
+  devise:
+    sessions:
+      signed_in: "Bon retour parmi nous ! 🎵"
+      signed_out: "Vous avez bien été déconnecté(e) ! À bientôt sur DropOne 🎵"
+    registrations:
+      signed_up: "Inscription réussie !"
+      signed_up_but_inactive: "Compte créé mais en attente d'activation."
+      updated: "Profil mis à jour."
+      destroyed: "Compte supprimé avec succès."
+    failure:
+      already_authenticated: "Vous êtes déjà connecté(e)."
+      unauthenticated: "Veuillez vous connecter pour continuer."
+      unconfirmed: "Merci de confirmer votre compte."
+      locked: "Votre compte est verrouillé."
+      invalid: "Email ou mot de passe invalide."
+      timeout: "Votre session a expiré. Veuillez vous reconnecter."
+      inactive: "Votre compte n'est pas encore activé."

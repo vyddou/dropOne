@@ -1,6 +1,33 @@
+// .alert {
+//   position: fixed;
+//   bottom: 16px;
+//   right: 16px;
+//   z-index: 1000;
+// }
+
 .alert {
   position: fixed;
-  bottom: 16px;
-  right: 16px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 1000;
+  width: 90%;
+  max-width: 400px;
+  margin: 0 auto;
+  bottom: 16px;
+
+  /* Version mobile */
+  @media (max-width: 768px) {
+    bottom: var(--alert-bottom-pos, 16px);
+    
+    .with-bottom-navbar & {
+      bottom: var(--navbar-height, 72px); // 72px = hauteur typique navbar mobile
+    }
+  }
+  
+  /* Version desktop */
+  @media (min-width: 769px) {
+    right: 16px;
+    left: auto;
+    transform: none;
+  }
 }
