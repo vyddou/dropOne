@@ -4,6 +4,7 @@ import "controllers"
 import "@popperjs/core"
 import "bootstrap"
 
+
 document.addEventListener('turbo:load', () => {
   const input = document.getElementById('search-input');
   const form = document.getElementById('search-form');
@@ -15,3 +16,5 @@ document.addEventListener('turbo:load', () => {
     }
   });
 });
+import "./custom/adjust_alerts"
+

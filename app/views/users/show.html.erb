@@ -13,16 +13,6 @@
       }
     </style>
 
-
-    .nav-tabs .nav-link {
-      color: #495057; /* Couleur texte sombre */
-    }
-    .nav-tabs .nav-link.active {
-      font-weight: bold;
-      color: #0d6efd; /* Bleu Bootstrap */
-      border-bottom: 3px solid #0d6efd;
-    }
-  </style>
   <% unless current_user == @user %>
   <%= button_to "Envoyer un message", conversations_path(user_id: @user.id), method: :post, class:"btn btn-primary btn-aurora-glow" %>
   <% end %>
@@ -39,7 +29,7 @@
         </button>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
           <li><%= link_to "Modifier mon profil", edit_user_registration_path, class: "dropdown-item" %></li>
-          <li><%= link_to "Déconnexion", destroy_user_session_path, method: :delete, class: "dropdown-item" %></li>
+          <li><%= link_to "Déconnexion", destroy_user_session_path, data: { "turbo-method": :delete }, class: "dropdown-item" %></li>
         </ul>
       </div>
     <% end %>
@@ -50,7 +40,9 @@
     <div class="d-flex align-items-start mt-3 flex-column flex-sm-row">
       <!-- Avatar -->
       <div class="me-sm-3 mb-3 mb-sm-0 text-center">
-        <%= image_tag @user.avatar_url, alt: "Avatar de #{@user.username}", class: "rounded-circle", width: 100, height: 100 %>
+        <!-- Avatar par défaut en cas d'absence d'image -->
+       <% avatar_url_to_display = @user.avatar_url.presence || "https://images.unsplash.com/photo-1715615685666-882710b534f9?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NTd8fGF2YXRhcnxlbnwwfHwwfHx8MA%3D%3D" %>
+<%= image_tag avatar_url_to_display, alt: "Avatar de #{@user.username}", class: "rounded-circle", width: 100, height: 100 %>
       </div>
 
       <!-- Description (affichage ou formulaire) -->
@@ -80,7 +72,7 @@
 
 
 
-    
+
   </div>
 
   <!-- Stats followers/following -->

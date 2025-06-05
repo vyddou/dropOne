@@ -12,3 +12,7 @@ fr:
       default: "%d %B %Y à %H:%M"
       short: "%d/%m/%Y %H:%M"  # Ajoutez cette ligne
       long: "%d %B %Y à %H:%M:%S"
+  
+  helpers:
+    alert: "Alerte"
+    notice: "Information"
