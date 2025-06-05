@@ -3,4 +3,18 @@ import "@hotwired/turbo-rails"
 import "controllers"
 import "@popperjs/core"
 import "bootstrap"
+
+
+document.addEventListener('turbo:load', () => {
+  const input = document.getElementById('search-input');
+  const form = document.getElementById('search-form');
+
+  input.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // empêche le comportement par défaut (si besoin)
+      form.requestSubmit();    // déclenche l'envoi du formulaire comme si tu cliquais sur le bouton
+    }
+  });
+});
 import "./custom/adjust_alerts"
+

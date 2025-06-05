@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = [ "playButtonIcon", "visualWrapper" ] // Exemple de cibles
+  static targets = [ "playButtonIcon", "visualWrapper" ]
 
   connect() {
     console.log("Audio Player Controller connecté!", this.element)
@@ -14,16 +14,7 @@ export default class extends Controller {
     }
   }
 
-  disconnect() {
-    if (this.globalAudioPlayer) {
-      // Potentiellement supprimer les écouteurs si nécessaire,
-      // mais pour les écouteurs sur globalAudioPlayer, ce n'est pas toujours critique
-      // si le contrôleur est déconnecté et reconnecté souvent.
-    }
-  }
-
   _setupGlobalPlayerListeners() {
-    // Utilise des fonctions fléchées pour conserver le 'this' du contrôleur
     this.handleAudioEnd = this.handleAudioEnd.bind(this);
     this.handleAudioError = this.handleAudioError.bind(this);
 
@@ -46,14 +37,23 @@ export default class extends Controller {
 
   handleAudioError(e) {
     console.error("Erreur de lecture audio:", e);
-    this.handleAudioEnd(); // Réinitialise l'état comme à la fin de la lecture
+    this.handleAudioEnd();
   }
 
   togglePlay(event) {
     const clickedButton = event.currentTarget;
+
+    // Déclare les wrappers
     const cell = clickedButton.closest(".carousel-cell");
+    const cardTop = clickedButton.closest(".card-img-top");
     const visualWrapper = clickedButton.closest(".album-art-visual-wrapper");
-    const previewUrl = cell.dataset.previewUrl;
+
+    // Recherche previewUrl dans l'ordre
+    let previewUrl = cell?.dataset.previewUrl
+                 || cardTop?.dataset.previewUrl
+                 || visualWrapper?.dataset.previewUrl
+                 || visualWrapper?.dataset.audioPlayerPreviewUrlValue;
+
     const icon = clickedButton.querySelector("i");
 
     if (!previewUrl) {
@@ -70,14 +70,18 @@ export default class extends Controller {
       this.globalAudioPlayer.pause();
       icon.classList.remove("bi-pause-fill");
       icon.classList.add("bi-play-fill");
-      visualWrapper.classList.remove("is-playing");
+
+      if (cell) cell.classList.remove("is-playing");
+      if (cardTop) cardTop.classList.remove("is-playing");
+      if (visualWrapper) visualWrapper.classList.remove("is-playing");
+
     } else {
       if (this.currentlyPlayingButton && this.currentlyPlayingButton !== clickedButton) {
         const oldIcon = this.currentlyPlayingButton.querySelector("i");
         oldIcon.classList.remove("bi-pause-fill");
         oldIcon.classList.add("bi-play-fill");
       }
-      if (this.currentVisualWrapper && this.currentVisualWrapper !== visualWrapper) {
+      if (this.currentVisualWrapper && this.currentVisualWrapper !== (cell || cardTop || visualWrapper)) {
         this.currentVisualWrapper.classList.remove("is-playing");
       }
 
@@ -87,14 +91,19 @@ export default class extends Controller {
       this.globalAudioPlayer.play().then(() => {
         icon.classList.remove("bi-play-fill");
         icon.classList.add("bi-pause-fill");
-        visualWrapper.classList.add("is-playing");
+
+        const playingWrapper = cell || cardTop || visualWrapper;
+        if (playingWrapper) playingWrapper.classList.add("is-playing");
+
         this.currentlyPlayingButton = clickedButton;
-        this.currentVisualWrapper = visualWrapper;
+        this.currentVisualWrapper = playingWrapper;
       }).catch(error => {
         console.error("Erreur lors de la tentative de lecture :", error);
         icon.classList.remove("bi-pause-fill");
         icon.classList.add("bi-play-fill");
-        visualWrapper.classList.remove("is-playing");
+
+        const playingWrapper = cell || cardTop || visualWrapper;
+        if (playingWrapper) playingWrapper.classList.remove("is-playing");
       });
     }
   }
