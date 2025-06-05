@@ -1,14 +1,9 @@
-<% if notice %>
-  <div class="alert alert-info alert-dismissible fade show m-1" role="alert">
-    <%= notice %>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-    </button>
-  </div>
-<% end %>
-<% if alert %>
-  <div class="alert alert-warning alert-dismissible fade show m-1" role="alert">
-    <%= alert %>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-    </button>
+<% flash.each do |type, message| %>
+  <% alert_class = type == 'notice' ? 'alert-info' : 'alert-danger' %>
+  <% auto_dismiss = type == 'notice' ? 'data-auto-dismiss="true"' : '' %>
+  
+  <div class="alert <%= alert_class %> alert-dismissible fade show flash-message" <%= auto_dismiss %> role="alert">
+    <%= message %>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
   </div>
 <% end %>
