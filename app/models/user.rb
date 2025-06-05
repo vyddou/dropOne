@@ -35,4 +35,12 @@ class User < ApplicationRecord
     following.include?(user)
   end
 
+  def unread_messages_count
+    Message.joins(:conversation)
+           .where(conversations: { id: self.conversations.ids })
+           .where.not(user_id: self.id)
+           .unread
+           .count
+  end
+
 end

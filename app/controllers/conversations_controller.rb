@@ -13,6 +13,7 @@ class ConversationsController < ApplicationController
     end
     @messages = @conversation.messages.order(created_at: :asc)
     @message = Message.new
+    @messages.where.not(user_id: current_user.id).where(read_at: nil).update_all(read_at: Time.current)
   end
 
   def create
