@@ -10,4 +10,6 @@ class Message < ApplicationRecord
   def read?
     read_at.present?
   end
+
+  scope :unread, -> { where(read_at: nil) }
 end
