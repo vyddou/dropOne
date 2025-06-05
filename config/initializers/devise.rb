@@ -1,3 +1,4 @@
+require Rails.root.join('app/responders/custom_responder.rb')
 # frozen_string_literal: true
 
 # Assuming you have not yet modified this file, each configuration option below
