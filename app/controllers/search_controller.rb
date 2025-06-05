@@ -7,7 +7,7 @@ class SearchController < ApplicationController
       q = params[:query]
 
       @results = {
-        tracks: Post.joins(:track).where("tracks.title ILIKE ?", "%#{q}%").limit(10),
+        tracks: Post.joins(:track).includes(:track).where("tracks.title ILIKE ?", "%#{q}%").limit(10),
         playlists: Playlist.where("name ILIKE ?", "%#{q}%").limit(10),
         users: User.where("username ILIKE ?", "%#{q}%").limit(10)
       }
@@ -24,32 +24,49 @@ class SearchController < ApplicationController
     suggestions = []
 
     if q.present?
-      # Recherches locales — récupérer titre + artiste
-      tracks = Post.joins(:track)
+      tracks = Post.joins(:track).includes(:track)
                    .where("tracks.title ILIKE ?", "%#{q}%")
                    .limit(3)
-                   .includes(:track)
                    .map do |post|
-                     track = post.track
-                     # Remplace artist_name par ta méthode ou association artiste si besoin
-                     artist_name = track.artist_name rescue "Artiste inconnu"
-                     "#{artist_name} - #{track.title}"
-                   end
+        track = post.track
+        artist_name = track.artist_name rescue "Artiste inconnu"
+        {
+          type: "track",
+          label: "#{artist_name} - #{track.title}",
+          image_url: track.cover_url || "/images/default_cover.png"
+        }
+      end
 
-      playlists = Playlist.where("name ILIKE ?", "%#{q}%").limit(3).pluck(:name)
-      users = User.where("username ILIKE ?", "%#{q}%").limit(3).pluck(:username)
+      playlists = Playlist.where("name ILIKE ?", "%#{q}%").limit(3).map do |playlist|
+        {
+          type: "playlist",
+          label: playlist.name,
+          image_url: "/images/black_placeholder.png"
+        }
+      end
+
+      users = User.where("username ILIKE ?", "%#{q}%").limit(3).map do |user|
+        {
+          type: "user",
+          label: user.username,
+          image_url: user.avatar_url || "/images/default_user_avatar.png"
+        }
+      end
 
       suggestions += tracks + playlists + users
 
-      # Recherche Deezer API
       begin
         url = URI("https://api.deezer.com/search?q=#{URI.encode_www_form_component(q)}&limit=5")
         res = Net::HTTP.get_response(url)
         if res.is_a?(Net::HTTPSuccess)
           data = JSON.parse(res.body)
           deezer_titles = data["data"].map do |item|
-            artist_name = item.dig("artist", "name") || "Artiste inconnu"
-            "#{artist_name} - #{item['title']}"
+            {
+              type: "deezer",
+              label: "#{item.dig('artist', 'name') || 'Artiste inconnu'} - #{item['title']}",
+              image_url: item.dig("album", "cover_small") || "/images/default_cover.png",
+              preview: item["preview"]
+            }
           end
           suggestions += deezer_titles
         end
@@ -57,7 +74,8 @@ class SearchController < ApplicationController
         Rails.logger.error("Deezer API error in suggestions: #{e.message}")
       end
 
-      suggestions = suggestions.uniq.first(10)
+      suggestions.uniq! { |s| s[:label] }
+      suggestions = suggestions.first(10)
     end
 
     render json: suggestions
@@ -70,7 +88,16 @@ class SearchController < ApplicationController
     res = Net::HTTP.get_response(url)
     if res.is_a?(Net::HTTPSuccess)
       data = JSON.parse(res.body)
-      data["data"] || []
+      data["data"].map do |item|
+        {
+          "id" => item["id"],
+          "title" => item["title"],
+          "artist" => item["artist"],
+          "album" => item["album"],
+          "link" => item["link"],
+          "preview" => item["preview"]
+        }
+      end
     else
       Rails.logger.error("Deezer API error: #{res.code} - #{res.body}")
       flash.now[:alert] = "Erreur lors de la recherche Deezer"
