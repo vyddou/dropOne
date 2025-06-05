@@ -10,10 +10,6 @@
     }
   </style>
 
-  <% unless current_user == @user %>
-    <%= button_to "Envoyer un message", conversations_path(user_id: @user.id), method: :post, class:"btn btn-primary btn-aurora-glow" %>
-  <% end %>
-
   <!-- En-tête avec menu burger pour l'utilisateur courant -->
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="mb-0"><%= @user.username %></h1>
@@ -74,14 +70,21 @@
   </div>
 
   <% if user_signed_in? && !@is_current_user %>
-    <div class="text-center mb-4">
-      <% if @is_following %>
-        <%= button_to "Se désabonner", unfollow_user_path(@user), method: :delete, class: "btn btn-danger" %>
-      <% else %>
-        <%= button_to "S'abonner", follow_user_path(@user), method: :post, class: "btn btn-primary" %>
-      <% end %>
-    </div>
-  <% end %>
+  <div class="d-flex justify-content-center mb-4 gap-2">
+    <%# Bouton S'abonner / Se désabonner %>
+    <% if @is_following %>
+      <%= button_to "Se désabonner", unfollow_user_path(@user), method: :delete, class: "btn btn-danger" %>
+    <% else %>
+      <%= button_to "S'abonner", follow_user_path(@user), method: :post, class: "btn btn-primary" %>
+    <% end %>
+
+    <%# Bouton Envoyer un message %>
+    <% unless current_user == @user %>
+      <%= button_to "Envoyer un message", conversations_path(user_id: @user.id), method: :post, class:"btn btn-primary btn-aurora-glow" %>
+    <% end %>
+  </div>
+<% end %>
+
 
   <ul class="nav nav-tabs" id="profileTabs" role="tablist">
     <li class="nav-item" role="presentation">
