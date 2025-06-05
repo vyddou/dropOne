@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
       const bsAlert = new bootstrap.Alert(alert);
       bsAlert.close();
-    }, 10000); // 10 secondes
+    }, 100); // 10 secondes
   });
 });
 

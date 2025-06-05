@@ -16,3 +16,7 @@ fr:
       invalid: "Email ou mot de passe invalide."
       timeout: "Votre session a expiré. Veuillez vous reconnecter."
       inactive: "Votre compte n'est pas encore activé."
+      last_attempt: "Il vous reste une dernière tentative avant que votre compte ne soit verrouillé."
+      not_found_in_database: "Adresse email ou mot de passe incorrect"
+      unauthenticated: "Vous devez vous connecter ou vous inscrire pour continuer."
+      unconfirmed: "Vous devez confirmer votre compte par email."
