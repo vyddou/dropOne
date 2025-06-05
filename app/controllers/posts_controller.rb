@@ -1,9 +1,7 @@
 # app/controllers/posts_controller.rb
 class PostsController < ApplicationController
-
-  before_action :authenticate_user!, except: [:show, :deezer_search] # Permet la recherche et de voir un post
-  before_action :set_post, only: [:show, :edit, :update, :vote, :destroy] # vote est maintenant une action sur un post existant
-
+  before_action :authenticate_user!, except: [:show, :deezer_search]
+  before_action :set_post, only: [:show, :edit, :update, :vote, :destroy]
 
   def show
     # @post est défini par set_post
@@ -18,6 +16,7 @@ class PostsController < ApplicationController
   end
 
   def create
+    # Vérification de la limite d'un post par jour
     if Post.exists?(user: current_user, created_at: Time.zone.today.all_day)
       redirect_to root_path, alert: "Vous avez déjà publié un morceau aujourd'hui."
       return
@@ -33,6 +32,7 @@ class PostsController < ApplicationController
       render :new, status: :unprocessable_entity and return
     end
 
+    # Logique pour trouver ou créer le Track (associé à current_user pour la "découverte")
     @track = Track.find_or_initialize_by(deezer_track_id: deezer_track_id_param)
     Rails.logger.debug "Track found or initialized: #{@track.persisted? ? "Persisted (ID: #{@track.id})" : 'New Record'}"
 
@@ -55,7 +55,7 @@ class PostsController < ApplicationController
         cover_url: track_data["album"]["cover_medium"],
         link_deezer: track_data["link"],
         duration: track_data["duration"],
-        user_id: current_user.id # Le track est "possédé" par le premier utilisateur qui crée un post avec.
+        user_id: current_user.id # Le track est "découvert" par cet utilisateur
       )
       unless @track.save
         flash.now[:alert] = "Erreur lors de la sauvegarde des infos du morceau : #{@track.errors.full_messages.join(', ')}"
@@ -65,6 +65,7 @@ class PostsController < ApplicationController
       Rails.logger.debug "New track saved with ID: #{@track.id}"
     end
 
+    # Création du Post utilisateur
     @post = current_user.posts.build(
       track: @track,
       description: params.dig(:post, :description)
@@ -85,8 +86,6 @@ class PostsController < ApplicationController
   end
 
   def update
-    # ... (votre logique d'update existante) ...
-    # Assurez-vous que la logique de gestion du track est similaire à celle de `create` si l'utilisateur peut changer le morceau.
     unless @post.user == current_user
       redirect_to root_path, alert: "Accès refusé" and return
     end
@@ -95,16 +94,14 @@ class PostsController < ApplicationController
     current_post_description = params.dig(:post, :description)
     track_to_assign = @post.track
 
-    if new_track_id.present? && new_track_id.to_s != @post.track.deezer_track_id.to_s # Assurez la comparaison de string
+    if new_track_id.present? && new_track_id.to_s != @post.track.deezer_track_id.to_s
       @new_track = Track.find_or_initialize_by(deezer_track_id: new_track_id)
-
       unless @new_track.persisted?
         track_data = fetch_deezer_track(new_track_id)
         unless track_data
           flash.now[:alert] = "Erreur lors de la récupération des infos Deezer pour le nouveau morceau."
           render :edit, status: :unprocessable_entity and return
         end
-
         @new_track.assign_attributes(
           title: track_data["title_short"] || track_data["title"],
           artist_name: track_data["artist"]["name"],
@@ -113,7 +110,7 @@ class PostsController < ApplicationController
           cover_url: track_data["album"]["cover_medium"],
           link_deezer: track_data["link"],
           duration: track_data["duration"],
-          user_id: current_user.id
+          user_id: current_user.id # Le nouveau track est aussi "découvert" par l'utilisateur actuel
         )
         unless @new_track.save
           flash.now[:alert] = "Erreur lors de la sauvegarde du nouveau morceau : #{@new_track.errors.full_messages.join(', ')}"
@@ -131,10 +128,13 @@ class PostsController < ApplicationController
     end
   end
 
-
   def vote
-    # @post est déjà défini par set_post
+    # @post est déjà défini par set_post. Cette action s'applique aux Posts de l'application.
     vote_type_param = params[:vote_type]
+    unless current_user
+      redirect_to new_user_session_path, alert: "Vous devez être connecté pour voter."
+      return
+    end
 
     if vote_type_param.blank?
       redirect_back fallback_location: root_path, alert: "Type de vote manquant."
@@ -163,12 +163,11 @@ class PostsController < ApplicationController
     redirect_back fallback_location: root_path
   end
 
+  # --- MODIFICATION DE create_post_from_deezer_and_vote ---
   def create_post_from_deezer_and_vote
-    deezer_track_id = params[:id] # Vient de la route /tracks/:id/create_post_and_vote
+    deezer_track_id = params[:id]
     vote_type_param = params[:vote_type] # 'hot' ou 'cold'
 
-    # Redirige si l'utilisateur n'est pas connecté (déjà géré par before_action :authenticate_user! sur cette action si besoin)
-    # mais une vérification explicite ici peut être utile si le before_action est plus permissif.
     unless current_user
       redirect_to new_user_session_path, alert: "Vous devez être connecté pour effectuer cette action."
       return
@@ -179,12 +178,14 @@ class PostsController < ApplicationController
       return
     end
 
-    # 1. Trouver ou créer le Track
+    Rails.logger.info "Interaction utilisateur (vote: #{vote_type_param}) sur suggestion Deezer ID: #{deezer_track_id} par user #{current_user.id}."
+
+    # 1. S'assurer que le Track existe dans notre base (sans nécessairement créer un Post utilisateur)
     track = Track.find_or_initialize_by(deezer_track_id: deezer_track_id)
     unless track.persisted?
       track_data = fetch_deezer_track(deezer_track_id)
       unless track_data
-        redirect_back fallback_location: root_path, alert: "Impossible de récupérer les informations du morceau depuis Deezer."
+        redirect_back fallback_location: root_path, alert: "Impossible de récupérer les informations du morceau suggéré depuis Deezer."
         return
       end
       track.assign_attributes(
@@ -195,61 +196,37 @@ class PostsController < ApplicationController
         cover_url: track_data["album"]["cover_medium"],
         link_deezer: track_data["link"],
         duration: track_data["duration"],
-        user_id: current_user.id # Le track est associé à l'utilisateur qui initie le post
+        # Qui est le 'user' d'un track qui n'est pas encore un post?
+        # Pourrait être le premier utilisateur à interagir, ou nil si la colonne user_id sur tracks le permet.
+        # D'après votre schema, tracks.user_id est null: false. Donc, on doit l'assigner.
+        # Si on l'assigne à current_user, cela signifie que current_user "possède" la connaissance de ce track dans votre DB.
+        user_id: current_user.id
       )
       unless track.save
-        redirect_back fallback_location: root_path, alert: "Erreur lors de la sauvegarde du morceau : #{track.errors.full_messages.join(', ')}"
+        redirect_back fallback_location: root_path, alert: "Erreur technique lors de la sauvegarde du morceau suggéré : #{track.errors.full_messages.join(', ')}"
         return
       end
     end
 
-    # 2. Trouver ou créer le Post pour ce Track par l'utilisateur actuel
-    # Un utilisateur ne "poste" un morceau qu'une seule fois. S'il vote à nouveau, c'est sur son post existant.
-    post = Post.find_or_initialize_by(user: current_user, track: track)
-    if post.new_record?
-      post.description = "" # Pas de description pour un post créé par un simple vote sur une suggestion
-      unless post.save
-        redirect_back fallback_location: root_path, alert: "Erreur lors de la création du post associé : #{post.errors.full_messages.join(', ')}"
-        return
-      end
-    end
+    # IMPORTANT : Nous NE CRÉONS PAS de Post ici.
+    # Si vous voulez enregistrer ce "vote" sur la suggestion, il faut une autre logique/table.
+    # Par exemple, créer un enregistrement dans une table "SuggestionVotes".
+    # Pour l'instant, on affiche juste un message.
 
-    # 3. Appliquer le vote sur ce post
-    is_hot_vote = vote_type_param == 'hot'
-    existing_vote = post.votes.find_by(user: current_user)
-
-    if existing_vote
-      if existing_vote.vote_type == is_hot_vote
-        existing_vote.destroy
-        flash[:notice] = "Vote annulé."
-      else
-        existing_vote.update(vote_type: is_hot_vote)
-        flash[:notice] = "Vote mis à jour."
-      end
-    else
-      new_vote = post.votes.build(user: current_user, vote_type: is_hot_vote)
-      if new_vote.save
-        flash[:notice] = "Vote enregistré !"
-      else
-        flash[:alert] = "Impossible d'enregistrer le vote : #{new_vote.errors.full_messages.join(', ')}"
-      end
-    end
-
+    flash[:info] = "Merci ! Votre intérêt pour '#{track.title}' a été noté."
     redirect_back fallback_location: root_path
   end
-
+  # --- FIN DE LA MODIFICATION ---
 
   def destroy
     if @post.user != current_user
       redirect_to root_path, alert: "Accès refusé" and return
     end
-
     @post.destroy
     redirect_to root_path, notice: "Post supprimé avec succès."
   end
 
   def deezer_search
-    # ... (votre logique de recherche existante, qui semble correcte) ...
     query = params[:q]
     if query.blank?
       render json: { error: "La requête de recherche est vide." }, status: :bad_request and return
@@ -268,10 +245,9 @@ class PostsController < ApplicationController
           cover: track["album"]["cover_small"]
         }
       end
-      Rails.logger.debug "Deezer search results: #{results.to_json}"
       render json: results
     else
-      Rails.logger.error "Deezer search failed: Code=#{response.code}, Message=#{response.message}, Body=#{response.body}"
+      Rails.logger.error "Deezer search failed: Code=#{response.code}, Message=#{response.message}"
       render json: { error: "La recherche Deezer a échoué.", details: response.message }, status: response.code || 500
     end
   rescue StandardError => e
@@ -288,7 +264,6 @@ class PostsController < ApplicationController
   end
 
   def fetch_deezer_track(track_id)
-    # ... (votre logique fetch_deezer_track existante, qui semble correcte) ...
     if track_id.blank?
       Rails.logger.error "fetch_deezer_track appelé avec un track_id vide."
       return nil
@@ -299,19 +274,17 @@ class PostsController < ApplicationController
     if response.success?
       parsed = response.parsed_response
       if parsed.is_a?(Hash) && parsed["id"]
-
         Rails.logger.debug "Deezer track API success for ID #{track_id}. Data (extrait): id=#{parsed['id']}, title=#{parsed['title_short'] || parsed['title']}"
         if parsed["error"]
-            Rails.logger.warn "Deezer API returned an error in a successful response for track ID #{track_id}: #{parsed['error']}"
-            return nil
-
+          Rails.logger.warn "Deezer API returned an error in a successful response for track ID #{track_id}: #{parsed['error']}"
+          return nil
         end
         return parsed
       else
-        Rails.logger.error "Réponse Deezer inattendue (pas un Hash valide ou pas d'ID de morceau) pour track #{track_id}: #{parsed.inspect}"
+        Rails.logger.error "Réponse Deezer inattendue pour track #{track_id}: #{parsed.inspect}"
       end
     else
-      Rails.logger.error "Deezer API Error (HTTParty) for track #{track_id}: Code=#{response.code}, Message=#{response.message}, Body=#{response.body}"
+      Rails.logger.error "Deezer API Error (HTTParty) for track #{track_id}: Code=#{response.code}, Message=#{response.message}"
     end
     nil
   end
