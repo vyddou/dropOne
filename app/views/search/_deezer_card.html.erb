@@ -1,0 +1,24 @@
+<div class="album-art-card-container mb-4">
+  <div class="album-art-visual-wrapper position-relative" data-controller="audio-player" data-audio-player-preview-url-value="<%= item['preview'] %>" data-preview-url="<%= item['preview'] %>">
+    <%= image_tag item["album"]["cover_medium"], alt: item["title"], class: "album-cover-image" %>
+
+    <% if item["preview"].present? %>
+      <button class="btn-play-on-cover" aria-label="Lire l'extrait" data-action="click->audio-player#togglePlay">
+        <i class="bi bi-play-fill"></i>
+      </button>
+    <% end %>
+
+    <div class="album-cover-text-overlay">
+      <h5 class="album-title-on-cover" title="<%= item["title"] %>"><%= item["title"] %></h5>
+      <p class="album-artist-on-cover" title="<%= item.dig("artist", "name") %>"><%= item.dig("artist", "name") %></p>
+    </div>
+  </div>
+
+  <div class="album-details-section mt-2">
+    <p class="track-deezer-link mt-2">
+      <a href="<%= item["link"] %>" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-info w-100">
+        <i class="bi bi-play-circle-fill"></i> Écouter sur Deezer
+      </a>
+    </p>
+  </div>
+</div>
