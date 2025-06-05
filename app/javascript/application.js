@@ -9,6 +9,8 @@ document.addEventListener('turbo:load', () => {
   const input = document.getElementById('search-input');
   const form = document.getElementById('search-form');
 
+  if (!input || !form) return;  // Quitte si un des éléments est introuvable
+
   input.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
       event.preventDefault(); // empêche le comportement par défaut (si besoin)
@@ -16,5 +18,3 @@ document.addEventListener('turbo:load', () => {
     }
   });
 });
-import "./custom/adjust_alerts"
-

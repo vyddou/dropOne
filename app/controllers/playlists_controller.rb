@@ -12,7 +12,8 @@ class PlaylistsController < ApplicationController
   end
 
   def show
-    @playlist = current_user.playlists.find(params[:id])
+    # @playlist = current_user.playlists.find(params[:id])
+    @playlist = Playlist.find(params[:id])
     @playlist_items = @playlist.playlist_items.includes(:track)
   end
 
@@ -20,10 +21,18 @@ class PlaylistsController < ApplicationController
     @playlist = Playlist.new
   end
 
+  # def destroy
+  #   playlist = current_user.playlists.find(params[:id])
+  #   playlist.destroy
+  #   redirect_to playlists_path, notice: "Playlist supprimée."
+  # end
   def destroy
-    playlist = current_user.playlists.find(params[:id])
-    playlist.destroy
-    redirect_to playlists_path, notice: "Playlist supprimée."
+    @playlist = current_user.playlists.find(params[:id])
+    @playlist.destroy
+    respond_to do |format|
+      format.html { redirect_to request.referer || user_path(current_user), notice: "Playlist supprimée" }
+      format.turbo_stream { render turbo_stream: turbo_stream.remove("playlist_#{params[:id]}") }
+    end
   end
 
   def rename

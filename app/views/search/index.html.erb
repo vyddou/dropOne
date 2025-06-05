@@ -79,7 +79,7 @@
 <% end %>
 
 <% if @deezer_results.present? && @deezer_results.any? %>
-  <div class="search-tracks-results d-flex flex-wrap space justify-content-md-around">
+  <div class="search-tracks-results d-flex flex-wrap gap-3 justify-content-center justify-content-md-around">
     <% @deezer_results.each do |item| %>
       <%= render partial: "search/deezer_card", locals: { item: item } %>
     <% end %>
@@ -140,3 +140,5 @@ document.addEventListener('turbo:load', () => {
 });
 </script>
 <audio id="global-audio-player" style="display:none;"></audio>
+
+<%= render "shared/bottom_navbar" %>

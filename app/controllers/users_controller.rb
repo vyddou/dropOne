@@ -6,6 +6,7 @@ class UsersController < ApplicationController
 
     # Initialisation des variables
     @user_posts = @user.posts.order(created_at: :desc)
+
     @user_playlists = @user.playlists.order(created_at: :desc)
 
     # Gestion des tracks likées
