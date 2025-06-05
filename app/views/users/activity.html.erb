@@ -1,0 +1,62 @@
+<h1 class="text-center mb-4">Activité de <%= @user.username %></h1>
+
+<% if @activity_feed.any? %>
+  <div class="container" style="max-width: 600px;">
+    <% @activity_feed.each do |activity| %>
+      <div class="d-flex gap-3 mb-4 align-items-start">
+
+        <!-- Avatar -->
+        <div>
+          <%= link_to user_path(activity[:user]) do %>
+            <%= image_tag(
+              activity[:user].avatar_url || 'default_avatar.png',
+              alt: activity[:user].username,
+              class: "rounded-circle",
+              style: "width: 40px; height: 40px; object-fit: cover;"
+            ) %>
+          <% end %>
+        </div>
+
+        <!-- Contenu -->
+        <div class="flex-grow-1">
+          <div class="d-flex align-items-baseline flex-wrap gap-1">
+            <%= link_to activity[:user].username, user_path(activity[:user]),
+                class: "text-primary fw-semibold text-decoration-none" %>
+
+            <% if activity[:type] == :follow %>
+              <span>a commencé à vous suivre.</span>
+            <% elsif activity[:type] == :like %>
+              <span>
+                a liké votre post sur la musique :
+                <strong><%= activity[:post].track.title %></strong>
+
+                <% if activity[:post].track.cover_url.present? %>
+                  <%= image_tag(
+                    activity[:post].track.cover_url,
+                    alt: activity[:post].track.title,
+                    class: "rounded ms-2",
+                    style: "width: 48px; height: 48px; object-fit: cover;"
+                  ) %>
+                <% end %>
+              </span>
+            <% end %>
+          </div>
+
+          <% if activity[:type] == :like %>
+            <div class="mt-2 fst-italic">
+              <%= simple_format(activity[:post].description) %>
+            </div>
+          <% end %>
+
+          <div class="mt-1">
+            <small class="text-muted">
+              <%= activity[:created_at].strftime("%d/%m/%Y %H:%M") %>
+            </small>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <p class="text-center">Aucune activité récente.</p>
+<% end %>
