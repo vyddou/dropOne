@@ -49,7 +49,7 @@ class SearchController < ApplicationController
         {
           type: "user",
           label: user.username,
-          image_url: user.profile_photo_url || "/images/default_user_avatar.png"
+          image_url: user.avatar_url || "/images/default_user_avatar.png"
         }
       end
 
@@ -65,7 +65,7 @@ class SearchController < ApplicationController
               type: "deezer",
               label: "#{item.dig('artist', 'name') || 'Artiste inconnu'} - #{item['title']}",
               image_url: item.dig("album", "cover_small") || "/images/default_cover.png",
-              preview: item["preview"]  # ajout de l'URL de l'extrait
+              preview: item["preview"]
             }
           end
           suggestions += deezer_titles
@@ -95,7 +95,7 @@ class SearchController < ApplicationController
           "artist" => item["artist"],
           "album" => item["album"],
           "link" => item["link"],
-          "preview" => item["preview"]  # ajout de l'URL preview ici aussi
+          "preview" => item["preview"]
         }
       end
     else
