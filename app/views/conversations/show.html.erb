@@ -1,18 +1,49 @@
-<h2>Conversation</h2>
+<% other_user = (@conversation.users - [current_user]).first %>
 
-<div id="messages">
+<div class="d-flex flex-column align-items-center mb-4">
+  <%= link_to user_path(other_user), class: "mb-2" do %>
+    <% avatar_url = other_user.avatar_url.presence || "https://placehold.co/50x50/E0E0E0/000000?text=User" %>
+    <%= image_tag avatar_url, alt: "Avatar", class: "rounded-circle", style: "width: 50px; height: 50px; object-fit: cover;" %>
+  <% end %>
+  <h4 class="fw-bold text-primary text-center mb-0"><%= other_user.username %></h4>
+</div>
+
+<div id="messages" class="mb-4 overflow-auto p-4" style="max-height: 500px;">
   <% @messages.each do |msg| %>
-    <div class="<%= msg.user == current_user ? 'text-end' : 'text-start' %> mb-2">
-      <strong><%= msg.user.username %></strong><br>
-      <%= msg.content %><br>
-      <small><%= msg.created_at.strftime("%H:%M") %></small>
+    <div class="d-flex mb-3 <%= msg.user == current_user ? 'justify-content-end' : 'justify-content-start' %>">
+      <div class="d-flex flex-column" style="max-width: 55%;">
+        <span class="fw-semibold <%= msg.user == current_user ? 'text-end text-primary' : 'text-start text-white' %> mb-1">
+          <%= msg.user.username %>
+        </span>
+        <% if msg.user == current_user %>
+          <div class="py-1 px-3  rounded-pill bg-primary text-white" style="word-wrap: break-word;">
+            <%= msg.content %>
+          </div>
+        <% else %>
+          <div class="py-1 px-3 rounded-pill" style="word-wrap: break-word; background-color: #d40178; color: white; border: 1.5px solid #d40178;">
+            <%= msg.content %>
+          </div>
+        <% end %>
+        <small class="text-muted mt-1 <%= msg.user == current_user ? 'text-end' : 'text-start' %>">
+          <%= msg.created_at.to_date == Date.today ? msg.created_at.strftime("%H:%M") : msg.created_at.strftime("%d/%m/%Y %H:%M") %>
+        </small>
+      </div>
     </div>
   <% end %>
 </div>
 
 <%= form_with model: [@conversation, @message], local: true do |form| %>
   <div class="mb-2">
-    <%= form.text_area :content, rows: 3, class: "form-control" %>
+    <%= form.text_area :content, rows: 3, class: "form-control", placeholder: "Écris ton message..." %>
   </div>
   <%= form.submit "Envoyer", class: "btn btn-primary btn-aurora-glow" %>
 <% end %>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const messagesContainer = document.getElementById("messages");
+    if (messagesContainer) {
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+  });
+</script>
