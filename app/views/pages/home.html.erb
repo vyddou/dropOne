@@ -35,10 +35,12 @@
                   <p class="album-artist-on-cover" title="<%= item.artist %>"><%= item.artist %></p>
                 </div>
 
-                <%# Nouvel affichage du score sur la cover (haut droit) %>
-                <%# Affiche le score pour tous les posts qui ont un score (ceux de l'app et les posts système) %>
+                 <%# Nouvel affichage du score dans un cœur (haut droit) %>
                 <% if item.origin == :app || item.origin == :deezer_post %>
                   <div class="album-cover-score-overlay">
+                    <%# L'icône du cœur qui servira de fond %>
+                    <i class="bi bi-heart-fill score-heart-icon"></i>
+                    <%# Le chiffre du score qui sera superposé %>
                     <span class="score-value"><%= item.net_votes %></span>
                   </div>
                 <% end %>

@@ -1,4 +1,4 @@
-// Dans votre fichier SCSS, par exemple _cards.scss
+
 
 .carousel-cell {
   display: flex;
@@ -105,37 +105,34 @@
     opacity: 1;
   }
 
-  // --- STYLES POUR L'AFFICHAGE DU SCORE SUR LA COVER ---
-  // CE BLOC DOIT ÊTRE À L'INTÉRIEUR DE .album-art-visual-wrapper
+  // --- STYLES POUR LE SCORE DANS UN CŒUR ---
   .album-cover-score-overlay {
     position: absolute;
-    top: 8px;
-    right: 8px;
-    background-color: rgba(0, 0, 0, 0.65);
-    color: white;
-    padding: 5px 10px;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    font-weight: bold;
-    z-index: 4; // Au-dessus du bouton play et de l'overlay texte
-    text-shadow: 1px 1px 1px rgba(0,0,0,0.4);
-    display: flex;
-    align-items: center;
-    line-height: 1;
+    top: 10px;
+    right: 10px;
+    width: 50px;
+    height: 50px;
+    display: grid;
+    place-items: center;
+    z-index: 4;
+
+    .score-heart-icon {
+      grid-area: 1 / 1;
+      font-size: 2.3rem;
+      color: rgba(220, 53, 69, 0.85);
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    }
 
     .score-value {
-      // Styles spécifiques pour le chiffre si besoin
-    }
-
-    i.bi-heart-fill {
-      margin-right: 5px;
-      color: #ff6b6b;
+      grid-area: 1 / 1;
+      color: white;
       font-size: 0.9rem;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+      padding-bottom: 2px;
     }
   }
-  // --- FIN DES STYLES POUR LE SCORE ---
-
-} // Fin de .album-art-visual-wrapper
+} // --- FIN DE .album-art-visual-wrapper ---
 
 .album-details-section {
   padding: 10px 12px;
