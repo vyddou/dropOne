@@ -13,13 +13,12 @@
     <% end %>
   </div>
 
-  <%# --- BOUTON AJOUTER UN MORCEAU RÉINTÉGRÉ --- %>
+  <%# Bouton pour ajouter un morceau si l'utilisateur est connecté %>
   <% if user_signed_in? %>
     <div class="add-track-button-container mt-4 mb-5 w-100 text-center">
      <%= link_to "Ajouter un morceau", new_post_path, class: "btn btn-primary btn-aurora-glow" %>
     </div>
   <% end %>
-  <%# --- FIN DU BOUTON --- %>
 
   <section class="unified-carousel-section w-100">
   <h2 class="section-title text-center mb-4">🎶 Les Sons du Moment 🎶</h2>
@@ -49,11 +48,10 @@
                 </div>
 
                 <%# Nouvel affichage du score sur la cover (haut droit) %>
-                <% if item.origin == :app && item.db_post_object %>
+                <%# Affiche le score pour tous les posts qui ont un score (ceux de l'app et les posts système) %>
+                <% if item.origin == :app || item.origin == :deezer_post %>
                   <div class="album-cover-score-overlay">
                     <span class="score-value"><%= item.net_votes %></span>
-                    <%# Pour une icône cœur à côté du score (nécessite Bootstrap Icons) : %>
-                    <%# <i class="bi bi-heart-fill"></i> <span class="score-value"><%#= item.net_votes %></span>
                   </div>
                 <% end %>
               </div>
@@ -64,50 +62,50 @@
                   <p class="track-genre small mb-2"><span class="badge bg-secondary"><%= item.genre.capitalize %></span></p>
                 <% end %>
 
-                <%# Description (si c'est un post de l'app et qu'il y a une description) %>
+                <%# Description (uniquement pour les posts utilisateurs) %>
                 <% if item.origin == :app && item.description.present? %>
                   <p class="card-text description-preview small mb-2"><%= truncate(item.description, length: 70) %></p>
                 <% end %>
 
-                <div class="mt-auto"> <%# Pour pousser les éléments suivants vers le bas de la carte %>
-                  <% if item.origin == :app && item.user && item.db_post_object %>
+                <div class="mt-auto">
+                  <%# Affiche "Posté par" ou "Suggéré par" %>
+                  <% if item.user %>
                     <p class="card-text mb-1">
                       <small class="text-muted">
-                        Posté par <%= link_to item.user.username, user_path(item.user), class: "text-decoration-none" %>
+                        <% if item.origin == :app %>
+                          Posté par <%= link_to item.user.username, user_path(item.user), class: "text-decoration-none" %>
+                        <% else %>
+                          Suggéré par <strong><%= item.user.username %></strong>
+                        <% end %>
                       </small>
                     </p>
                   <% end %>
 
                   <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div> <%# Conteneur pour les boutons de vote %>
-                      <% if item.origin == :app && item.db_post_object %>
-                        <%= button_to vote_post_path(item.db_post_object, vote_type: 'hot'), method: :post, class: "btn btn-sm btn-vote", title: "J'aime", form_class: "d-inline" do %>
-                          <i class="bi bi-hand-thumbs-up-fill"></i>
-                        <% end %>
-                        <%= button_to vote_post_path(item.db_post_object, vote_type: 'cold'), method: :post, class: "btn btn-sm btn-vote", title: "Je n'aime pas", form_class: "d-inline" do %>
-                          <i class="bi bi-hand-thumbs-down-fill"></i>
-                        <% end %>
-                      <% elsif item.origin == :deezer %>
-                        <%= button_to create_post_and_vote_on_track_path(item.id_for_links, vote_type: 'hot'), method: :post, class: "btn btn-sm btn-vote", title: "J'aime et ajoute ce son", form_class: "d-inline" do %>
-                          <i class="bi bi-hand-thumbs-up"></i>
-                        <% end %>
-                        <%= button_to create_post_and_vote_on_track_path(item.id_for_links, vote_type: 'cold'), method: :post, class: "btn btn-sm btn-vote", title: "Je n'aime pas ce son", form_class: "d-inline" do %>
-                          <i class="bi bi-hand-thumbs-down"></i>
-                        <% end %>
+                    <div>
+                      <%# --- LOGIQUE DE VOTE SIMPLIFIÉE --- %>
+                      <%# Tous les boutons utilisent la même route et la même logique %>
+                      <% deezer_id = (item.origin == :app || item.origin == :deezer_post) ? item.db_post_object.track.deezer_track_id : item.id_for_links %>
+
+                      <%= button_to vote_on_track_path(deezer_id, vote_type: 'hot'), method: :post, class: "btn btn-sm btn-vote", title: "J'aime", form_class: "d-inline" do %>
+                        <i class="bi bi-hand-thumbs-up-fill"></i>
                       <% end %>
+                      <%= button_to vote_on_track_path(deezer_id, vote_type: 'cold'), method: :post, class: "btn btn-sm btn-vote", title: "Je n'aime pas", form_class: "d-inline" do %>
+                        <i class="bi bi-hand-thumbs-down-fill"></i>
+                      <% end %>
+                      <%# --- FIN DE LA LOGIQUE DE VOTE SIMPLIFIÉE --- %>
                     </div>
-                    <%# L'ancien affichage du score a été retiré d'ici, il est maintenant sur la cover %>
                   </div>
 
-                  <%# Condition pour le lien Modifier corrigée %>
-                  <% if item.origin == :app && user_signed_in? && item.user == current_user && item.db_post_object %>
-                    <%= button_to 'Supprimer', post_path(item.db_post_object), method: :delete, data: { confirm: 'Êtes-vous sûr de vouloir supprimer ce post ?' }, class: "btn btn-sm btn-outline-secondary mt-1 w-100" %>
+                  <%# Lien Modifier uniquement pour les posts créés par l'utilisateur actuel %>
+                  <% if item.origin == :app && user_signed_in? && item.user == current_user %>
+                    <%= link_to 'Modifier', edit_post_path(item.db_post_object), class: "btn btn-sm btn-outline-secondary mt-1 w-100" %>
                   <% end %>
                 </div>
 
                 <%# Lien Deezer %>
                 <% if item.deezer_link.present? %>
-                  <p class="track-deezer-link mt-2 <%= 'mt-auto' if item.preview_url.blank? && (item.origin != :app || !(item.user && item.db_post_object)) %>">
+                  <p class="track-deezer-link mt-2">
                     <a href="<%= item.deezer_link %>" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-info w-100">
                       <i class="bi bi-play-circle-fill"></i> Écouter sur Deezer
                     </a>
@@ -122,9 +120,9 @@
   <% else %>
     <p class="text-center text-muted mt-4">Aucun son à découvrir pour le moment. Revenez plus tard ou soyez le premier à partager !</p>
   <% end %>
-</section> <%# Fin de unified-carousel-section %>
+</section>
 
-</div> <%# Fermeture du container-fluid home-page-container %>
+</div>
 
 <audio id="global-audio-player" style="display: none;"></audio>
 

@@ -1,18 +1,18 @@
+# config/routes.rb
+
 Rails.application.routes.draw do
   devise_for :users
   root to: "pages#home"
 
+  get 'posts/deezer_search', to: 'posts#deezer_search'
 
-    get 'posts/deezer_search', to: 'posts#deezer_search'
-
-
-  resources :users, only: [:show] do # Pour user_path(user)
+  resources :users, only: [:show] do
     member do
       post :follow
       delete :unfollow
       patch :update_description
       get :activity
-    end 
+    end
   end
 
   resources :playlists, only: [:index, :show, :new, :create, :destroy] do
@@ -29,25 +29,27 @@ Rails.application.routes.draw do
     member do
       post :like
       post :dislike
-      delete :remove_from_likes  # Nouvelle route spécifique
+      delete :remove_from_likes
     end
   end
 
-  resources :posts, only: [:new, :create, :edit, :update, :show, :destroy] do
-    member do
-      post 'vote' # Pour voter sur un post existant
-    end
-  end
+  # --- MODIFICATION ICI ---
+  # On supprime le bloc de vote de 'posts' car il sera géré par la nouvelle route
+  resources :posts, only: [:new, :create, :edit, :update, :show, :destroy]
+  # La ligne "member do post 'vote' end" a été supprimée.
 
-  # Route pour créer un post à partir d'un track Deezer et voter
-  # :id ici sera le deezer_track_id
-  post 'tracks/:id/create_post_and_vote', to: 'posts#create_post_from_deezer_and_vote', as: 'create_post_and_vote_on_track'
+  # L'ancienne route pour voter sur les suggestions est aussi supprimée.
+  # post 'tracks/:id/create_post_and_vote', ...
+
+  # On la remplace par une route unique et plus propre pour tous les votes :
+  post 'tracks/:track_id/vote', to: 'votes#create', as: 'vote_on_track'
+  # --- FIN DE LA MODIFICATION ---
+
 
   resources :conversations, only: [:index, :show, :create, :destroy] do
     resources :messages, only: [:create]
   end
 
-  # Routes pour la recherche
   get 'search', to: 'search#index', as: 'search'
   get 'search_suggestions', to: 'search#suggestions'
 
