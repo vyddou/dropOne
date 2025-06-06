@@ -34,9 +34,10 @@ class VotesController < ApplicationController
     # 2. Trouver ou créer le Post du jour pour ce Track
     # Si le post n'existe pas, il est créé et appartient à l'utilisateur système "Deezer"
     # Cela garantit qu'il n'y a qu'un seul "post" par morceau par jour.
-    deezer_system_user = User.find_by(email: 'deezer@system.com')
+
+    post_user = User.find_by(username: params[:user])
     post = Post.find_or_create_by(track: track, created_at: Time.zone.today.all_day) do |p|
-      p.user = deezer_system_user
+      p.user = post_user
       p.description = "Suggéré par la communauté."
     end
 
