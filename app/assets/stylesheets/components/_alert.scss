@@ -59,6 +59,9 @@
   z-index: 1000;
   overflow-y: auto; // Permet le défilement si nécessaire
   animation: fadein 0.2s ease-out;
+  border: 2px solid transparent; // Bordure transparente par défaut
+  position: relative; // Ajoute cette ligne pour positionner la barre de chargement
+  overflow: hidden; // Assure que la barre de chargement ne dépasse pas
 }
 
 .flash-close-btn {
@@ -76,20 +79,39 @@
   z-index: 2;
 }
 
-// .flash-message-text {
-//   white-space: nowrap;
-//   // overflow: hidden;
-//   display: inline-block;
-//   padding-right: 20px;
-//   text-overflow: ellipsis;
-//   max-width: 100%;
-//   display: block;
-//   animation: scrollIfNeeded 1s linear 0.3s infinite;
-// }
+.flash-message::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 4px;
+  width: 100%;
+  animation: loadingBar 6s linear forwards; // Durée de 6 secondes pour correspondre à la fermeture automatique
+}
 
-// .flash-message-text {
-//   white-space: nowrap;
-//   animation: scrollIfNeeded 12s linear 0.3s infinite;
-//   display: inline-block;
-//   padding-right: 20px;
-// }
+// Animation pour la barre de chargement
+@keyframes loadingBar {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+// Styles spécifiques pour les deux types d'alertes
+.flash-message.alert-info {
+  border-color: #17a2b8;
+}
+
+.flash-message.alert-info::before {
+  background: #17a2b8; // Utilise la même couleur que la bordure pour l'alerte info
+}
+
+.flash-message.alert-danger {
+  border-color: #dc3545;
+}
+
+.flash-message.alert-danger::before {
+  background: #dc3545; // Utilise la même couleur que la bordure pour l'alerte danger
+}
