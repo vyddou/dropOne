@@ -3,7 +3,6 @@ class PagesController < ApplicationController
   skip_before_action :authenticate_user!, only: [:home]
 
   # Crée un objet simple pour simuler l'affichage de "Suggéré par Deezer"
-  DeezerUser = OpenStruct.new(id: 0, username: "Deezer")
 
   CarouselItem = Struct.new(
     :id_for_links, :origin, :title, :artist, :cover_url, :genre, :description,
@@ -55,7 +54,8 @@ class PagesController < ApplicationController
 
     # 4. Transformer les suggestions pures en CarouselItem
     deezer_carousel_items = unique_deezer_suggestions.map do |deezer_track|
-      CarouselItem.new(deezer_track.id, :deezer_suggestion, deezer_track.title, deezer_track.artist, deezer_track.cover_url, "Hits", nil, DeezerUser, 0, Time.now, deezer_track.link_deezer, deezer_track.preview_url, nil)
+      deezer_user = OpenStruct.new(id: 0, username: User.all.sample.username)
+      CarouselItem.new(deezer_track.id, :deezer_suggestion, deezer_track.title, deezer_track.artist, deezer_track.cover_url, "Hits", nil, deezer_user, 0, Time.now, deezer_track.link_deezer, deezer_track.preview_url, nil)
     end
 
     # 5. Combiner et trier

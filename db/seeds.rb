@@ -8,5 +8,12 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 
+Vote.destroy_all
+User.destroy_all
 
-User.create!(email: "deezer@system.com", password: "azerty")
+User.create!(username: "Deezer", email: "deezer@system.com", password: "azerty")
+User.create!(username: "NathanLBM", email: "nathan@dropone.fr", password: "azerty")
+User.create!(username: "Vyddou", email: "ugo@dropone.fr", password: "azerty")
+User.create!(username: "Flaflamobile", email: "fred@dropone.fr", password: "azerty")
+User.create!(username: "Roroapero", email: "romain@dropone.fr", password: "azerty")
+User.create!(username: "Wulfens", email: "mathieu@dropone.fr", password: "azerty")

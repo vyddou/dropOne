@@ -77,10 +77,10 @@
                       <%# Tous les boutons utilisent la même route et la même logique %>
                       <% deezer_id = (item.origin == :app || item.origin == :deezer_post) ? item.db_post_object.track.deezer_track_id : item.id_for_links %>
 
-                      <%= button_to vote_on_track_path(deezer_id, vote_type: 'hot'), method: :post, class: "btn btn-sm btn-vote", title: "J'aime", form_class: "d-inline" do %>
+                      <%= button_to vote_on_track_path(deezer_id, vote_type: 'hot', user: item.user.username), method: :post, class: "btn btn-sm btn-vote", title: "J'aime", form_class: "d-inline" do %>
                         <i class="bi bi-hand-thumbs-up-fill"></i>
                       <% end %>
-                      <%= button_to vote_on_track_path(deezer_id, vote_type: 'cold'), method: :post, class: "btn btn-sm btn-vote", title: "Je n'aime pas", form_class: "d-inline" do %>
+                      <%= button_to vote_on_track_path(deezer_id, vote_type: 'cold', user: item.user.username), method: :post, class: "btn btn-sm btn-vote", title: "Je n'aime pas", form_class: "d-inline" do %>
                         <i class="bi bi-hand-thumbs-down-fill"></i>
                       <% end %>
                       <%# --- FIN DE LA LOGIQUE DE VOTE SIMPLIFIÉE --- %>
