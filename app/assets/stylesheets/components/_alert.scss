@@ -55,10 +55,10 @@
   width: auto;
   text-align: center;
   max-height: 160px; // Augmente la hauteur maximale pour 4 lignes
-  overflow-y: auto; // Permet le défilement si nécessaire
-  z-index: 1000;
-  animation: fadein 0.2s ease-out;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  overflow-y: auto; // Permet le défilement si nécessaire
+  animation: fadein 0.2s ease-out;
 }
 
 .flash-close-btn {
@@ -76,16 +76,16 @@
   z-index: 2;
 }
 
-.flash-message-text {
-  white-space: nowrap;
-  // overflow: hidden;
-  display: inline-block;
-  padding-right: 20px;
-  text-overflow: ellipsis;
-  max-width: 100%;
-  display: block;
-  animation: scrollIfNeeded 1s linear 0.3s infinite;
-}
+// .flash-message-text {
+//   white-space: nowrap;
+//   // overflow: hidden;
+//   display: inline-block;
+//   padding-right: 20px;
+//   text-overflow: ellipsis;
+//   max-width: 100%;
+//   display: block;
+//   animation: scrollIfNeeded 1s linear 0.3s infinite;
+// }
 
 // .flash-message-text {
 //   white-space: nowrap;
