@@ -13,13 +13,19 @@
         </div>
       <% end %>
 
-      <%= link_to new_post_path, class: "nav-link text-white" do %>
-        <i class="bi bi-plus-circle"></i>
+      <%= link_to new_post_path, class: "nav-link text-white d-flex flex-column align-items-center" do %>
+        <i class="bi bi-plus-circle fs-4"></i>
         <span>Ajouter</span>
       <% end %>
 
-      <%= link_to search_path, class: "nav-link text-white" do %>
-        <i class="bi bi-search"></i>
+      <!-- Bouton Playlist ajouté au centre -->
+      <%= link_to new_playlist_path, class: "nav-link text-white d-flex flex-column align-items-center #{'active' if current_page?(new_playlist_path)}" do %>
+        <i class="bi bi-music-note-beamed fs-4"></i>
+        <span>IA</span>
+      <% end %>
+
+      <%= link_to search_path, class: "nav-link text-white d-flex flex-column align-items-center" do %>
+        <i class="bi bi-search fs-4"></i>
         <span>Recherche</span>
       <% end %>
 
@@ -29,8 +35,8 @@
         <span>Profil</span>
       <% end %>
     <% else %>
-      <%= link_to new_user_session_path, class: "nav-link text-white" do %>
-        <i class="bi bi-box-arrow-in-right"></i>
+      <%= link_to new_user_session_path, class: "nav-link text-white d-flex flex-column align-items-center" do %>
+        <i class="bi bi-box-arrow-in-right fs-4"></i>
         <span>Login</span>
       <% end %>
     <% end %>
