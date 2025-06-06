@@ -42,12 +42,17 @@
       </div>
 
       <div class="song-info flex-grow-1">
-        <strong><%= track.title %></strong> par <em><%= track.artist_name %></em> -
-        Durée : <%= (track.duration / 1000).to_i %> secondes
+        <p class="mb-1"><strong><%= track.title %></strong> par <em><%= track.artist_name %></em></p>
 
-        <%# Ici on prend uniquement preview_url qui est un lien direct vers l'audio %>
+        <% if playlist_item.description.present? %>
+          <p class="text-muted fst-italic mb-2">
+            → <%= playlist_item.description %>
+          </p>
+        <% end %>
+        <p class="mb-2 small">Durée : <%= (track.duration / 1000).to_i %> secondes</p>
+
         <% if track.preview_url.present? %>
-          <div class="audio-player mt-2">
+          <div class="audio-player">
             <audio controls preload="none" style="width: 100%;">
               <source src="<%= track.preview_url %>" type="audio/mpeg" />
               Votre navigateur ne supporte pas l'élément audio.
@@ -96,4 +101,3 @@
     }
   })
 </script>
-<%= render "shared/bottom_navbar" %>
