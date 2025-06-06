@@ -101,7 +101,7 @@
 
                   <%# Condition pour le lien Modifier corrigée %>
                   <% if item.origin == :app && user_signed_in? && item.user == current_user && item.db_post_object %>
-                    <%= link_to 'Modifier', edit_post_path(item.db_post_object), class: "btn btn-sm btn-outline-secondary mt-1 w-100" %>
+                    <%= button_to 'Supprimer', post_path(item.db_post_object), method: :delete, data: { confirm: 'Êtes-vous sûr de vouloir supprimer ce post ?' }, class: "btn btn-sm btn-outline-secondary mt-1 w-100" %>
                   <% end %>
                 </div>
 
