@@ -2,18 +2,6 @@
 
 <div class="container-fluid home-page-container mt-4 mb-5 px-md-3 px-lg-4">
 
-  <%# Bloc de bienvenue %>
-  <div class="greeting-container text-center mb-3 w-100" style="max-width: 700px;">
-    <% if user_signed_in? %>
-      <h1 class="greeting-title">Bonjour <%= current_user.username.presence || current_user.first_name.presence || "Utilisateur" %>!</h1>
-      <p class="greeting-subtitle">Vous êtes connecté.</p>
-    <% else %>
-      <h1 class="greeting-title">Bonjour!</h1>
-      <p class="greeting-subtitle">Vous n'êtes pas connecté.</p>
-    <% end %>
-  </div>
-
-  <%# Bouton pour ajouter un morceau si l'utilisateur est connecté %>
   <% if user_signed_in? %>
     <div class="add-track-button-container mt-4 mb-5 w-100 text-center">
      <%= link_to "Ajouter un morceau", new_post_path, class: "btn btn-primary btn-aurora-glow" %>
