@@ -26,7 +26,7 @@ class PlaylistItemsController < ApplicationController
     @playlist_item.destroy
     
     respond_to do |format|
-      format.html { redirect_to user_path(current_user), notice: "Musique retirée des likes" }
+      format.html { redirect_to request.referer, notice: "Musique retirée des likes" }
       format.turbo_stream  # Optionnel si vous utilisez Hotwire
     end
   end

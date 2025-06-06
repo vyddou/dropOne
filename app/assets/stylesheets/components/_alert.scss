@@ -40,38 +40,53 @@
   padding-bottom: 4.5rem; // ajuste la valeur si ta navbar est plus haute
 }
 
+
 .flash-message {
   position: fixed;
   bottom: 100px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.7);
   color: white;
-  padding: 10px 20px;
-  border-radius: 5px;
+  padding: 15px 40px 15px 20px;
+  border-radius: 8px;
   max-width: 90%;
+  min-width: 250px;
   width: auto;
-  max-height: 120px;
-  overflow-y: auto;
-  text-align: center;
   z-index: 1000;
-  animation: fadein 0.5s;
-
-  // Style par défaut pour les écrans plus grands
-  font-size: 16px;
+  animation: fadein 0.2s ease-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-@keyframes fadein {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+.flash-close-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 5px;
+  z-index: 2;
 }
 
-// Media query pour les smartphones
-@media only screen and (max-width: 600px) {
-  .flash-message {
-    max-width: 95%; // Augmente légèrement la largeur maximale sur smartphone
-    padding: 8px 15px; // Réduit le padding pour gagner de la place
-    font-size: 14px; // Réduit légèrement la taille de la police
-  }
+.flash-message-text {
+  white-space: nowrap;
+  // overflow: hidden;
+  display: inline-block;
+  padding-right: 20px;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: block;
+  animation: scrollIfNeeded 1s linear 0.3s infinite;
 }
 
+// .flash-message-text {
+//   white-space: nowrap;
+//   animation: scrollIfNeeded 12s linear 0.3s infinite;
+//   display: inline-block;
+//   padding-right: 20px;
+// }

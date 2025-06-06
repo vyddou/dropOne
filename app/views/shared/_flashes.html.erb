@@ -6,7 +6,13 @@
        role="alert"
        <%= auto_dismiss %>
        data-controller="flash-auto-dismiss">
-    <%= message %>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <div class="flash-content-container">
+      <div class="flash-message-text">
+        <%= message %>
+      </div>
+    </div>
+    <button type="button" class="flash-close-btn" data-bs-dismiss="alert" aria-label="Close">
+      &times;
+    </button>
   </div>
 <% end %>
