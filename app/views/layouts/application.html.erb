@@ -5,37 +5,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <!-- Favicon multiplateforme -->
+    
     <%= favicon_link_tag "favicon.ico" %>
-    <!-- Pour iPhone/Safari -->
     <%= favicon_link_tag "apple-touch-icon.png", rel: "apple-touch-icon", type: "image/png" %>
-    <!-- Pour Android/Chrome -->
     <%= favicon_link_tag "android-chrome-192x192.png", rel: "icon", type: "image/png", sizes: "192x192" %>
     <%= favicon_link_tag "android-chrome-512x512.png", rel: "icon", type: "image/png", sizes: "512x512" %>
+
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
-
     <%= javascript_importmap_tags %>
-
     <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
 
-
     <link rel="manifest" href="<%= asset_path 'manifest.json' %>">
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <%= render 'shared/ios_pwa_links' %>
   </head>
 
   <body>
     <%= render "shared/navbar" %>
-    <%= render "shared/flashes" %>
+
+    <!-- ✅ Zone d'affichage des alertes -->
+    <div id="flash-container" class="px-3 flash-container" style="position: fixed; bottom: 1.5rem; left: 0; right: 0; z-index: 1080;">
+      <%= render 'shared/flashes' %>
+    </div>
+
+    <!-- ✅ Contenu principal -->
     <div class="container d-flex justify-content-center" style="padding-bottom: 100px;">
       <div class="text-center w-100">
         <%= yield %>
       </div>
     </div>
+
+    <!-- ✅ Script pour auto-dismiss + placement dynamique -->
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // Auto-dismiss après 10 secondes
+        document.querySelectorAll('.flash-message[data-auto-dismiss="true"]').forEach((el) => {
+          setTimeout(() => {
+            const bsAlert = bootstrap.Alert.getOrCreateInstance(el);
+            bsAlert.close();
+          }, 10000);
+        });
+
+        // Ajuste la position si navbar_bottom présente
+        const flashContainer = document.getElementById("flash-container");
+        const bottomNavbar = document.getElementById("bottom-navbar");
+
+        if (flashContainer && bottomNavbar) {
+          const navbarHeight = bottomNavbar.offsetHeight;
+          flashContainer.style.bottom = `${navbarHeight + 16}px`;
+        }
+      });
+    </script>
   </body>
 </html>

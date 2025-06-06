@@ -220,11 +220,13 @@ class PostsController < ApplicationController
 
   def destroy
     if @post.user != current_user
-      redirect_to root_path, alert: "Accès refusé" and return
+      redirect_back(fallback_location: root_path, alert: "Accès refusé") and return
     end
+
     @post.destroy
-    redirect_to root_path, notice: "Post supprimé avec succès."
+    redirect_back(fallback_location: root_path, notice: "Post supprimé avec succès.")
   end
+
 
   def deezer_search
     query = params[:q]

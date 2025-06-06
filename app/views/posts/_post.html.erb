@@ -8,20 +8,15 @@
   <div class="card-body d-flex flex-column flex-grow-1">
     <div class="d-flex align-items-center mb-2">
       <h5 class="card-title mb-0"><%= post.track.title %></h5>
-      <small class="ms-auto text-muted">
-        <%= post.formatted_date %>
-      </small>
+      <small class="ms-auto text-muted"><%= post.formatted_date %></small>
     </div>
 
-    <h6 class="card-subtitle mb-2 text-muted">
-      <%= post.track.artist_name %>
-    </h6>
+    <h6 class="card-subtitle mb-2 text-muted"><%= post.track.artist_name %></h6>
 
     <p class="card-text flex-grow-1">
       <% if post.description.present? %>
         <%= post.description %>
       <% else %>
-        <!-- placeholder vide pour prendre la place -->
         &nbsp;
       <% end %>
     </p>
@@ -42,14 +37,43 @@
             <i class="bi bi-pencil"></i>
           <% end %>
 
-          <%= link_to post_path(post),
-                      method: :delete,
-                      data: { confirm: "Supprimer ce post ?" },
-                      class: "btn btn-sm btn-outline-danger ms-2" do %>
+          <!-- Bouton qui déclenche la modale -->
+          <button class="btn btn-sm btn-outline-danger ms-2"
+                  data-bs-toggle="modal"
+                  data-bs-target="#deletePostModal-<%= post.id %>"
+                  data-turbo="false">
             <i class="bi bi-trash"></i>
-          <% end %>
+          </button>
         </div>
       <% end %>
     </div>
   </div>
 </div>
+
+<% if current_user == post.user %>
+  <!-- Modale de suppression -->
+  <div class="modal fade" id="deletePostModal-<%= post.id %>" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Supprimer ce post</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+        <div class="modal-body">
+          <p>Supprimer "<strong><%= post.track.title %></strong>" ?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+
+          <%= form_with url: post_path(post), method: :delete, data: { turbo_frame: "_top" } do %>
+            <button type="submit"
+                    class="btn btn-danger"
+                    onclick="bootstrap.Modal.getInstance(document.getElementById('deletePostModal-<%= post.id %>')).hide()">
+              Supprimer
+            </button>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
