@@ -1,0 +1,754 @@
+[33mcommit 4ce91b6949937b85a56431d6d845b91fa1567ed4[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Merge: 67413d3 4ba090a
+Author: nathanlbm7 <nathanlebrusqm@gmail.com>
+Date:   Thu Jun 5 17:23:07 2025 +0200
+
+    Merge pull request #44 from vyddou/suppression-spoty
+    
+    nettoyage des traces de spoty dans notre code
+
+[33mcommit 4ba090ab9bb8c8c9798d555f0e65fbabcf595ad5[m[33m ([m[1;31morigin/suppression-spoty[m[33m, [m[1;32msuppression-spoty[m[33m)[m
+Author: Frederic Lamagdelaine <f.lamag@free.fr>
+Date:   Thu Jun 5 17:21:47 2025 +0200
+
+    nettoyage des traces de spoty dans notre code
+
+[33mcommit 67413d3c8a730d93593e9e3a92da377dd54edb9e[m
+Merge: 51e50b7 1d81057
+Author: nathanlbm7 <nathanlebrusqm@gmail.com>
+Date:   Thu Jun 5 17:03:01 2025 +0200
+
+    Merge pull request #43 from vyddou/divers-trucs
+    
+    divers trucs
+
+[33mcommit 1d81057ef85a4b44ce4c020b13c4326cdb348075[m
+Merge: 63168a7 51e50b7
+Author: nathanlbm7 <nathanlebrusqm@gmail.com>
+Date:   Thu Jun 5 17:02:53 2025 +0200
+
+    Merge branch 'master' into divers-trucs
+
+[33mcommit 63168a7eea18331565356c1dd744daf3e9564ac5[m[33m ([m[1;31morigin/divers-trucs[m[33m, [m[1;32mdivers-trucs[m[33m)[m
+Author: Frederic Lamagdelaine <f.lamag@free.fr>
+Date:   Thu Jun 5 16:59:26 2025 +0200
+
+    modif de pleins de petits trucs, comme les poubelles de la user publique
+
+[33mcommit 51e50b7c5866ee002ea845ab7befb517f367cf15[m
+Merge: c540bf0 6b9dfd1
+Author: nathanlbm7 <nathanlebrusqm@gmail.com>
+Date:   Thu Jun 5 16:58:01 2025 +0200
+
+    Merge pull request #42 from vyddou/changement-home-tentative
+    
+    bouton message à coté bouton s'abonner done
+
+[33mcommit 6b9dfd12435ad3677605d54411ef7c546938a1a1[m
+Author: Nathan LeBrusq <nathanlebrusqm@gmail.com>
+Date:   Thu Jun 5 16:57:23 2025 +0200
+
+    bouton message à coté bouton s'abonner done
+
+[33mcommit c540bf012ae96fffa69a58d204eb6473913d5043[m
+Merge: fc3057d 51fcdbd
+Author: Fred <f.lamag@free.fr>
+Date:   Thu Jun 5 16:14:14 2025 +0200
+
+    Merge pull request #41 from vyddou/usershow-posts
+    
+    ajouts sympas
+
+[33mcommit 51fcdbd42163166391d07774030700e945ee1a55[m
+Author: Nathan LeBrusq <nathanlebrusqm@gmail.com>
+Date:   Thu Jun 5 16:10:13 2025 +0200
+
+    ajouts sympas
+
+[33mcommit fc3057d0fae31ecf00f3a86cba3a00a62ba34751[m
+Merge: 27eb2bc 3022e4b
+Author: Ugo Vibderg <38910731+vyddou@users.noreply.github.com>
+Date:   Thu Jun 5 15:41:53 2025 +0200
+
+    Merge pull request #40 from vyddou/ngrock
+    
+    pwa
+
+[33mcommit 3022e4bbee0efcd5aad41a6d5585a211b58dd81f[m
+Author: Ugo Vidberg <ugo.vidberg@gmail.com>
+Date:   Thu Jun 5 15:41:11 2025 +0200
+
+    pwa
+
+[33mcommit 27eb2bc08cb37c51d9ced96c857a8d63f9129347[m
+Merge: 16b611b 9f8b018
+Author: Romain1709 <riboullet.romain@outlook.fr>
+Date:   Thu Jun 5 15:13:49 2025 +0200
+
+    Merge pull request #39 from vyddou/divers-trucs
+    
+    modif alertes et navbar haut
+
+[33mcommit 9f8b018f3ef143e72a3636b86c6c858ada75f5b2[m
+Author: Frederic Lamagdelaine <f.lamag@free.fr>
+Date:   Thu Jun 5 15:11:06 2025 +0200
+
+    modif alertes et navbar haut
+
+[33mcommit 16b611b42d4803388c213b12b4286bbf0406e609[m
+Merge: 00e59d8 4a39028
+Author: Fred <f.lamag@free.fr>
+Date:   Thu Jun 5 14:55:35 2025 +0200
+
+    Merge pull request #38 from vyddou/pages-search
+    
+    bug search format tel good
+
+[33mcommit 4a3902815e77a4db31e429618f4ffe7f07f861cc[m
+Author: Nathan LeBrusq <nathanlebrusqm@gmail.com>
+Date:   Thu Jun 5 14:54:03 2025 +0200
+
+    bug search format tel good
+
+[33mcommit 00e59d8e3744ac04e8eb4e6d61254d0f2f7aecd7[m
+Merge: ae00bb6 66f121b
+Author: Ugo Vibderg <38910731+vyddou@users.noreply.github.com>
+Date:   Thu Jun 5 14:43:17 2025 +0200
+
+    Merge pull request #37 from vyddou/search-modif
+    
+    search complet et d'autres features
+
+[33mcommit 66f121b3ce9604ec7813aa6e67d6f813530eb6f0[m
+Merge: 296d280 ae00bb6
+Author: Ugo Vibderg <38910731+vyddou@users.noreply.github.com>
+Date:   Thu Jun 5 14:43:08 2025 +0200
+
+    Merge branch 'master' into search-modif
+
+[33mcommit 296d28099deac45ec015072e04e48d4643208ff4[m
+Author: Nathan LeBrusq <nathanlebrusqm@gmail.com>
+Date:   Thu Jun 5 14:41:14 2025 +0200
+
+    search complet et d'autres features
+
+[33mcommit ae00bb651ca0a2385a0ffa372df4cfe9c6d52da3[m
+Merge: 26ba4a1 25e15dc
+Author: Ugo Vibderg <38910731+vyddou@users.noreply.github.com>
+Date:   Thu Jun 5 14:18:35 2025 +0200
+
+    Merge pull request #36 from vyddou/modif-navbar-haut-et-alertes
+    
+    modif navbar haut et alertes
+
+[33mcommit 25e15dc5adc84e281c3dc24930f78343c935df32[m[33m ([m[1;31morigin/modif-navbar-haut-et-alertes[m[33m, [m[1;32mmodif-navbar-haut-et-alertes[m[33m)[m
+Author: Frederic Lamagdelaine <f.lamag@free.fr>
+Date:   Thu Jun 5 12:40:08 2025 +0200
+
+    modif alertes et navbar haut
+
+[33mcommit 26ba4a15c8b07cac6def5c8c764bba174caf8179[m
+Merge: 181da8b 4f369a1
+Author: Ugo Vibderg <38910731+vyddou@users.noreply.github.com>
+Date:   Thu Jun 5 12:16:27 2025 +0200
+
+    Merge pull request #35 from vyddou/conversationsedit
+    
+    amelioration conv
+
+[33mcommit 181da8b3920595aa3386928faae8d83e035ea410[m
+Merge: 55b1e3f 9f483ee
+Author: Ugo Vibderg <38910731+vyddou@users.noreply.github.com>
+Date:   Thu Jun 5 12:15:29 2025 +0200
+
+    Merge pull request #34 from vyddou/user-avatar
+    
+    user avatar vierge ajouté
+
+[33mcommit 4f369a176ef883b34cd1197f19657cd18f695696[m
+Author: Riboullet Romain <riboullet.romain@outlook.fr>
+Date:   Thu Jun 5 12:15:16 2025 +0200
+
+    amelioration conv
+
+[33mcommit 9f483eeeaa327c71044068f3dd49cd935108cfd9[m
+Author: Ugo Vidberg <ugo.vidberg@gmail.com>
+Date:   Thu Jun 5 12:13:40 2025 +0200
+
+    avatar vierge ajouté
+
+[33mcommit 55b1e3f3b75e8d7252adaf8dad8115ce7e5ae835[m
+Author: Ugo Vidberg <ugo.vidberg@gmail.com>
+Date:   Thu Jun 5 11:40:12 2025 +0200
+
+    wget log
+
+[33mcommit 84f36f69f5616c2d47209d45f3e51fe430889932[m
+Merge: 68063c7 b50df04
+Author: Ugo Vibderg <38910731+vyddou@users.noreply.github.com>
+Date:   Thu Jun 5 11:35:35 2025 +0200
+
+    Merge pull request #33 from vyddou/modif-navbar-haut-et-alertes
+    
+    correction bouton deconnexion
+
+[33mcommit b50df0412adca29390f2b9602826d7d1217bf980[m
+Author: Frederic Lamagdelaine <f.lamag@free.fr>
+Date:   Thu Jun 5 11:33:55 2025 +0200
+
+    correction bouton deconnexion
+
+[33mcommit 68063c7b0397bbdedb149d5871923fe702ab7553[m
+Merge: 01ea5d8 7db97ce
+Author: Ugo Vibderg <38910731+vyddou@users.noreply.github.com>
+Date:   Thu Jun 5 11:25:16 2025 +0200
+
+    Merge pull request #32 from vyddou/posté
+    
+    post liké
+
+[33mcommit 7db97cebb2514ef28110473f6d3c8f76f4d32f4b[m
+Author: Ugo Vidberg <ugo.vidberg@gmail.com>
+Date:   Thu Jun 5 11:21:50 2025 +0200
+
+    premiere tentative post like
+
+[33mcommit 01ea5d8fc9803ad31595e69073dce285d948699f[m
+Merge: 7797040 ef98689
+Author: nathanlbm7 <nathanlebrusqm@gmail.com>
+Date:   Thu Jun 5 11:12:39 2025 +0200
+
+    Merge pull request #31 from vyddou/notifmessages
+    
+    notifmessages
+
+[33mcommit ef98689e120a5dc393eecbb9ab98fd9b3b2f71cd[m
+Author: Riboullet Romain <riboullet.romain@outlook.fr>
+Date:   Thu Jun 5 11:08:55 2025 +0200
+
+    amelioration des conversation
+
+[33mcommit 77970405d3813b3b1b78d71698a793fe965977e2[m
+Merge: 17353d2 709a2a7
+Author: nathanlbm7 <nathanlebrusqm@gmail.com>
+Date:   Thu Jun 5 11:00:45 2025 +0200
+
+    Merge pull request #30 from vyddou/notifmessages
+    
+    notif des messages
+
+[33mcommit 709a2a7bdeb87f56aa39b03f6ccc2d9e4e83cd5c[m
+Author: Riboullet Romain <riboullet.romain@outlook.fr>
+Date:   Thu Jun 5 10:56:59 2025 +0200
+
+    notif des messages
+
+[33mcommit 17353d2223a0a1384fb5d0b31b6ef6ecdc92704a[m
+Merge: 3d4109f 3293072
+Author: Fred <f.lamag@free.fr>
+Date:   Wed Jun 4 17:37:49 2025 +0200
+
+    Merge pull request #29 from vyddou/gestion-profil-user-public
+    
+    modif
+
+[33mcommit 32930728c880644ec52a467b4b73fe6674b8da02[m[33m ([m[1;31morigin/gestion-profil-user-public[m[33m, [m[1;32mgestion-profil-user-public[m[33m)[m
+Author: Frederic Lamagdelaine <f.lamag@free.fr>
+Date:   Wed Jun 4 17:37:25 2025 +0200
+
+    modif
+
+[33mcommit 3d4109f82d18e31c432e0fa82a8310fe3c5aaea8[m
+Merge: 7d1aa39 045814c
+Author: nathanlbm7 <nathanlebrusqm@gmail.com>
+Date:   Wed Jun 4 17:28:37 2025 +0200
+
+    Merge pull request #28 from vyddou/gestion-profil-user-public
+    
+    gestion profil user public
+
+[33mcommit 045814c8d5bbaa56a0870f37829cb203a699fc5e[m
+Merge: c20427f 7d1aa39
+Author: nathanlbm7 <nathanlebrusqm@gmail.com>
+Date:   Wed Jun 4 17:28:31 2025 +0200
+
+    Merge branch 'master' into gestion-profil-user-public
+
+[33mcommit c20427f2c6e70cf06613f9d20e863f5a294c60ca[m
+Author: Frederic Lamagdelaine <f.lamag@free.fr>
+Date:   Wed Jun 4 17:25:56 2025 +0200
+
+    modif et évolutions de la page user publique
+
+[33mcommit 7d1aa396f2f8b3f36358818170d19eee34069ae7[m
+Author: Ugo Vidberg <ugo.vidberg@gmail.com>
+Date:   Wed Jun 4 17:17:16 2025 +0200
+
+    correction destroy romain
+
+[33mcommit 850ee5ee8e9505a7f502065e27477956bec0f610[m
+Merge: 754c82f 6aee063
+Author: nathanlbm7 <nathanlebrusqm@gmail.com>
+Date:   Wed Jun 4 17:06:51 2025 +0200
+
+    Merge pull request #27 from vyddou/editnavbar
+    
+    modif barnav
+
+[33mcommit 754c82feb55fd7c9ea88f7463fed98ef16e328f1[m
+Merge: aa81682 6f2ce8b
+Author: nathanlbm7 <nathanlebrusqm@gmail.com>
+Date:   Wed Jun 4 17:06:30 2025 +0200
+
+    Merge pull request #23 from vyddou/swiperjs
+    
+    bottom scroll
+
+[33mcommit 6f2ce8be920e4b6b43302bde3b0f92ee7e3e4819[m
+Merge: d7bb154 aa81682
+Author: nathanlbm7 <nathanlebrusqm@gmail.com>
+Date:   Wed Jun 4 17:06:21 2025 +0200
+
+    Merge branch 'master' into swiperjs
+
+[33mcommit 6aee063f6d1554a7188e67d9f376773e2ed5f26c[m
+Author: Riboullet Romain <riboullet.romain@outlook.fr>
+Date:   Wed Jun 4 16:57:43 2025 +0200
+
+    modif barnav
+
+[33mcommit aa816827807e778e56142e7c81fa3dc7df373ae6[m
+Merge: 2f8e754 8b2e8f2
+Author: Romain1709 <riboullet.romain@outlook.fr>
+Date:   Wed Jun 4 16:55:51 2025 +0200
+
+    Merge pull request #26 from vyddou/search-bug
+    
+    search bug réglé
+
+[33mcommit 8b2e8f2c568fffc88eba09c0937a22e1ec33c4c6[m
+Author: Nathan LeBrusq <nathanlebrusqm@gmail.com>
+Date:   Wed Jun 4 16:54:35 2025 +0200
+
+    search bug réglé
+
+[33mcommit d7bb1541b8ef76bfac96390d1fcdd07965b590f6[m
+Author: Ugo Vidberg <ugo.vidberg@gmail.com>
+Date:   Wed Jun 4 16:45:35 2025 +0200
+
+     ajout score au dessus a droite de la cover
+
+[33mcommit 2f8e754832a97352f18b27f9ed7abb71216f8251[m
+Merge: c6d4563 8b4f711
+Author: nathanlbm7 <nathanlebrusqm@gmail.com>
+Date:   Wed Jun 4 16:06:25 2025 +0200
+
+    Merge pull request #25 from vyddou/search-navigation
+    
+    search navigation et suggestions
+
+[33mcommit 8b4f711671e9c920e9e69da03fc11c66523d06e7[m
+Merge: 0111cc5 c6d4563
+Author: nathanlbm7 <nathanlebrusqm@gmail.com>
+Date:   Wed Jun 4 16:06:16 2025 +0200
+
+    Merge branch 'master' into search-navigation
+
+[33mcommit 0111cc56a5d63509389c057a2c715dc9351a4427[m
+Author: Nathan LeBrusq <nathanlebrusqm@gmail.com>
+Date:   Wed Jun 4 16:03:11 2025 +0200
+
+    search navigation et suggestions
+
+[33mcommit c6d45634c9f5d8b9922d5c460c7ab4daee33d16d[m
+Merge: 181b3e3 b191e19
+Author: nathanlbm7 <nathanlebrusqm@gmail.com>
+Date:   Wed Jun 4 15:48:34 2025 +0200
+
+    Merge pull request #24 from vyddou/updatemessages
+    
+    messageupdate
+
+[33mcommit b191e190178dcb73c1c7025aa8c302c799f11c34[m
+Author: Riboullet Romain <riboullet.romain@outlook.fr>
+Date:   Wed Jun 4 15:47:22 2025 +0200
+
+    messageupdate
+
+[33mcommit 64bc136257171c8c4e9d81f4b912de816f30a364[m
+Author: Ugo Vidberg <ugo.vidberg@gmail.com>
+Date:   Wed Jun 4 15:34:33 2025 +0200
+
+    bottom scrolling
+
+[33mcommit 181b3e3435f809878aaf9c48a9ec17e05b204f51[m
+Merge: 1477052 052e9d9
+Author: nathanlbm7 <nathanlebrusqm@gmail.com>
+Date:   Wed Jun 4 15:15:14 2025 +0200
+
+    Merge pull request #22 from vyddou/messages
+    
+    creation message
+
+[33mcommit 052e9d9199f5369e94033afe25028fe95744b970[m
+Merge: c8b0cea 1477052
+Author: nathanlbm7 <nathanlebrusqm@gmail.com>
+Date:   Wed Jun 4 15:15:06 2025 +0200
+
+    Merge branch 'master' into messages
+
+[33mcommit c8b0ceaa7729ae2b3820e2d9214d2b87221f9ee6[m
+Author: Riboullet Romain <riboullet.romain@outlook.fr>
+Date:   Wed Jun 4 15:11:21 2025 +0200
+
+    creation message
+
+[33mcommit 1477052d11f61dbea9b35b33fb5f5ad1640e9032[m
+Merge: 9f8d964 39ff2c6
+Author: nathanlbm7 <nathanlebrusqm@gmail.com>
+Date:   Wed Jun 4 14:56:09 2025 +0200
+
+    Merge pull request #21 from vyddou/ajout-btn-navbar
+    
+    ajout bouton sur navbar du bas
+
+[33mcommit 39ff2c611bde0bb641369c5dd9a351051578aeae[m
+Author: Nathan LeBrusq <nathanlebrusqm@gmail.com>
+Date:   Wed Jun 4 14:54:52 2025 +0200
+
+    ajout bouton sur navbar du bas
+
+[33mcommit 9f8d96478c568286c50b47491eb8fb70e0542dcb[m
+Merge: 5c2adcf c6ca4dd
+Author: Fred <f.lamag@free.fr>
+Date:   Wed Jun 4 14:41:54 2025 +0200
+
+    Merge pull request #20 from vyddou/new-navbar
+    
+    bottom-navbar
+
+[33mcommit c6ca4ddc89565007f6664ff734474321874dfd06[m
+Merge: 1ae4883 5c2adcf
+Author: Fred <f.lamag@free.fr>
+Date:   Wed Jun 4 14:41:44 2025 +0200
+
+    Merge branch 'master' into new-navbar
+
+[33mcommit 5c2adcf4b423f78f0925b96f4d111a9576c4769c[m
+Merge: d368109 ae8dce1
+Author: nathanlbm7 <nathanlebrusqm@gmail.com>
+Date:   Wed Jun 4 14:40:11 2025 +0200
+
+    Merge pull request #19 from vyddou/gestion-profil-user-public
+    
+    ajout d'une page user publique
+
+[33mcommit 1ae488363407a6867564d27c0b72055bba8323e6[m
+Author: Nathan LeBrusq <nathanlebrusqm@gmail.com>
+Date:   Wed Jun 4 14:38:15 2025 +0200
+
+    bottom-navbar
+
+[33mcommit 5673d9fefd59f17de793b0d43ca27b264dc580a6[m
+Author: Ugo Vidberg <ugo.vidberg@gmail.com>
+Date:   Wed Jun 4 14:24:07 2025 +0200
+
+    création des cards, des pouces , ajout de margin en préambule de swipper
+
+[33mcommit ae8dce121d06c1364f005e29661dc9c821e7aa14[m
+Author: Frederic Lamagdelaine <f.lamag@free.fr>
+Date:   Wed Jun 4 13:16:04 2025 +0200
+
+    ajout d'une page user publique
+
+[33mcommit 0141c2950b31ab81c57ed88392d8002c98dac24f[m
+Author: Ugo Vidberg <ugo.vidberg@gmail.com>
+Date:   Wed Jun 4 13:07:59 2025 +0200
+
+    ajout pouce vert rouge
+
+[33mcommit 6093e1c3894880129ba5cc0a1b4886eb7d70980b[m
+Author: Ugo Vidberg <ugo.vidberg@gmail.com>
+Date:   Wed Jun 4 12:48:27 2025 +0200
+
+    ajout 30 sons pour simuler la playlist user lien vers deezer et ajout player
+
+[33mcommit d36810980804ee3e47db7a3074cb52ca43a350f5[m
+Merge: e423090 3b0fa53
+Author: Fred <f.lamag@free.fr>
+Date:   Wed Jun 4 12:11:22 2025 +0200
+
+    Merge pull request #15 from vyddou/ajustement_post
+    
+    ajout du btn supprimer, blocage a un post par jours
+
+[33mcommit 3b0fa534eb52fb6efd47e0495dae933b4e211fee[m
+Author: Riboullet Romain <riboullet.romain@outlook.fr>
+Date:   Wed Jun 4 12:08:09 2025 +0200
+
+    ajout du btn supprimer, blocage a un post par jours
+
+[33mcommit e423090ccd704b0c840f575cd055fc11cb6912aa[m
+Merge: 7a04217 eda2548
+Author: Fred <f.lamag@free.fr>
+Date:   Wed Jun 4 11:20:21 2025 +0200
+
+    Merge pull request #14 from vyddou/music-home
+    
+    Music home
+
+[33mcommit eda254884d41fdb0086345378dfc654cbc29d0d9[m
+Merge: a0c55ad 7a04217
+Author: Fred <f.lamag@free.fr>
+Date:   Wed Jun 4 11:20:11 2025 +0200
+
+    Merge branch 'master' into music-home
+
+[33mcommit a0c55ad020c2f8c93ee2d7bb024bad914660f694[m
+Author: Ugo Vidberg <ugo.vidberg@gmail.com>
+Date:   Wed Jun 4 11:15:47 2025 +0200
+
+    mus
+
+[33mcommit 83fe4c11539a2403d0bc1971a1d13e53a37ec57d[m
+Author: Ugo Vidberg <ugo.vidberg@gmail.com>
+Date:   Wed Jun 4 10:56:04 2025 +0200
+
+    recherche corrigée
+
+[33mcommit 8c72a8949143643eb5812e8123bfba801b9e076f[m
+Author: Ugo Vidberg <ugo.vidberg@gmail.com>
+Date:   Wed Jun 4 10:42:21 2025 +0200
+
+    test
+
+[33mcommit c69fb3521ec516fbd1d305fd61abe3b6b11833dd[m
+Author: Ugo Vidberg <ugo.vidberg@gmail.com>
+Date:   Wed Jun 4 10:31:29 2025 +0200
+
+    a affiiner
+
+[33mcommit 7a0421718aa98d77314c2902b7125dad454aefa9[m
+Merge: 0f436cc 86ae638
+Author: nathanlbm7 <nathanlebrusqm@gmail.com>
+Date:   Wed Jun 4 10:26:56 2025 +0200
+
+    Merge pull request #13 from vyddou/ajustement
+    
+    flafla
+
+[33mcommit 86ae638fc9d9a3798c2cb4b01d0da880c7cc2e82[m
+Author: Riboullet Romain <riboullet.romain@outlook.fr>
+Date:   Tue Jun 3 17:42:46 2025 +0200
+
+    flafla
+
+[33mcommit 0f436cc04c89999af9f845910c64478c64995c8a[m[33m ([m[1;32mtest[m[33m)[m
+Merge: 3045a70 fc99430
+Author: nathanlbm7 <nathanlebrusqm@gmail.com>
+Date:   Tue Jun 3 16:00:12 2025 +0200
+
+    Merge pull request #12 from vyddou/add-tracks
+    
+    button add tracks
+
+[33mcommit fc9943024355fccc5064ea88a01a7561c80803e0[m
+Author: Ugo Vidberg <ugo.vidberg@gmail.com>
+Date:   Tue Jun 3 15:59:21 2025 +0200
+
+    add-tracks
+
+[33mcommit 3045a70487041dd84a2db41931207fcdf21d3e47[m
+Author: Ugo Vidberg <ugo.vidberg@gmail.com>
+Date:   Tue Jun 3 15:20:00 2025 +0200
+
+    gemfile
+
+[33mcommit d0f0c417bfa08b08d13c3f41f2f861d7388b9e08[m
+Merge: 5ed5681 c93dd2d
+Author: Riboullet Romain <riboullet.romain@outlook.fr>
+Date:   Tue Jun 3 15:15:56 2025 +0200
+
+    Merge branch 'master' of github.com:vyddou/dropOne
+
+[33mcommit 5ed5681632a242cd74e8e83fd1d50303028ceb9c[m
+Author: Riboullet Romain <riboullet.romain@outlook.fr>
+Date:   Tue Jun 3 15:14:48 2025 +0200
+
+    update boostrap
+
+[33mcommit c93dd2d7ce44eec38eeee2d1c30b02de732c6585[m
+Author: Ugo Vidberg <ugo.vidberg@gmail.com>
+Date:   Tue Jun 3 15:08:23 2025 +0200
+
+    flafla
+
+[33mcommit 599e728fbd87a19dd815557df09b9759e279c587[m
+Merge: be8650b 5bdb6bb
+Author: nathanlbm7 <nathanlebrusqm@gmail.com>
+Date:   Tue Jun 3 15:06:16 2025 +0200
+
+    Merge pull request #11 from vyddou/rapatriement_ia
+    
+    recopie et adaptation de notre ancien code au nouveau
+
+[33mcommit 5bdb6bbb056ae48586d6193694e32d539379e290[m
+Merge: 8aa7440 be8650b
+Author: nathanlbm7 <nathanlebrusqm@gmail.com>
+Date:   Tue Jun 3 15:06:07 2025 +0200
+
+    Merge branch 'master' into rapatriement_ia
+
+[33mcommit 8aa744019ce062e176019cd6e866ab0ab2df5548[m[33m ([m[1;31morigin/rapatriement_ia[m[33m, [m[1;32mrapatriement_ia[m[33m)[m
+Author: Frederic Lamagdelaine <f.lamag@free.fr>
+Date:   Tue Jun 3 15:02:59 2025 +0200
+
+    recopie et adaptation de notre ancien code au nouveau
+
+[33mcommit be8650bcbfe2983d60030560ebc366656dd237e4[m
+Merge: e381dde 0b984d7
+Author: nathanlbm7 <nathanlebrusqm@gmail.com>
+Date:   Tue Jun 3 14:48:45 2025 +0200
+
+    Merge pull request #9 from vyddou/deezer
+    
+    deezer
+
+[33mcommit 0b984d78f8380e858ce6ffcd7293702a16b7a120[m
+Merge: cac13fc e381dde
+Author: nathanlbm7 <nathanlebrusqm@gmail.com>
+Date:   Tue Jun 3 14:48:28 2025 +0200
+
+    Merge branch 'master' into deezer
+
+[33mcommit e381dde68907cf8c7e8e800cef9b88343af1463f[m
+Merge: c039cca 062ded1
+Author: nathanlbm7 <nathanlebrusqm@gmail.com>
+Date:   Tue Jun 3 14:36:49 2025 +0200
+
+    Merge pull request #10 from vyddou/edit-user
+    
+    edit user et new user a valider avec Flaflamobile
+
+[33mcommit 062ded1b9dbea2739834e32f2b4da556cb85eb4b[m
+Author: Ugo Vidberg <ugo.vidberg@gmail.com>
+Date:   Tue Jun 3 14:33:44 2025 +0200
+
+    edit user and new user
+
+[33mcommit c039ccadbd8e6a2862b5bf018a77b81c48d4a19f[m
+Merge: 00d3d5b c6e5487
+Author: nathanlbm7 <nathanlebrusqm@gmail.com>
+Date:   Tue Jun 3 14:33:21 2025 +0200
+
+    Merge pull request #8 from vyddou/playlist-view
+    
+    playlist-view
+
+[33mcommit cac13fc9a88276d64350038e6f981d0f84e14255[m
+Author: Riboullet Romain <riboullet.romain@outlook.fr>
+Date:   Tue Jun 3 14:25:42 2025 +0200
+
+    deezer via api creation post journalié
+
+[33mcommit c6e54871f2453e4d0d034351c949089d207cf5d5[m
+Author: Ugo Vidberg <ugo.vidberg@gmail.com>
+Date:   Tue Jun 3 12:13:26 2025 +0200
+
+    avatar url
+
+[33mcommit 0a5f8ba0ffd02ebed48b59df342199ee034faa85[m
+Author: Ugo Vidberg <ugo.vidberg@gmail.com>
+Date:   Tue Jun 3 12:03:57 2025 +0200
+
+    playlist view and route playlist
+
+[33mcommit 201f9be13f9b269ffa27778e10b5f7e1fa932ad5[m
+Author: Riboullet Romain <riboullet.romain@outlook.fr>
+Date:   Tue Jun 3 11:51:58 2025 +0200
+
+    Setup ruby_llm gem
+
+[33mcommit 00d3d5bdfbfc518ed9140f94663993e8e110c88c[m
+Merge: fa5a206 ec7a0c6
+Author: Ugo Vibderg <38910731+vyddou@users.noreply.github.com>
+Date:   Tue Jun 3 11:50:23 2025 +0200
+
+    Merge pull request #4 from vyddou/user-name
+    
+    username last name first name
+
+[33mcommit fa5a206674a47488ccffa1066e7c2ac797e9b9b5[m
+Merge: 1bedf90 0496b66
+Author: Ugo Vibderg <38910731+vyddou@users.noreply.github.com>
+Date:   Tue Jun 3 11:50:07 2025 +0200
+
+    Merge pull request #3 from vyddou/scss-compontents
+    
+    home view and scss components
+
+[33mcommit 0a0e3d431bd9a31253c34c463f930c010facfcf0[m
+Author: Ugo Vidberg <ugo.vidberg@gmail.com>
+Date:   Tue Jun 3 11:37:24 2025 +0200
+
+    init
+
+[33mcommit ec7a0c630ee616558cf51451ac6c04240f2b8f4e[m
+Author: Ugo Vidberg <ugo.vidberg@gmail.com>
+Date:   Tue Jun 3 11:25:18 2025 +0200
+
+    add username and firtname lastname
+
+[33mcommit 0496b662c3a3d490e2dac5e401e2199e2a2d8e2e[m
+Author: Ugo Vidberg <ugo.vidberg@gmail.com>
+Date:   Tue Jun 3 11:13:03 2025 +0200
+
+    scss + homepage view
+
+[33mcommit 1bedf90850171bfd0197d1d156f3c6e1a7fc7d5e[m
+Merge: b95fd2e 47076f2
+Author: Ugo Vibderg <38910731+vyddou@users.noreply.github.com>
+Date:   Tue Jun 3 10:33:26 2025 +0200
+
+    Merge pull request #1 from vyddou/models
+    
+    ajout models
+
+[33mcommit b95fd2e06661d0fc3bf1fab9b667b117ca586b26[m
+Merge: 7ea4a6b edf3f68
+Author: Ugo Vibderg <38910731+vyddou@users.noreply.github.com>
+Date:   Tue Jun 3 10:32:40 2025 +0200
+
+    Merge pull request #2 from vyddou/fav-icon
+    
+    fav icon
+
+[33mcommit edf3f68ecff3e73088a45a4b17e9d00fd6880e97[m[33m ([m[1;31morigin/fav-icon[m[33m, [m[1;32mfav-icon[m[33m)[m
+Author: Frederic Lamagdelaine <f.lamag@free.fr>
+Date:   Mon Jun 2 17:47:08 2025 +0200
+
+    ajout du favicon à la page web, ajout autre format
+
+[33mcommit 380ab91dcdbbd4b190556c525e85319098bd404f[m
+Author: Frederic Lamagdelaine <f.lamag@free.fr>
+Date:   Mon Jun 2 17:35:35 2025 +0200
+
+    ajout du favicon à la page web
+
+[33mcommit 47076f2abe900570b49c3b2a3d601aa5abc1b3a3[m
+Author: Ugo Vidberg <ugo.vidberg@gmail.com>
+Date:   Mon Jun 2 17:13:36 2025 +0200
+
+    ajout des has many et autres dans tous le smodels
+
+[33mcommit 7ea4a6b3ba2b4fc0856c5d7a39faf61252fbb1b6[m
+Author: Ugo Vidberg <ugo.vidberg@gmail.com>
+Date:   Mon Jun 2 16:41:09 2025 +0200
+
+    rails g models
+
+[33mcommit caa1d35079792618fdad3695871a8627d07122f7[m
+Author: Ugo Vidberg <ugo.vidberg@gmail.com>
+Date:   Mon Jun 2 16:28:14 2025 +0200
+
+    Initial commit with devise template from https://github.com/lewagon/rails-templates

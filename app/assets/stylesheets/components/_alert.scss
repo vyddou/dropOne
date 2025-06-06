@@ -31,3 +31,47 @@
     transform: none;
   }
 }
+
+.flash-container {
+  padding-bottom: 1rem;
+}
+
+.bottom-navbar + #flash-container {
+  padding-bottom: 4.5rem; // ajuste la valeur si ta navbar est plus haute
+}
+
+.flash-message {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  max-width: 90%;
+  width: auto;
+  max-height: 120px;
+  overflow-y: auto;
+  text-align: center;
+  z-index: 1000;
+  animation: fadein 0.5s;
+
+  // Style par défaut pour les écrans plus grands
+  font-size: 16px;
+}
+
+@keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+// Media query pour les smartphones
+@media only screen and (max-width: 600px) {
+  .flash-message {
+    max-width: 95%; // Augmente légèrement la largeur maximale sur smartphone
+    padding: 8px 15px; // Réduit le padding pour gagner de la place
+    font-size: 14px; // Réduit légèrement la taille de la police
+  }
+}
+
