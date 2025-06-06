@@ -4,22 +4,7 @@
       <%= image_tag "https://img.notionusercontent.com/ext/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fpublic.notion-static.com%2F974621a6-c896-401b-9c9d-23ad57ee2174%2Flogo_drop_one.jpeg/size/w=70?exp=1748532281&sig=0UR8i9c0zhN8_0APBuhnAcK1570A8VIAGJwFacNe6a8&id=1d08d7b6-4e96-81e8-ac5f-00035f88e75b&table=space&userId=cad7b2d7-04fc-4adc-a196-165aa4ca6a25", alt: "DropOne Logo", class: "navbar-brand-logo-image me-2" %>
     <% end %>
 
-    <ul class="navbar-nav ms-auto d-flex flex-row">
-      <% if user_signed_in? %>
-        <li class="nav-item me-3">
-          <%= link_to activity_user_path(current_user), class: "nav-link #{'active' if current_page?(activity_user_path(current_user))}" do %>
-            <i class="bi bi-suit-heart fs-5"></i>
-          <% end %>
-        </li>
-
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto">
-      </ul>
-
+    
       <ul class="navbar-nav ms-auto">
         <% if user_signed_in? %>
           <li class="nav-item">
