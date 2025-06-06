@@ -12,19 +12,31 @@
           <% end %>
         </li>
 
-        <li class="nav-item">
-          <%= link_to new_playlist_path, class: "nav-link #{'active' if current_page?(new_playlist_path)}" do %>
-            <i class="bi bi-music-note-beamed fs-4"></i>
-          <% end %>
-        </li>
-      <% else %>
-        <li class="nav-item me-3">
-          <%= link_to "Login", new_user_session_path, class: "nav-link #{'active' if current_page?(new_user_session_path)}" %>
-        </li>
-        <li class="nav-item">
-          <%= link_to "Inscription", new_user_registration_path, class: "nav-link #{'active' if current_page?(new_user_registration_path)}" %>
-        </li>
-      <% end %>
-    </ul>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto">
+      </ul>
+
+      <ul class="navbar-nav ms-auto">
+        <% if user_signed_in? %>
+          <li class="nav-item">
+            <%= link_to activity_user_path(current_user), class: "nav-link #{'active' if current_page?(activity_user_path(current_user))}" do %>
+              <i class="bi bi-suit-heart fs-5"></i>
+            <% end %>
+          </li>
+
+        <% else %>
+          <li class="nav-item">
+            <%= link_to "Login", new_user_session_path, class: "nav-link #{'active' if current_page?(new_user_session_path)}" %>
+          </li>
+          <li class="nav-item">
+            <%= link_to "Inscription", new_user_registration_path, class: "nav-link #{'active' if current_page?(new_user_registration_path)}" %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
   </div>
 </nav>

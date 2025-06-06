@@ -118,8 +118,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_06_04_132957) do
     t.string "link_deezer"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "link_spotify"
-    t.string "link_apple"
     t.index ["user_id"], name: "index_tracks_on_user_id"
   end
 
