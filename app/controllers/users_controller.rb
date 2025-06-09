@@ -2,27 +2,33 @@ class UsersController < ApplicationController
   before_action :authenticate_user!, except: [:show]
 
   def show
-    @user = User.find(params[:id])
+  @user = User.find(params[:id])
 
-    # Initialisation des variables
-    @user_posts = @user.posts.order(created_at: :desc)
+  # Initialisation des variables
+  @user_posts = @user.posts.order(created_at: :desc)
 
-    @user_playlists = @user.playlists.order(created_at: :desc)
+  @user_playlists = @user.playlists.order(created_at: :desc)
 
-    # Gestion des tracks likées
-    @like_playlist = @user.playlists.find_by(name: "Like")  # (sans 's' à "Like")
-    @user_tracks = @like_playlist ? @like_playlist.tracks.order(created_at: :desc) : []
+  # Gestion des tracks likées via Playlist Like
+  @like_playlist = @user.playlists.find_by(name: "Like")
+  @user_tracks = @like_playlist ? @like_playlist.tracks.order(created_at: :desc) : []
 
-    # Variables pour les interactions
-    @is_current_user = current_user == @user
-    @is_following = user_signed_in? && !@is_current_user ? current_user.following.include?(@user) : false
+  # Posts likés via les votes
+  @liked_posts = Post.joins(:votes)
+                   .where(votes: { user_id: @user.id, vote_type: true })
+                   .includes(:track)
+                   .distinct
+                   # pas de order ici → sinon PG râle
+
+# Tri en Ruby
+@liked_posts = @liked_posts.sort_by { |post| post.votes.find { |v| v.user_id == @user.id && v.vote_type == true }&.created_at || post.created_at }.reverse
+
+
+  # Variables pour les interactions
+  @is_current_user = current_user == @user
+  @is_following = user_signed_in? && !@is_current_user ? current_user.following.include?(@user) : false
   end
 
-  def follow
-    @user = User.find(params[:id])
-    current_user.following << @user
-    redirect_to user_path(@user), notice: "Vous suivez maintenant #{@user.username}"
-  end
 
   def unfollow
     @user = User.find(params[:id])
