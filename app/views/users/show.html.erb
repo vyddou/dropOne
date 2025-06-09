@@ -116,15 +116,21 @@
   <% end %>
 </div>
 
-
-
-    <div class="tab-pane fade" id="tracks" role="tabpanel">
-      <% if @user_tracks.any? %>
-        <%= render @user_tracks %>
-      <% else %>
-        <p class="mt-3">Aucune musique likées</p>
+<div class="tab-pane fade show active" id="posts" role="tabpanel">
+  <% if @user_posts.any? %>
+    <div class="row g-3 mt-3 justify-content-md" data-controller="audio-player">
+      <% @user_posts.each do |post| %>
+        <div class="col-6 col-md-3">
+          <%= render partial: "posts/post", locals: { post: post } %>
+        </div>
       <% end %>
     </div>
+  <% else %>
+    <p class="mt-3">Aucun post pour le moment</p>
+  <% end %>
+</div>
+
+
 
     <div class="tab-pane fade" id="playlists" role="tabpanel">
       <% if @user_playlists.any? %>
@@ -135,5 +141,10 @@
     </div>
   </div>
 </div>
+
+  </div> <!-- fin tab-content -->
+
+  <audio id="global-audio-player" style="display: none;" controls></audio>
+
 
 <%= render "shared/bottom_navbar" %>
