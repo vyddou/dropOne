@@ -6,7 +6,7 @@
     <div class="add-track-button-container mt-4 mb-5 w-100 text-center">
       <% if !Post.exists?(user: current_user, created_at: Time.zone.today.all_day) %>
         <%= link_to "Proposer ma musique du jour", new_post_path, class: "btn btn-primary btn-aurora-glow" %>
-      <% end %>     
+      <% end %>
     </div>
   <% end %>
 
@@ -122,14 +122,31 @@
                   <% end %>
                 </div>
 
-                <%# Lien Deezer %>
-                <% if item.deezer_link.present? %>
-                  <p class="track-deezer-link mt-2">
-                    <a href="<%= item.deezer_link %>" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-info w-100">
-                      <i class="bi bi-play-circle-fill"></i> Écouter sur Deezer
+                <%# --- NOUVEAUX LOGOS DE STREAMING ALIGNÉS --- %>
+                <div class="streaming-links-container mt-auto pt-2">
+                  <div class="streaming-logos-wrapper">
+                    <%# Logo Deezer %>
+                    <% if item.deezer_link.present? %>
+                      <a href="<%= item.deezer_link %>" target="_blank" rel="noopener noreferrer" class="streaming-logo deezer" title="Écouter sur Deezer">
+                        <%# Utilisons une icône plus stylée pour Deezer si possible, sinon le play-circle est bien %>
+                        <i class="bi bi-play-circle-fill"></i>
+                      </a>
+                    <% end %>
+
+                    <%# Logo Spotify %>
+                    <% spotify_search_url = "https://open.spotify.com/search/#{URI.encode_www_form_component(item.title + ' ' + item.artist)}" %>
+                    <a href="<%= spotify_search_url %>" target="_blank" rel="noopener noreferrer" class="streaming-logo spotify" title="Écouter sur Spotify">
+                      <i class="bi bi-spotify"></i>
                     </a>
-                  </p>
-                <% end %>
+
+                    <%# Logo Apple Music %>
+                    <% apple_music_search_url = "https://music.apple.com/us/search?term=#{URI.encode_www_form_component(item.title + ' ' + item.artist)}" %>
+                    <a href="<%= apple_music_search_url %>" target="_blank" rel="noopener noreferrer" class="streaming-logo apple" title="Écouter sur Apple Music">
+                      <i class="bi bi-apple"></i>
+                    </a>
+                  </div>
+                </div>
+                <%# --- FIN DES LOGOS DE STREAMING --- %>
               </div>
             </div>
           </div>
