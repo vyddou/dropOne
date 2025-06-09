@@ -4,7 +4,9 @@
 
   <% if user_signed_in? %>
     <div class="add-track-button-container mt-4 mb-5 w-100 text-center">
-     <%= link_to "Ajouter un morceau", new_post_path, class: "btn btn-primary btn-aurora-glow" %>
+      <% if !Post.exists?(user: current_user, created_at: Time.zone.today.all_day) %>
+        <%= link_to "Proposer ma musique du jour", new_post_path, class: "btn btn-primary btn-aurora-glow" %>
+      <% end %>     
     </div>
   <% end %>
 
@@ -73,17 +75,44 @@
 
                   <div class="d-flex justify-content-between align-items-center mb-2">
                     <div>
-                      <%# --- LOGIQUE DE VOTE SIMPLIFIÉE --- %>
-                      <%# Tous les boutons utilisent la même route et la même logique %>
+                     <%# --- LOGIQUE DE VOTE SIMPLIFIÉE --- %>
                       <% deezer_id = (item.origin == :app || item.origin == :deezer_post) ? item.db_post_object.track.deezer_track_id : item.id_for_links %>
+                      <% post_id = (item.origin == :app || item.origin == :deezer_post) ? item.db_post_object.id : nil %>
 
-                      <%= button_to vote_on_track_path(deezer_id, vote_type: 'hot', user: item.user.username), method: :post, class: "btn btn-sm btn-vote", title: "J'aime", form_class: "d-inline" do %>
-                        <i class="bi bi-hand-thumbs-up-fill"></i>
-                      <% end %>
-                      <%= button_to vote_on_track_path(deezer_id, vote_type: 'cold', user: item.user.username), method: :post, class: "btn btn-sm btn-vote", title: "Je n'aime pas", form_class: "d-inline" do %>
-                        <i class="bi bi-hand-thumbs-down-fill"></i>
-                      <% end %>
-                      <%# --- FIN DE LA LOGIQUE DE VOTE SIMPLIFIÉE --- %>
+                      <% if user_signed_in? %>
+                        <%# Icône pour le vote "J'aime" %>
+                        <%= button_to vote_on_track_path(deezer_id, vote_type: 'hot', user: item.user.username),
+                            method: :post,
+                            class: "btn btn-sm btn-vote",
+                            title: "J'aime",
+                            form_class: "d-inline",
+                            remote: true,
+                            id: "like-button-#{post_id}" do %>
+                          <i class="bi <%= current_user.liked?(post_id) == true ? 'bi-hand-thumbs-up-fill' : 'bi-hand-thumbs-up' %>" style="<%= 'color: green;' if current_user.liked?(post_id) == true %>"></i>
+                        <% end %>
+
+                        <%# Icône pour le vote "Je n'aime pas" %>
+                        <%= button_to vote_on_track_path(deezer_id, vote_type: 'cold', user: item.user.username),
+                            method: :post,
+                            class: "btn btn-sm btn-vote",
+                            title: "Je n'aime pas",
+                            form_class: "d-inline",
+                            remote: true,
+                            id: "dislike-button-#{post_id}" do %>
+                          <i class="bi <%= current_user.liked?(post_id) == false ? 'bi-hand-thumbs-down-fill' : 'bi-hand-thumbs-down' %>" style="<%= 'color: red;' if current_user.liked?(post_id) == false %>"></i>
+                        <% end %>
+
+                        <%# --- FIN DE LA LOGIQUE DE VOTE SIMPLIFIÉE --- %>
+                    <% else %>
+                      <%# Version pour les non-connectés (boutons désactivés) %>
+                      <button class="btn btn-sm btn-vote" title="Connectez-vous pour voter" disabled>
+                        <i class="bi bi-hand-thumbs-up"></i>
+                      </button>
+                      <button class="btn btn-sm btn-vote" title="Connectez-vous pour voter" disabled>
+                        <i class="bi bi-hand-thumbs-down"></i>
+                      </button>
+                    <% end %>
+
                     </div>
                   </div>
 
