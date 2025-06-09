@@ -32,24 +32,30 @@
   <p class="mt-3 text-light fs-5">Votre IA réfléchit à votre playlist...</p>
 </div>
 
-<!-- Script Loader compatible Turbo + Audio -->
+<!-- Script loader propre, compatible Turbo et audio -->
 <script>
+  // Affiche le loader quand le formulaire est soumis
   document.addEventListener("turbo:submit-start", function(event) {
     if (event.target.id === "playlist-form") {
       document.getElementById("page-loader").style.display = "flex";
     }
   });
 
-  // Cache le loader si la page quitte totalement (vers la show)
+  // Cache le loader si on quitte la page complètement
   window.addEventListener("beforeunload", function () {
     document.getElementById("page-loader").style.display = "none";
   });
 
-  // Si Turbo gère la réponse sans rediriger, on cache le loader
+  // Cache le loader si Turbo ne redirige pas vers une nouvelle page
   document.addEventListener("turbo:before-fetch-response", function(event) {
     const redirect = event.detail.fetchResponse?.redirected;
     if (!redirect) {
       document.getElementById("page-loader").style.display = "none";
     }
+  });
+
+  // Toujours cacher le loader au chargement complet (accès direct ou retour Turbo)
+  document.addEventListener("turbo:load", function() {
+    document.getElementById("page-loader").style.display = "none";
   });
 </script>
