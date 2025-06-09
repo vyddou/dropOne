@@ -45,4 +45,10 @@ class User < ApplicationRecord
            .count
   end
 
+    def liked?(post_id)
+      vote = votes.find_by(post_id: post_id)
+      puts "Vote pour post_id #{post_id}: #{vote.inspect}"
+      vote&.vote_type
+    end
+
 end

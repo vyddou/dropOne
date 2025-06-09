@@ -6,10 +6,10 @@ export default class extends Controller {
     setTimeout(() => {
       this.element.classList.remove("show")
       this.element.classList.add("fade")
-    }, 3000) //4 secondes
+    }, 2300) //4 secondes
 
     setTimeout(() => {
       this.element.remove()
-    }, 4000) // 1s plus tard
+    }, 3000) // 1s plus tard
   }
 }

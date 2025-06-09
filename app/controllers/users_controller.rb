@@ -8,6 +8,7 @@ class UsersController < ApplicationController
     @user_posts = @user.posts.order(created_at: :desc)
 
     @user_playlists = @user.playlists.order(created_at: :desc)
+                      .reject { |playlist| ["Like", "Dislikes"].include?(playlist.name) }
 
     # Gestion des tracks likées
     @like_playlist = @user.playlists.find_by(name: "Like")  # (sans 's' à "Like")
