@@ -102,19 +102,21 @@
   </ul>
 
   <div class="tab-content" id="profileTabContent">
-    <div class="tab-pane fade show active" id="posts" role="tabpanel">
-      <% if @user_posts.any? %>
-        <div class="row g-3 mt-3 justify-content-md">
-          <% @user_posts.each do |post| %>
-            <div class="col-6 col-md-3">
-              <%= render partial: "posts/post", locals: { post: post } %>
-            </div>
-          <% end %>
+    <div class="tab-pane fade" id="tracks" role="tabpanel">
+  <% if @liked_posts.any? %>
+    <div class="row g-3 mt-3 justify-content-md">
+      <% @liked_posts.each do |post| %>
+        <div class="col-6 col-md-3">
+          <%= render partial: "posts/post", locals: { post: post } %>
         </div>
-      <% else %>
-        <p class="mt-3">Aucune musique partagée</p>
       <% end %>
     </div>
+  <% else %>
+    <p class="mt-3">Aucune musique likée</p>
+  <% end %>
+</div>
+
+
 
     <div class="tab-pane fade" id="tracks" role="tabpanel">
       <% if @user_tracks.any? %>
