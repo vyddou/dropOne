@@ -5,7 +5,7 @@
   Vous pouvez aussi laisser ce champ vide pour une surprise totale !
 </p>
 
-<%= form_with(url: playlists_path, method: :post, local: true) do |form| %>
+<%= form_with url: playlists_path, method: :post, local: false, html: { id: "playlist-form", data: { turbo: true } } do |form| %>
   <div class="field">
     <%= form.label :user_prompt, "Votre idée de playlist (ex: 'soirée disco nostalgique', 'concentration deep house')" %>
     <%= form.text_area :user_prompt, rows: 3, class: "form-control" %>
@@ -20,5 +20,36 @@
 <% end %>
 
 <br>
+
 <%= link_to "Retour aux playlists", playlists_path, class: "btn btn-secondary btn-aurora-glow" %>
 <%= render "shared/bottom_navbar" %>
+
+<!-- Loader -->
+<div id="page-loader" style="display:none; position: fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.6); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 1rem;">
+  <div class="spinner-border text-light" role="status" style="width: 3rem; height: 3rem;">
+    <span class="visually-hidden">Chargement...</span>
+  </div>
+  <p class="mt-3 text-light fs-5">Votre IA réfléchit à votre playlist...</p>
+</div>
+
+<!-- Script Loader compatible Turbo + Audio -->
+<script>
+  document.addEventListener("turbo:submit-start", function(event) {
+    if (event.target.id === "playlist-form") {
+      document.getElementById("page-loader").style.display = "flex";
+    }
+  });
+
+  // Cache le loader si la page quitte totalement (vers la show)
+  window.addEventListener("beforeunload", function () {
+    document.getElementById("page-loader").style.display = "none";
+  });
+
+  // Si Turbo gère la réponse sans rediriger, on cache le loader
+  document.addEventListener("turbo:before-fetch-response", function(event) {
+    const redirect = event.detail.fetchResponse?.redirected;
+    if (!redirect) {
+      document.getElementById("page-loader").style.display = "none";
+    }
+  });
+</script>

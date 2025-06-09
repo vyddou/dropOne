@@ -11,7 +11,6 @@ class PlaylistsController < ApplicationController
   end
 
   def show
-    # Utiliser find_by pour éviter une erreur si la playlist n'existe pas
     @playlist = Playlist.find_by(id: params[:id])
     if @playlist.nil?
       redirect_to playlists_path, alert: "Playlist non trouvée."
@@ -44,16 +43,14 @@ class PlaylistsController < ApplicationController
 
   def create
     user_prompt = params[:user_prompt].to_s.strip
-    Rails.logger.debug "[Playlist#create] Démarrage avec le prompt : #{user_prompt}"
-
     requested_duration_min = extract_duration_from_prompt(user_prompt)
-    target_duration_ms = requested_duration_min * 60 * 1000 if requested_duration_min
+    target_duration_ms = requested_duration_min.to_i * 60 * 1000 if requested_duration_min
 
     excluded_tracks_info = get_excluded_tracks_info
-    curated_list = generate_curated_list_from_llm(user_prompt, excluded_tracks_info)
+    curated_list = generate_curated_list_from_llm(user_prompt, excluded_tracks_info, requested_duration_min)
 
     if curated_list.blank?
-      redirect_to new_playlist_path, alert: "L'IA n'a pas pu générer de playlist. Essayez d'être plus précis."
+      redirect_to new_playlist_path, alert: "L'IA n'a pas pu générer de playlist. Réessaie avec un autre prompt."
       return
     end
 
@@ -61,31 +58,24 @@ class PlaylistsController < ApplicationController
     cumulative_duration_ms = 0
 
     curated_list.each do |item|
-      # Si une durée est demandée et atteinte, on arrête.
-      if target_duration_ms && cumulative_duration_ms >= target_duration_ms
-        Rails.logger.info "[Playlist#create] Durée cible de #{requested_duration_min} min atteinte. Arrêt de l'ajout."
-        break
-      end
-
+      break if target_duration_ms && cumulative_duration_ms >= target_duration_ms
       next unless item['artiste'].present? && item['titre'].present?
 
       deezer_track = find_track_on_deezer(item['artiste'], item['titre'])
       if deezer_track
         selected_tracks << deezer_track.merge(description: item['description'])
         cumulative_duration_ms += deezer_track[:duration] if deezer_track[:duration]
-      else
-        Rails.logger.warn "[Playlist#create] Morceau suggéré non trouvé : #{item['artiste']} - #{item['titre']}"
       end
     end
 
     if selected_tracks.blank?
-      redirect_to new_playlist_path, alert: "Aucun des morceaux suggérés n'a pu être trouvé sur Deezer."
+      redirect_to new_playlist_path, alert: "Aucun morceau trouvé sur Deezer pour cette sélection."
       return
     end
 
     final_duration_min = (cumulative_duration_ms / 60000.0).round
     playlist_name = generate_playlist_name(user_prompt, final_duration_min, requested_duration_min.present?)
-    notice_message = "Playlist '#{playlist_name}' générée ! Durée d'environ #{final_duration_min} min."
+    notice_message = "Playlist '#{playlist_name}' générée ! Durée : ~#{final_duration_min} min."
 
     ActiveRecord::Base.transaction do
       playlist = current_user.playlists.create!(name: playlist_name)
@@ -93,67 +83,96 @@ class PlaylistsController < ApplicationController
       redirect_to playlist_path(playlist), notice: notice_message
     end
   rescue => e
-    Rails.logger.error "[Playlist#create] Échec : #{e.class} #{e.message}\n#{e.backtrace.join("\n")}"
+    Rails.logger.error "[Playlist#create] Erreur : #{e.class} #{e.message}\n#{e.backtrace.join("\n")}"
     redirect_to new_playlist_path, alert: "Une erreur est survenue : #{e.message}"
   end
 
   private
 
-  def generate_curated_list_from_llm(user_prompt, excluded_tracks = [])
-    excluded_list_str = excluded_tracks.empty? ? "Aucun." : excluded_tracks.join("\n- ")
+  # Le prompt modifié pour générer un nombre de morceaux adapté à la durée demandée,
+  # ou une estimation raisonnable si aucune durée n'est précisée.
+  def generate_curated_list_from_llm(user_prompt, excluded_tracks = [], requested_duration_min = nil)
+    excluded_list_str = excluded_tracks.empty? ? "Aucune exclusion." : excluded_tracks.map { |t| "- #{t}" }.join("\n")
+
+    # Calcul approximatif : en moyenne un morceau dure 3.5 minutes,
+    # donc on demande environ nombre_morceaux = durée / 3.5
+    estimated_tracks_count = if requested_duration_min && requested_duration_min > 0
+                               [(requested_duration_min / 3.5).round, 5].max
+                             else
+                               10 # par défaut si pas de durée demandée
+                             end
 
     prompt = <<~PROMPT
-      Tu es un expert musical qui répond UNIQUEMENT avec du JSON.
-      Ta tâche est de créer une liste de suggestions de morceaux basée sur la demande suivante : "#{user_prompt}"
+      Tu es un expert musical spécialisé dans la curation de playlists.
 
-      ### Consignes IMPÉRATIVES :
-      1. Tu DOIS générer une liste de **25 morceaux**. C'est une consigne stricte. Même si la demande semble simple, fournis une liste riche et variée de 25 titres.
-      2. Pour chaque morceau, fournis les clés "artiste", "titre", et "description" (1 phrase en français).
-      3. **Exclusion** : Ne suggère PAS les morceaux suivants :
-      - #{excluded_list_str}
-      4. **Formatage OBLIGATOIRE** : Ta réponse doit être un objet JSON valide, et RIEN D'AUTRE. Elle doit commencer par `[` et se terminer par `]`.
+      ### Objectif :
+      Génère un tableau JSON strictement valide contenant environ #{estimated_tracks_count} morceaux musicaux,
+      en fonction de cette demande utilisateur : "#{user_prompt}"
+
+      ### Contraintes :
+      - Fournis environ #{estimated_tracks_count} morceaux (environ, pas besoin d'être exact).
+      - Chaque élément est un objet avec ces 3 clés :
+        - "artiste" : le nom de l’artiste
+        - "titre" : le titre du morceau
+        - "description" : une courte phrase (en français) décrivant l’ambiance ou le style du morceau
+
+      ### Interdits :
+      - N'inclus **aucun** morceau déjà présent dans cette liste :
+      #{excluded_list_str}
+
+      ### Format :
+      Réponds uniquement avec un tableau JSON d'objets. Aucune introduction, explication, balise ou texte en dehors du tableau JSON.
+
+      ### Important :
+      - Si la demande semble courte ou vague (ex : "jazz", "chill", "musique pour travailler"), interprète-la librement pour produire une sélection pertinente.
+      - N’invoque **jamais** de message d’erreur, même si le prompt est flou.
+      - Fournis toujours une sélection cohérente.
+
+      Commence directement par `[` et termine par `]`. Ne donne rien d’autre.
     PROMPT
 
     begin
       chat = RubyLLM.chat
       response = chat.ask(prompt)
-      raw_content = response.respond_to?(:content) ? response.content : response
-      Rails.logger.info "[LLM RAW RESPONSE]:\n#{raw_content}"
-      json_match = raw_content.match(/(\[.*\]|\{.*\})/m)
-      return nil unless json_match
-      JSON.parse(json_match[1])
+      raw = response.respond_to?(:content) ? response.content : response
+      Rails.logger.info "[LLM RESPONSE] : #{raw}"
+
+      json_start = raw.index("[")
+      json_end = raw.rindex("]")
+      return nil unless json_start && json_end
+
+      json_str = raw[json_start..json_end]
+      JSON.parse(json_str)
     rescue JSON::ParserError => e
-      Rails.logger.error "[LLM PARSING] Erreur de parsing: #{e.message}"
+      Rails.logger.error "[LLM PARSE ERROR] #{e.message}"
       nil
     rescue => e
-      Rails.logger.error "[LLM API] Erreur: #{e.class} #{e.message}"
+      Rails.logger.error "[LLM API ERROR] #{e.class} #{e.message}"
       nil
     end
   end
 
   def extract_duration_from_prompt(prompt)
     return nil if prompt.blank?
-    duration_match = prompt.downcase.match(/(\d+)\s*(minutes?|mins?|h|heures?)/)
-    return nil unless duration_match
-    value = duration_match[1].to_i
-    unit = duration_match[2]
-    unit.start_with?('h') ? value * 60 : value
+    match = prompt.downcase.match(/(\d+)\s*(minutes?|mins?|h|heures?)/)
+    return nil unless match
+    value = match[1].to_i
+    match[2].start_with?("h") ? value * 60 : value
   end
 
   def generate_playlist_name(user_prompt, final_duration, duration_was_requested)
     prompt = <<~PROMPT
-      Génère un nom de playlist créatif (2 à 5 mots) pour la demande : "#{user_prompt}".
+      Propose un nom de playlist original (2 à 5 mots) pour cette demande : "#{user_prompt}".
       Ne donne que le nom, sans guillemets.
     PROMPT
 
     begin
       response = RubyLLM.chat.ask(prompt)
       base_name = (response.respond_to?(:content) ? response.content : response).strip.gsub('"', '')
-      # On n'ajoute la durée au nom que si l'utilisateur l'a demandée
       duration_was_requested ? "#{base_name} (#{final_duration} min)" : base_name
     rescue => e
-      Rails.logger.error "[generate_playlist_name] LLM Error: #{e.class} #{e.message}"
-      "Playlist Inspirée"
+      Rails.logger.error "[generate_playlist_name] Erreur LLM : #{e.class} #{e.message}"
+      "Playlist inspirée"
     end
   end
 
@@ -170,7 +189,7 @@ class PlaylistsController < ApplicationController
       id: track_data["id"],
       title: track_data["title"],
       artist_name: track_data.dig("artist", "name"),
-      duration: track_data.dig("duration").to_i * 1000,
+      duration: track_data["duration"].to_i * 1000,
       preview_url: track_data["preview"],
       cover_url: track_data.dig("album", "cover_medium")
     }
@@ -180,8 +199,8 @@ class PlaylistsController < ApplicationController
     current_user.tracks.pluck(:artist_name, :title).map { |artist, title| "#{artist} - #{title}" }
   end
 
-  def create_playlist_items_with_description(playlist, tracks_with_descriptions)
-    tracks_with_descriptions.each do |deezer_track|
+  def create_playlist_items_with_description(playlist, tracks)
+    tracks.each do |deezer_track|
       track = Track.find_or_create_by!(deezer_track_id: deezer_track[:id]) do |t|
         t.title = deezer_track[:title]
         t.artist_name = deezer_track[:artist_name]
