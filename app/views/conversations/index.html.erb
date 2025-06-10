@@ -1,60 +1,63 @@
-<h1 class="mb-4">Mes conversations</h1>
+<h1 class="mb-4 text-center">Mes conversations</h1>
 
-<ul class="list-group">
-  <% @conversations.each do |conversation| %>
-    <% other_user = (conversation.users - [current_user]).first %>
-    <% last_message = conversation.messages.last %>
+<div class="card shadow-sm rounded-4">
+  <div class="card-body p-0">
+    <ul class="list-group list-group-flush">
+      <% @conversations.each_with_index do |conversation, index| %>
+        <% other_user = (conversation.users - [current_user]).first %>
+        <% last_message = conversation.messages.last %>
 
-    <li class="list-group-item d-flex align-items-center justify-content-between">
+        <li class="list-group-item py-3 px-4 d-flex align-items-center justify-content-between"
+            style="border: none; <%= 'border-top: 1px solid #dee2e6;' unless index == 0 %>">
 
-      <%# Avatar qui redirige vers le profil %>
-      <%= link_to user_path(other_user), class: "me-3 flex-shrink-0" do %>
-        <%= image_tag(
-              other_user.avatar_url.presence || "https://placehold.co/50x50/E0E0E0/000000?text=User",
-              alt: other_user.username,
-              class: "rounded-circle",
-              size: "50x50"
-            ) %>
-      <% end %>
-
-      <%# Wrapper contenu texte et heure en flex row %>
-      <%= link_to conversation_path(conversation),
-          class: "d-flex align-items-center flex-grow-1 text-decoration-none",
-          style: "min-width: 0;" do %> <%# important pour le texte tronqué %>
-
-        <%# Conteneur texte qui grandit mais ne pousse pas le bouton %>
-        <div class="flex-grow-1 me-3" style="min-width: 0;">
-          <div class="fw-semibold fs-6 mb-1 text-primary text-truncate">
-            <%= other_user.username %>
-          </div>
-          <div class="text-muted small text-truncate">
-            <%= last_message ? truncate(last_message.content, length: 50) : "Aucun message" %>
-          </div>
-        </div>
-
-        <%# Heure à droite avec largeur fixe %>
-        <div class="text-muted small text-end text-nowrap flex-shrink-0" style="width: 70px;">
-          <% if last_message %>
-            <% if last_message.created_at.to_date == Date.current %>
-              <%= last_message.created_at.strftime("%H:%M") %>
-            <% else %>
-              <%= last_message.created_at.strftime("%d %b") %>
-            <% end %>
+          <%# Avatar qui redirige vers le profil %>
+          <%= link_to user_path(other_user), class: "me-3 flex-shrink-0" do %>
+            <%= image_tag(
+                  other_user.avatar_url.presence || "https://placehold.co/50x50/E0E0E0/000000?text=User",
+                  alt: other_user.username,
+                  class: "rounded-circle shadow-sm",
+                  size: "50x50"
+                ) %>
           <% end %>
-        </div>
-      <% end %>
 
-      <%# Bouton supprimer avec icône, taille fixe, margin-end pour ne pas coller au bord %>
-      <%= button_to conversation_path(conversation),
-          method: :delete,
-          data: { confirm: "Êtes-vous sûr de vouloir supprimer cette conversation ?" },
-          class: "btn btn-aurora-delete ms-3 flex-shrink-0 d-flex align-items-center justify-content-center",
-          style: "width: 40px; height: 40px;" do %>
-        <i class="bi bi-trash"></i>
-      <% end %>
+          <%# Wrapper contenu texte et heure %>
+          <%= link_to conversation_path(conversation),
+              class: "d-flex align-items-center flex-grow-1 text-decoration-none",
+              style: "min-width: 0;" do %>
 
-    </li>
-  <% end %>
-</ul>
+            <div class="flex-grow-1 me-3" style="min-width: 0;">
+              <div class="fw-semibold fs-6 text-primary text-truncate">
+                <%= other_user.username %>
+              </div>
+              <div class="text-muted small text-truncate">
+                <%= last_message ? truncate(last_message.content, length: 50) : "Aucun message" %>
+              </div>
+            </div>
+
+            <div class="text-muted small text-end text-nowrap flex-shrink-0" style="width: 70px;">
+              <% if last_message %>
+                <% if last_message.created_at.to_date == Date.current %>
+                  <%= last_message.created_at.strftime("%H:%M") %>
+                <% else %>
+                  <%= last_message.created_at.strftime("%d %b") %>
+                <% end %>
+              <% end %>
+            </div>
+          <% end %>
+
+          
+          <%= button_to conversation_path(conversation),
+              method: :delete,
+              class: "btn-icon btn-icon-delete ms-3 flex-shrink-0 d-flex align-items-center justify-content-center",
+              style: "width: 40px; height: 40px;",
+              title: "Supprimer la conversation",
+              data: { "turbo-method": :delete, "turbo-confirm": "Êtes-vous sûr de vouloir supprimer cette conversation ?" } do %>
+            <i class="bi bi-trash"></i>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+</div>
 
 <%= render "shared/bottom_navbar" %>

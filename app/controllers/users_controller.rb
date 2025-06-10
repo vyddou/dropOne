@@ -56,12 +56,6 @@ class UsersController < ApplicationController
   @liked_posts = liked_content.uniq { |p| p.track_id }.sort_by(&:created_at).reverse
 
 
-    @liked_posts = Post.joins(:votes)
-                       .where(votes: { user_id: @user.id, vote_type: true })
-                       .includes(:track)
-                       .distinct
-    @liked_posts = @liked_posts.sort_by { |post| post.votes.find { |v| v.user_id == @user.id && v.vote_type == true }&.created_at || post.created_at }.reverse
-
     @is_current_user = current_user == @user
     @is_following = user_signed_in? && !@is_current_user ? current_user.following.include?(@user) : false
   end
@@ -69,6 +63,10 @@ class UsersController < ApplicationController
   def follow
     @user = User.find(params[:id])
     current_user.following << @user
+    
+    # Notifier en temps réel
+    NotificationService.notify_new_follow(@user, current_user)
+    
     redirect_to user_path(@user), notice: "Vous suivez maintenant #{@user.username}"
   end
 
@@ -92,6 +90,11 @@ class UsersController < ApplicationController
 
   def activity
     @user = User.find(params[:id])
+
+    # Marquer les activités comme vues si c'est l'utilisateur connecté
+    if current_user == @user
+      session[:last_activity_check] = Time.current
+    end
 
     # Activités de follow (abonnements)
     follower_activities = @user.followers.map do |follower|
