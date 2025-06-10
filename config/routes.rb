@@ -45,6 +45,9 @@ Rails.application.routes.draw do
   post 'tracks/:track_id/vote', to: 'votes#create', as: 'vote_on_track'
   # --- FIN DE LA MODIFICATION ---
 
+  resources :tracks, only: [] do
+    get :preview, on: :member
+  end
 
   resources :conversations, only: [:index, :show, :create, :destroy] do
     resources :messages, only: [:create]

@@ -37,4 +37,28 @@ class DeezerService
     Rails.logger.error "DeezerService Service Error (Playlist Tracks): #{e.message}"
     []
   end
+
+  def self.fetch_track(track_id)
+    Rails.logger.info "DeezerService: Fetching single track ID #{track_id}"
+    response = get("/track/#{track_id}")
+
+    if response.success? && response.parsed_response
+      track_data = response.parsed_response
+      if track_data["error"]
+        Rails.logger.error "DeezerService API Error (Single Track): #{track_data['error']['message']}"
+        return nil
+      end
+      # On retourne juste l'URL de l'aperçu, c'est tout ce dont on a besoin pour l'instant
+      return track_data["preview"]
+    else
+      Rails.logger.error "DeezerService API Error (Single Track): #{response.code} - #{response.message}. Body: #{response.body}"
+      nil
+    end
+  rescue HTTParty::Error => e
+    Rails.logger.error "DeezerService HTTParty Error (Single Track): #{e.message}"
+    nil
+  rescue StandardError => e
+    Rails.logger.error "DeezerService Service Error (Single Track): #{e.message}"
+    nil
+  end
 end

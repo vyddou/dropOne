@@ -10,19 +10,49 @@ class UsersController < ApplicationController
   @user_playlists = @user.playlists.order(created_at: :desc)
                       .reject { |playlist| ["Like", "Dislikes"].include?(playlist.name) }
 
-  # Gestion des tracks likées via Playlist Like
-  @like_playlist = @user.playlists.find_by(name: "Like")
-  @user_tracks = @like_playlist ? @like_playlist.tracks.order(created_at: :desc) : []
+  # 1. Posts likés via les votes
+  posts_from_votes = Post.joins(:votes)
+                         .where(votes: { user_id: @user.id, vote_type: true })
+                         .includes(:track, :user, :votes, :comments)
 
-  # Posts likés via les votes
-  @liked_posts = Post.joins(:votes)
-                   .where(votes: { user_id: @user.id, vote_type: true })
-                   .includes(:track)
-                   .distinct
-                   # pas de order ici → sinon PG râle
+  # On commence avec les posts votés
+  liked_content = posts_from_votes.to_a
 
-# Tri en Ruby
-@liked_posts = @liked_posts.sort_by { |post| post.votes.find { |v| v.user_id == @user.id && v.vote_type == true }&.created_at || post.created_at }.reverse
+  # 2. Tracks depuis la playlist "Like"
+  like_playlist = @user.playlists.find_by(name: "Like")
+
+  if like_playlist
+    # IDs des tracks déjà inclus via les votes
+    existing_track_ids = liked_content.map(&:track_id)
+
+    # On charge les items de la playlist pour avoir la date d'ajout, et on précharge les tracks
+    playlist_items = like_playlist.playlist_items.includes(track: [:user, :posts]).order(created_at: :desc)
+
+    playlist_items.each do |item|
+      track = item.track
+      # On ajoute seulement si un post pour cette track n'est pas déjà dans la liste
+      unless existing_track_ids.include?(track.id)
+        # On cherche un post existant pour cette track (le plus ancien, par exemple)
+        existing_post = track.posts.order(created_at: :asc).first
+
+        if existing_post
+          # Si un post existe, on l'ajoute (s'il n'y est pas déjà par son id)
+          liked_content << existing_post unless liked_content.any? { |p| p.id == existing_post.id }
+        else
+          # Si aucun post n'existe, on crée un objet Post en mémoire (non sauvegardé)
+          dummy_post = Post.new(
+            track: track,
+            user: track.user, # Le post est attribué à l'auteur original de la track
+            created_at: item.created_at # On utilise la date d'ajout à la playlist pour le tri
+          )
+          liked_content << dummy_post
+        end
+      end
+    end
+  end
+
+  # 3. Dédoublonner par track et trier
+  @liked_posts = liked_content.uniq { |p| p.track_id }.sort_by(&:created_at).reverse
 
 
   # Variables pour les interactions

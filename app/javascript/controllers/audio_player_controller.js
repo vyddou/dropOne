@@ -40,71 +40,94 @@ export default class extends Controller {
     this.handleAudioEnd();
   }
 
-  togglePlay(event) {
+  async togglePlay(event) {
     const clickedButton = event.currentTarget;
-
-    // Déclare les wrappers
-    const cell = clickedButton.closest(".carousel-cell");
-    const cardTop = clickedButton.closest(".card-img-top");
-    const visualWrapper = clickedButton.closest(".album-art-visual-wrapper");
-
-    // Recherche previewUrl dans l'ordre
-    let previewUrl = cell?.dataset.previewUrl
-                 || cardTop?.dataset.previewUrl
-                 || visualWrapper?.dataset.previewUrl
-                 || visualWrapper?.dataset.audioPlayerPreviewUrlValue;
-
     const icon = clickedButton.querySelector("i");
+    
+    // On cherche le conteneur qui a les données. Peut être .carousel-cell ou .album-art-visual-wrapper
+    const dataWrapper = clickedButton.closest("[data-track-id], [data-preview-url]");
 
-    if (!previewUrl) {
-      console.warn("Aucune URL d'extrait disponible pour ce morceau.");
+    if (!dataWrapper) {
+      console.warn("Aucun conteneur de données trouvé pour le lecteur audio.");
       return;
     }
 
-    if (!this.globalAudioPlayer) {
-      console.error("Lecteur audio global non trouvé.");
-      return;
-    }
+    const trackId = dataWrapper.dataset.trackId;
+    const previewUrl = dataWrapper.dataset.previewUrl;
 
-    if (this.globalAudioPlayer.src === previewUrl && !this.globalAudioPlayer.paused) {
+    // Si on clique sur le bouton qui est déjà en lecture, on met en pause.
+    if (this.currentlyPlayingButton === clickedButton && !this.globalAudioPlayer.paused) {
       this.globalAudioPlayer.pause();
-      icon.classList.remove("bi-pause-fill");
-      icon.classList.add("bi-play-fill");
-
-      if (cell) cell.classList.remove("is-playing");
-      if (cardTop) cardTop.classList.remove("is-playing");
-      if (visualWrapper) visualWrapper.classList.remove("is-playing");
-
-    } else {
-      if (this.currentlyPlayingButton && this.currentlyPlayingButton !== clickedButton) {
-        const oldIcon = this.currentlyPlayingButton.querySelector("i");
-        oldIcon.classList.remove("bi-pause-fill");
-        oldIcon.classList.add("bi-play-fill");
-      }
-      if (this.currentVisualWrapper && this.currentVisualWrapper !== (cell || cardTop || visualWrapper)) {
-        this.currentVisualWrapper.classList.remove("is-playing");
-      }
-
-      if (this.globalAudioPlayer.src !== previewUrl) {
-        this.globalAudioPlayer.src = previewUrl;
-      }
-      this.globalAudioPlayer.play().then(() => {
-        icon.classList.remove("bi-play-fill");
-        icon.classList.add("bi-pause-fill");
-
-        const playingWrapper = cell || cardTop || visualWrapper;
-        if (playingWrapper) playingWrapper.classList.add("is-playing");
-
-        this.currentlyPlayingButton = clickedButton;
-        this.currentVisualWrapper = playingWrapper;
-      }).catch(error => {
-        console.error("Erreur lors de la tentative de lecture :", error);
-        icon.classList.remove("bi-pause-fill");
-        icon.classList.add("bi-play-fill");
-
-        const playingWrapper = cell || cardTop || visualWrapper;
-        if (playingWrapper) playingWrapper.classList.remove("is-playing");
-      });
+      return;
     }
+
+    // Si un autre bouton est cliqué, on réinitialise l'ancien.
+    if (this.currentlyPlayingButton && this.currentlyPlayingButton !== clickedButton) {
+      this.handleAudioEnd();
+    }
+
+    if (trackId) {
+      // --- NOUVELLE LOGIQUE API ---
+      await this.playViaApi(trackId, clickedButton, icon, dataWrapper);
+    } else if (previewUrl) {
+      // --- ANCIENNE LOGIQUE (FALLBACK) ---
+      this.playDirectUrl(previewUrl, clickedButton, icon, dataWrapper);
+    } else {
+      console.warn("Aucune source audio (trackId ou previewUrl) disponible.");
+    }
+  }
+
+  async playViaApi(trackId, button, icon, wrapper) {
+    icon.classList.remove("bi-play-fill", "bi-pause-fill");
+    icon.classList.add("bi-hourglass-split");
+
+    try {
+      const response = await fetch(`/tracks/${trackId}/preview`);
+      if (!response.ok) throw new Error(`Erreur serveur: ${response.statusText}`);
+      
+      const data = await response.json();
+      const freshUrl = data.preview_url;
+
+      if (!freshUrl) {
+        console.warn("Aucune URL d'extrait disponible pour ce morceau depuis Deezer.");
+        this.handleAudioEnd();
+        icon.classList.add("bi-play-fill");
+        icon.classList.remove("bi-hourglass-split");
+        return;
+      }
+
+      this.globalAudioPlayer.src = freshUrl;
+      await this.globalAudioPlayer.play();
+
+      icon.classList.remove("bi-hourglass-split", "bi-play-fill");
+      icon.classList.add("bi-pause-fill");
+      wrapper.classList.add("is-playing");
+
+      this.currentlyPlayingButton = button;
+      this.currentVisualWrapper = wrapper;
+
+    } catch (error) {
+      console.error("Impossible de récupérer ou de jouer l'extrait via API :", error);
+      this.handleAudioEnd();
+      icon.classList.add("bi-play-fill");
+      icon.classList.remove("bi-hourglass-split");
+    }
+  }
+
+  playDirectUrl(url, button, icon, wrapper) {
+    if (this.globalAudioPlayer.src !== url) {
+      this.globalAudioPlayer.src = url;
+    }
+    
+    this.globalAudioPlayer.play().then(() => {
+      icon.classList.remove("bi-play-fill");
+      icon.classList.add("bi-pause-fill");
+      wrapper.classList.add("is-playing");
+      this.currentlyPlayingButton = button;
+      this.currentVisualWrapper = wrapper;
+    }).catch(error => {
+      console.error("Erreur lors de la tentative de lecture directe :", error);
+      this.handleAudioEnd();
+    });
   }
 }

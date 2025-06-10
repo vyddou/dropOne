@@ -1,7 +1,7 @@
 <div class="card mb-3" style="max-width: 300px; background-color: #2e2e3a; color: white; border-radius: 12px; display: flex; flex-direction: column; min-height: 450px;">
   <% cover_url = post.track.cover_url.presence || "https://placehold.co/280x280/0A0F1E/E0E0E0?text=#{post.track.title.truncate(15)}" %>
 
-  <div class="album-art-visual-wrapper card-img-top" style="position: relative; border-radius: 12px 12px 0 0; overflow: hidden;" data-preview-url="<%= post.track.preview_url %>">
+  <div class="album-art-visual-wrapper card-img-top" style="position: relative; border-radius: 12px 12px 0 0; overflow: hidden;" data-track-id="<%= post.track.id %>">
     <%= image_tag cover_url, alt: "Pochette de #{post.track.title}", class: "album-cover-image", style: "width: 100%; height: auto; object-fit: cover;" %>
 
     <%# Bouton Play superposé %>
@@ -40,7 +40,7 @@
         <% end %>
       </div>
 
-      <% if current_user == post.user %>
+      <% if post.persisted? && current_user == post.user %>
         <div>
           <%= link_to edit_post_path(post), class: "btn btn-sm btn-outline-success" do %>
             <i class="bi bi-pencil"></i>
@@ -59,7 +59,7 @@
   </div>
 </div>
 
-<% if current_user == post.user %>
+<% if post.persisted? && current_user == post.user %>
   <!-- Modale de suppression -->
   <div class="modal fade" id="deletePostModal-<%= post.id %>" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">

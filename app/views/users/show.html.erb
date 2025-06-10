@@ -104,7 +104,7 @@
   <div class="tab-content" id="profileTabContent">
     <div class="tab-pane fade" id="tracks" role="tabpanel">
   <% if @liked_posts.any? %>
-    <div class="row g-3 mt-3 justify-content-md">
+    <div class="row g-3 mt-3 justify-content-md" data-controller="audio-player">
       <% @liked_posts.each do |post| %>
         <div class="col-6 col-md-3">
           <%= render partial: "posts/post", locals: { post: post } %>
