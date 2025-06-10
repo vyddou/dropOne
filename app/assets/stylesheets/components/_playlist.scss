@@ -1,24 +1,68 @@
-/* Effet de survol pour les cartes de playlist */
-.playlist-card {
-  transition: background-color 0.3s ease;
-  background-color: #2c2c2c; /* Couleur de base sombre */
+// Dans votre fichier SCSS
+
+.playlist-show-container {
+  color: white;
 }
 
-.playlist-card:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+// Conteneur pour une ligne de morceau dans la playlist
+.playlist-track-row {
+  background-color: rgba(44, 47, 54, 0.5); // Fond sombre et semi-transparent
+  border: 1px solid rgba(255, 255, 255, 0.1); // Bordure subtile
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: rgba(55, 60, 69, 0.7); // Change de couleur au survol
+  }
+
+  .track-info h6 {
+    font-weight: 500;
+  }
+
+  .audio-player-wrapper {
+    flex-shrink: 0;
+    width: 250px;
+    @media (max-width: 768px) {
+      width: 150px;
+    }
+    audio {
+      width: 100%;
+    }
+  }
 }
 
-.playlist-card:hover:not(.no-hover) {
-  background-color: #3a3a3a;
+// Style de base pour les boutons-icônes
+.btn-icon {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: #adb5bd; // Couleur grise neutre par défaut
+  font-size: 1.3rem;
   cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+  line-height: 1;
+
+  &:hover {
+    transform: scale(1.1);
+  }
 }
 
-.trash-button {
-  transition: none !important; /* Désactive les transitions pour le bouton */
+// Couleurs spécifiques au survol
+.btn-icon:hover {
+  i.bi-hand-thumbs-up {
+    color: #1DB954; // Vert
+  }
+
+  i.bi-hand-thumbs-down {
+    color: #EF5466; // Rose/Rouge
+  }
 }
 
-.delete-container:hover ~ .card-body {
-  background-color: inherit !important; /* Empêche le changement de fond */
+// Style spécifique pour l'icône de suppression
+.btn-icon.btn-icon-delete {
+  color: #6c757d; // Un gris un peu plus foncé
+  &:hover {
+    color: #dc3545; // Devient rouge au survol
+  }
 }
