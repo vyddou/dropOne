@@ -6,7 +6,7 @@ class ApplicationController < ActionController::Base
     flash[:notice] = "Bon retour parmi nous #{resource.username} ! 🎵" if resource.respond_to?(:username)
     super
   end
-  
+
   protected
 
   def configure_permitted_parameters

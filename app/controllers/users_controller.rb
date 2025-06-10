@@ -63,6 +63,10 @@ class UsersController < ApplicationController
   def follow
     @user = User.find(params[:id])
     current_user.following << @user
+    
+    # Notifier en temps réel
+    NotificationService.notify_new_follow(@user, current_user)
+    
     redirect_to user_path(@user), notice: "Vous suivez maintenant #{@user.username}"
   end
 
@@ -86,6 +90,11 @@ class UsersController < ApplicationController
 
   def activity
     @user = User.find(params[:id])
+
+    # Marquer les activités comme vues si c'est l'utilisateur connecté
+    if current_user == @user
+      session[:last_activity_check] = Time.current
+    end
 
     # Activités de follow (abonnements)
     follower_activities = @user.followers.map do |follower|

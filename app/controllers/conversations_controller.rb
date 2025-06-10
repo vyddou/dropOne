@@ -16,7 +16,14 @@ class ConversationsController < ApplicationController
     end
     @messages = @conversation.messages.order(created_at: :asc)
     @message = Message.new
-    @messages.where.not(user_id: current_user.id).where(read_at: nil).update_all(read_at: Time.current)
+    
+    # Marquer les messages comme lus et notifier la mise à jour du badge
+    unread_messages = @messages.where.not(user_id: current_user.id).where(read_at: nil)
+    if unread_messages.exists?
+      unread_messages.update_all(read_at: Time.current)
+      # Notifier la mise à jour du compteur de messages
+      NotificationService.notify_new_message(current_user, current_user, nil)
+    end
   end
 
   def create

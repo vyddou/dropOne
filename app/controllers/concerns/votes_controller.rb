@@ -56,6 +56,10 @@ class VotesController < ApplicationController
     else
       new_vote = post.votes.build(user: current_user, vote_type: is_hot_vote)
       if new_vote.save
+        # Notifier le propriétaire du post si c'est un like (hot vote)
+        if is_hot_vote && post.user != current_user
+          NotificationService.notify_new_like(post.user, current_user, post)
+        end
         flash[:notice] = "Vote enregistré !"
       else
         flash[:alert] = "Impossible d'enregistrer le vote."

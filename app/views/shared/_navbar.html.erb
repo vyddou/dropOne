@@ -9,7 +9,14 @@
         <% if user_signed_in? %>
           <li class="nav-item">
             <%= link_to activity_user_path(current_user), class: "nav-link #{'active' if current_page?(activity_user_path(current_user))}" do %>
-              <i class="bi bi-suit-heart fs-5"></i>
+              <div class="position-relative">
+                <i class="bi bi-suit-heart fs-5"></i>
+                <% if current_user.has_new_activities?(session[:last_activity_check]) %>
+                  <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
+                    <span class="visually-hidden">Nouvelles activités</span>
+                  </span>
+                <% end %>
+              </div>
             <% end %>
           </li>
 
