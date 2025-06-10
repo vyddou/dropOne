@@ -16,11 +16,11 @@
           <%= msg.user.username %>
         </span>
         <% if msg.user == current_user %>
-          <div class="py-1 px-3  rounded-pill bg-primary text-white" style="word-wrap: break-word;">
+          <div class="py-1 px-3  rounded-5 bg-primary text-white" style="word-wrap: break-word;">
             <%= msg.content %>
           </div>
         <% else %>
-          <div class="py-1 px-3 rounded-pill" style="word-wrap: break-word; background-color: #d40178; color: white; border: 1.5px solid #d40178;">
+          <div class="py-1 px-3 rounded-5" style="word-wrap: break-word; background-color: #d40178; color: white; border: 1.5px solid #d40178;">
             <%= msg.content %>
           </div>
         <% end %>
