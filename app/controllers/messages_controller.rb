@@ -8,9 +8,16 @@ class MessagesController < ApplicationController
     @messages = @conversation.messages.order(:created_at)
 
     if @message.save
+      # Notifier tous les autres participants de la conversation
+      @conversation.conversation_participants.includes(:user).each do |participant|
+        if participant.user != current_user
+          NotificationService.notify_new_message(participant.user, current_user, @message)
+        end
+      end
+      
       redirect_to conversation_path(@conversation)
     else
-      flash.now[:alert] = "Impossible d’envoyer le message car il est vide."
+      flash.now[:alert] = "Impossible d'envoyer le message car il est vide."
       render 'conversations/show', status: :unprocessable_entity
     end
   end

@@ -45,11 +45,28 @@ class User < ApplicationRecord
            .count
   end
 
-    def liked?(post_id)
-      vote = votes.find_by(post_id: post_id)
-      puts "Vote pour post_id #{post_id}: #{vote.inspect}"
-      vote&.vote_type
-    end
+  def liked?(post_id)
+    vote = votes.find_by(post_id: post_id)
+    puts "Vote pour post_id #{post_id}: #{vote.inspect}"
+    vote&.vote_type
+  end
+
+  def has_new_activities?(last_check = nil)
+    # Si pas de dernière vérification, on considère qu'il y a des nouvelles activités
+    return true if last_check.nil?
+    
+    # Vérifier s'il y a de nouveaux follows depuis la dernière vérification
+    new_follows = followers.joins(:active_follows)
+                          .where('follows.created_at > ?', last_check)
+                          .exists?
+    
+    # Vérifier s'il y a de nouveaux likes depuis la dernière vérification
+    new_likes = Vote.where(post_id: posts.ids)
+                   .where('created_at > ?', last_check)
+                   .exists?
+    
+    new_follows || new_likes
+  end
 
       def vote_for(post)
     votes.find_by(post_id: post.id)
