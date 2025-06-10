@@ -35,7 +35,9 @@ Rails.application.routes.draw do
 
   # --- MODIFICATION ICI ---
   # On supprime le bloc de vote de 'posts' car il sera géré par la nouvelle route
-  resources :posts, only: [:new, :create, :edit, :update, :show, :destroy]
+  resources :posts, only: [:new, :create, :edit, :update, :show, :destroy] do
+    resources :comments, only: [:create, :destroy]
+  end
   # La ligne "member do post 'vote' end" a été supprimée.
 
   # L'ancienne route pour voter sur les suggestions est aussi supprimée.
