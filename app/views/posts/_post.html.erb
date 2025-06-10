@@ -39,11 +39,13 @@
           <%# On récupère le vote de l'utilisateur actuel pour ce post une seule fois %>
           <% current_user_vote = user_signed_in? ? current_user.vote_for(post) : nil %>
 
+
           <%# Bouton J'aime avec icône %>
           <%= button_to vote_on_track_path(deezer_id, vote_type: 'hot'), method: :post, class: "btn-icon", title: "J'aime" do %>
             <%# L'icône est remplie et a la classe .liked si le vote est "hot" %>
             <i class="bi <%= current_user_vote&.vote_type == true ? 'bi-hand-thumbs-up-fill liked' : 'bi-hand-thumbs-up' %>"></i>
           <% end %>
+
 
           <%# Bouton Je n'aime pas avec icône %>
           <%= button_to vote_on_track_path(deezer_id, vote_type: 'cold'), method: :post, class: "btn-icon", title: "Je n'aime pas" do %>
