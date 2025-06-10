@@ -2,7 +2,7 @@
 <%# Ce partial reçoit une variable locale 'post' %>
 
 <div class="album-art-card-container">
-  <div class="album-art-visual-wrapper">
+  <div class="album-art-visual-wrapper" data-preview-url="<%= post.track.preview_url if post.track.preview_url.present? %>">
     <% cover_url = post.track.cover_url.presence || "https://placehold.co/280x280/0A0F1E/E0E0E0?text=#{post.track.title&.truncate(15)}" %>
     <%= image_tag cover_url, alt: "Pochette de #{post.track.title}", class: "album-cover-image" %>
 
