@@ -56,12 +56,6 @@ class UsersController < ApplicationController
   @liked_posts = liked_content.uniq { |p| p.track_id }.sort_by(&:created_at).reverse
 
 
-    @liked_posts = Post.joins(:votes)
-                       .where(votes: { user_id: @user.id, vote_type: true })
-                       .includes(:track)
-                       .distinct
-    @liked_posts = @liked_posts.sort_by { |post| post.votes.find { |v| v.user_id == @user.id && v.vote_type == true }&.created_at || post.created_at }.reverse
-
     @is_current_user = current_user == @user
     @is_following = user_signed_in? && !@is_current_user ? current_user.following.include?(@user) : false
   end

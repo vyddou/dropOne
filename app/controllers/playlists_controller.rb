@@ -139,7 +139,9 @@ class PlaylistsController < ApplicationController
 
     begin
       # chat = RubyLLM.chat
-      chat = RubyLLM.chat(model: 'google/gemini-2.0-flash-exp:free')
+      # chat = RubyLLM.chat(model: 'google/gemini-2.0-flash-exp:free')
+      # chat = RubyLLM.chat(model: 'deepseek/deepseek-r1-0528:free')
+      chat = RubyLLM.chat(model: 'meta-llama/llama-3.3-8b-instruct:free')
       response = chat.ask(prompt)
       raw = response.respond_to?(:content) ? response.content : response
       Rails.logger.info "[LLM RESPONSE] : #{raw}"
@@ -180,7 +182,7 @@ class PlaylistsController < ApplicationController
 
   def generate_playlist_name(user_prompt, final_duration, duration_was_requested)
     prompt = <<~PROMPT
-      Propose un nom de playlist original (2 à 5 mots) pour cette demande : "#{user_prompt}".
+      Propose un nom de playlist original (2 à 8 mots) pour cette demande : "#{user_prompt}".
       Ne donne que le nom, sans guillemets.
     PROMPT
 
@@ -189,7 +191,9 @@ class PlaylistsController < ApplicationController
 
     begin
       # response = RubyLLM.chat.ask(prompt)
-      response = RubyLLM.chat(model: 'google/gemini-2.0-flash-exp:free').ask(prompt)
+      # response = RubyLLM.chat(model: 'google/gemini-2.0-flash-exp:free').ask(prompt)
+      # response = RubyLLM.chat(model: 'deepseek/deepseek-r1-0528:free').ask(prompt)
+      response = RubyLLM.chat(model: 'meta-llama/llama-3.3-8b-instruct:free').ask(prompt)
       base_name = (response.respond_to?(:content) ? response.content : response).strip.gsub('"', '')
       duration_was_requested ? "#{base_name} (#{final_duration} min)" : base_name
     rescue RubyLLM::RateLimitError => e
