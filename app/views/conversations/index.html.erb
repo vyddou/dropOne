@@ -7,9 +7,8 @@
         <% other_user = (conversation.users - [current_user]).first %>
         <% last_message = conversation.messages.last %>
 
-        <li
-          class="list-group-item py-3 px-4 d-flex align-items-center justify-content-between"
-          style="border: none; <%= 'border-top: 1px solid #dee2e6;' unless index == 0 %>">
+        <li class="list-group-item py-3 px-4 d-flex align-items-center justify-content-between"
+            style="border: none; <%= 'border-top: 1px solid #dee2e6;' unless index == 0 %>">
 
           <%# Avatar qui redirige vers le profil %>
           <%= link_to user_path(other_user), class: "me-3 flex-shrink-0" do %>
@@ -21,7 +20,7 @@
                 ) %>
           <% end %>
 
-          <%# Wrapper contenu texte et heure en flex row %>
+          <%# Wrapper contenu texte et heure %>
           <%= link_to conversation_path(conversation),
               class: "d-flex align-items-center flex-grow-1 text-decoration-none",
               style: "min-width: 0;" do %>
@@ -46,14 +45,15 @@
             </div>
           <% end %>
 
+          
           <%= button_to conversation_path(conversation),
               method: :delete,
-              data: { confirm: "Êtes-vous sûr de vouloir supprimer cette conversation ?" },
-              class: "btn btn-aurora-delete ms-3 flex-shrink-0 d-flex align-items-center justify-content-center",
-              style: "width: 40px; height: 40px;" do %>
+              class: "btn-icon btn-icon-delete ms-3 flex-shrink-0 d-flex align-items-center justify-content-center",
+              style: "width: 40px; height: 40px;",
+              title: "Supprimer la conversation",
+              data: { "turbo-method": :delete, "turbo-confirm": "Êtes-vous sûr de vouloir supprimer cette conversation ?" } do %>
             <i class="bi bi-trash"></i>
           <% end %>
-
         </li>
       <% end %>
     </ul>
