@@ -1,86 +1,108 @@
-<div class="card mb-3" style="max-width: 300px; background-color: #2e2e3a; color: white; border-radius: 12px; display: flex; flex-direction: column; min-height: 450px;">
-  <% cover_url = post.track.cover_url.presence || "https://placehold.co/280x280/0A0F1E/E0E0E0?text=#{post.track.title.truncate(15)}" %>
+<%# app/views/posts/_post.html.erb %>
+<%# Ce partial reçoit une variable locale 'post' %>
 
-  <div class="album-art-visual-wrapper card-img-top" style="position: relative; border-radius: 12px 12px 0 0; overflow: hidden;" data-track-id="<%= post.track.id %>">
-    <%= image_tag cover_url, alt: "Pochette de #{post.track.title}", class: "album-cover-image", style: "width: 100%; height: auto; object-fit: cover;" %>
+<div class="album-art-card-container">
+  <div class="album-art-visual-wrapper">
+    <% cover_url = post.track.cover_url.presence || "https://placehold.co/280x280/0A0F1E/E0E0E0?text=#{post.track.title&.truncate(15)}" %>
+    <%= image_tag cover_url, alt: "Pochette de #{post.track.title}", class: "album-cover-image" %>
+
 
     <%# Bouton Play superposé %>
-    <% if post.track&.preview_url.present? %>
-      <button class="btn-play-on-cover" aria-label="Lire l'extrait"
-              data-action="click->audio-player#togglePlay"
-              style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2; border: none; background: rgba(0,0,0,0.5); border-radius: 50%; padding: 10px; color: white;">
-        <i class="bi bi-play-fill" style="font-size: 2rem;"></i>
+    <% if post.track.preview_url.present? %>
+      <button class="btn-play-on-cover" aria-label="Lire l'extrait" data-action="click->audio-player#togglePlay">
+        <i class="bi bi-play-fill"></i>
       </button>
     <% end %>
-  </div>
 
-  <div class="card-body d-flex flex-column flex-grow-1">
-    <div class="d-flex align-items-center mb-2">
-      <h5 class="card-title mb-0"><%= post.track.title %></h5>
-      <small class="ms-auto text-muted"><%= post.formatted_date %></small>
+    <%# Texte Titre/Artiste superposé en bas à gauche %>
+    <div class="album-cover-text-overlay">
+      <h5 class="album-title-on-cover" title="<%= post.track.title %>"><%= post.track.title %></h5>
+      <p class="album-artist-on-cover" title="<%= post.track.artist_name %>"><%= post.track.artist_name %></p>
     </div>
 
-    <h6 class="card-subtitle mb-2 text-muted"><%= post.track.artist_name %></h6>
+    <%# Affichage du score dans un cœur (haut droit) %>
+    <div class="album-cover-score-overlay">
+      <i class="bi bi-heart-fill score-heart-icon"></i>
+      <span class="score-value"><%= post.try(:net_votes) || 0 %></span>
+    </div>
+  </div>
 
-    <p class="card-text flex-grow-1">
-      <% if post.description.present? %>
-        <%= post.description %>
-      <% else %>
-        &nbsp;
+  <div class="album-details-section">
+    <% if post.description.present? %>
+      <p class="card-text description-preview small mb-2"><%= truncate(post.description, length: 70) %></p>
+    <% end %>
+
+    <div class="mt-auto">
+  <%# --- SECTION DES ACTIONS (VOTES ET COMMENTAIRES) MODIFIÉE --- %>
+  <div class="d-flex justify-content-between align-items-center mb-2 post-actions-wrapper">
+    <%# Groupe de boutons de vote (reste à gauche) %>
+    <div>
+      <% deezer_id = post.track.deezer_track_id %>
+      <%= button_to vote_on_track_path(deezer_id, vote_type: 'hot'), method: :post, class: "btn btn-sm btn-vote", title: "J'aime", form_class: "d-inline" do %>
+        <i class="bi bi-hand-thumbs-up-fill"></i>
       <% end %>
-    </p>
+      <%= button_to vote_on_track_path(deezer_id, vote_type: 'cold'), method: :post, class: "btn btn-sm btn-vote", title: "Je n'aime pas", form_class: "d-inline" do %>
+        <i class="bi bi-hand-thumbs-down-fill"></i>
+      <% end %>
+    </div>
 
-    <div class="d-flex justify-content-between align-items-center mt-auto">
-      <div>
-        <%= button_tag class: "btn btn-sm btn-outline-primary" do %>
-          <i class="bi bi-heart"></i> <%= post.votes.count %>
+    <%# Lien vers les commentaires (sera poussé à droite) %>
+    <%= link_to post_path(post, anchor: 'comments-section'), class: "btn-vote-comment", title: "#{post.comments.count} commentaires" do %>
+      <i class="bi bi-chat-dots-fill"></i>
+      <span><%= post.comments.count %></span>
+    <% end %>
+  </div>
+  <%# --- FIN DE LA SECTION DES ACTIONS --- %>
+
+
+  <%# Bouton Supprimer (uniquement pour le propriétaire du post) %>
+  <% if user_signed_in? && post.user == current_user %>
+    <button class="btn btn-sm btn-aurora-delete w-100"
+            data-bs-toggle="modal"
+            data-bs-target="#deletePostModal-<%= post.id %>">
+      Supprimer
+    </button>
+  <% end %>
+</div>
+
+    <%# Logos de streaming %>
+    <div class="streaming-links-container mt-auto pt-3">
+      <div class="streaming-logos-wrapper">
+        <% if post.track.link_deezer.present? %>
+          <a href="<%= post.track.link_deezer %>" target="_blank" rel="noopener noreferrer" class="streaming-logo deezer" title="Écouter sur Deezer">
+            <i class="bi bi-play-circle-fill"></i>
+          </a>
         <% end %>
-        <%= button_tag class: "btn btn-sm btn-outline-secondary ms-2" do %>
-          <i class="bi bi-chat"></i> <%= post.comments.count %>
-        <% end %>
+        <% spotify_search_url = "https://open.spotify.com/search/#{URI.encode_www_form_component(post.track.title + ' ' + post.track.artist_name)}" %>
+        <a href="<%= spotify_search_url %>" target="_blank" rel="noopener noreferrer" class="streaming-logo spotify" title="Écouter sur Spotify">
+          <i class="bi bi-spotify"></i>
+        </a>
+        <% apple_music_search_url = "https://music.apple.com/us/search?term=#{URI.encode_www_form_component(post.track.title + ' ' + post.track.artist_name)}" %>
+        <a href="<%= apple_music_search_url %>" target="_blank" rel="noopener noreferrer" class="streaming-logo apple" title="Écouter sur Apple Music">
+          <i class="bi bi-apple"></i>
+        </a>
       </div>
-
-      <% if post.persisted? && current_user == post.user %>
-        <div>
-          <%= link_to edit_post_path(post), class: "btn btn-sm btn-outline-success" do %>
-            <i class="bi bi-pencil"></i>
-          <% end %>
-
-          <!-- Bouton qui déclenche la modale -->
-          <button class="btn btn-sm btn-outline-danger ms-2"
-                  data-bs-toggle="modal"
-                  data-bs-target="#deletePostModal-<%= post.id %>"
-                  data-turbo="false">
-            <i class="bi bi-trash"></i>
-          </button>
-        </div>
-      <% end %>
     </div>
   </div>
 </div>
 
+
 <% if post.persisted? && current_user == post.user %>
   <!-- Modale de suppression -->
+
   <div class="modal fade" id="deletePostModal-<%= post.id %>" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
+      <div class="modal-content bg-dark text-white">
         <div class="modal-header">
           <h5 class="modal-title">Supprimer ce post</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
         </div>
         <div class="modal-body">
-          <p>Supprimer "<strong><%= post.track.title %></strong>" ?</p>
+          <p>Supprimer "<strong><%= post.track.title %></strong>" ? Cette action est irréversible.</p>
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer border-0">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-
-          <%= form_with url: post_path(post), method: :delete, data: { turbo_frame: "_top" } do %>
-            <button type="submit"
-                    class="btn btn-danger"
-                    onclick="bootstrap.Modal.getInstance(document.getElementById('deletePostModal-<%= post.id %>')).hide()">
-              Supprimer
-            </button>
-          <% end %>
+          <%= button_to "Supprimer", post_path(post), method: :delete, class: "btn btn-danger" %>
         </div>
       </div>
     </div>

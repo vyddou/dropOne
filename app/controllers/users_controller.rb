@@ -2,6 +2,7 @@ class UsersController < ApplicationController
   before_action :authenticate_user!, except: [:show]
 
   def show
+
   @user = User.find(params[:id])
 
   # Initialisation des variables
@@ -55,16 +56,26 @@ class UsersController < ApplicationController
   @liked_posts = liked_content.uniq { |p| p.track_id }.sort_by(&:created_at).reverse
 
 
-  # Variables pour les interactions
-  @is_current_user = current_user == @user
-  @is_following = user_signed_in? && !@is_current_user ? current_user.following.include?(@user) : false
+    @liked_posts = Post.joins(:votes)
+                       .where(votes: { user_id: @user.id, vote_type: true })
+                       .includes(:track)
+                       .distinct
+    @liked_posts = @liked_posts.sort_by { |post| post.votes.find { |v| v.user_id == @user.id && v.vote_type == true }&.created_at || post.created_at }.reverse
+
+    @is_current_user = current_user == @user
+    @is_following = user_signed_in? && !@is_current_user ? current_user.following.include?(@user) : false
   end
 
+  def follow
+    @user = User.find(params[:id])
+    current_user.following << @user
+    redirect_to user_path(@user), notice: "Vous suivez maintenant #{@user.username}"
+  end
 
   def unfollow
-    @user = User.find(params[:id])
-    current_user.following.delete(@user)
-    redirect_to user_path(@user), notice: "Vous ne suivez plus #{@user.username}"
+  @user = User.find(params[:id])
+  current_user.following.delete(@user)
+  redirect_to user_path(@user), notice: "Vous ne suivez plus #{@user.username}"
   end
 
   def update_description
