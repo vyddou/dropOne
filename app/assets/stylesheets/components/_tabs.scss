@@ -1,0 +1,43 @@
+// Dans votre fichier SCSS (par exemple _tabs.scss)
+
+.nav-tabs-modern {
+  display: flex;
+  justify-content: center; // Centre les onglets
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 1rem;
+}
+
+.nav-tab-modern {
+  padding: 0.75rem 1rem;
+  color: #adb5bd; // Couleur de texte neutre
+  text-decoration: none;
+  background-color: transparent;
+  border: none;
+  border-bottom: 3px solid transparent; // Bordure transparente par défaut
+  cursor: pointer;
+  transition: color 0.2s ease, border-bottom-color 0.2s ease;
+  font-weight: 500;
+  margin: 0 10px; // Espace entre les onglets
+
+  &:hover {
+    color: white;
+  }
+
+  &.active {
+    color: white; // Couleur du texte de l'onglet actif
+    border-bottom-color: #8a63d2; // Votre couleur d'accent (rose/violet)
+    font-weight: 600;
+  }
+}
+
+// .tab-content-modern {
+//   // Le contenu de l'onglet
+// }
+
+.tab-pane-modern {
+  // Par défaut, tous les panneaux sont cachés sauf celui qui a la classe 'active'
+  // d-none est géré par le JS, mais on peut avoir un fallback
+  &.active {
+    display: block; // Assurez-vous que l'onglet actif est bien visible
+  }
+}

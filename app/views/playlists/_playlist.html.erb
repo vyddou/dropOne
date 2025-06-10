@@ -1,47 +1,53 @@
-<div class="card my-2 playlist-card" id="playlist_<%= playlist.id %>">
-  <div class="card-body">
-    <div class="d-flex justify-content-between align-items-start">
-      <%= link_to playlist.name, playlist_path(playlist), class: "text-decoration-none text-white flex-grow-1" %>
+<%# app/views/playlists/_playlist.html.erb %>
+<%# Ce partial reçoit une variable locale 'playlist' %>
 
+<div class="playlist-row-wrapper">
+  <%# La modale de confirmation de suppression est ici pour chaque playlist %>
+  <% if current_user == @user %> <%# @user est défini dans le UsersController %>
+    <div class="modal fade" id="deletePlaylistModal-<%= playlist.id %>" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white">
+          <div class="modal-header">
+            <h5 class="modal-title">Supprimer la playlist</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+          </div>
+          <div class="modal-body">
+            <p>Supprimer "<strong><%= playlist.name %></strong>" ? Cette action est irréversible.</p>
+          </div>
+          <div class="modal-footer border-0">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            <%= button_to "Supprimer", playlist_path(playlist), method: :delete, class: "btn btn-danger" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <%# La ligne de la playlist stylisée, comme sur la page de détail %>
+  <div class="playlist-row d-flex align-items-center p-2 mb-2">
+    <div class="me-3 playlist-icon">
+      <%# Icône générique pour une playlist %>
+      <i class="bi bi-music-note-list"></i>
+    </div>
+
+    <div class="playlist-info flex-grow-1">
+      <%# Le nom et le nombre de titres sont un lien vers la playlist %>
+      <%= link_to playlist_path(playlist), class: "playlist-link" do %>
+        <h6 class="mb-0 text-white"><%= playlist.name %></h6>
+        <small class="text-muted"><%= pluralize(playlist.tracks.count, 'titre') %></small>
+      <% end %>
+    </div>
+
+    <div class="playlist-actions">
+      <%# Bouton supprimer, qui déclenche la modale %>
       <% if current_user == @user %>
-        <!-- Bouton pour ouvrir la modale -->
-        <button class="btn btn-danger btn-sm ms-2"
+        <button class="btn-icon btn-icon-delete"
                 data-bs-toggle="modal"
                 data-bs-target="#deletePlaylistModal-<%= playlist.id %>"
-                data-turbo="false">
+                title="Supprimer la playlist">
           <i class="bi bi-trash"></i>
         </button>
       <% end %>
     </div>
-
-    <p class="card-text mt-2 text-white"><%= playlist.tracks.count %> titres</p>
   </div>
 </div>
-
-<% if current_user == @user %>
-  <!-- Modale de confirmation -->
-  <div class="modal fade" id="deletePlaylistModal-<%= playlist.id %>" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Supprimer la playlist</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-        </div>
-        <div class="modal-body">
-          <p>Supprimer "<strong><%= playlist.name %></strong>" ?</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-          
-          <%= form_with url: playlist_path(playlist), method: :delete, data: { turbo_frame: "_top" } do %>
-            <button type="submit"
-                    class="btn btn-danger"
-                    onclick="bootstrap.Modal.getInstance(document.getElementById('deletePlaylistModal-<%= playlist.id %>')).hide()">
-              Supprimer
-            </button>
-          <% end %>
-        </div>
-      </div>
-    </div>
-  </div>
-<% end %>
