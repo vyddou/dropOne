@@ -1,85 +1,89 @@
-<h1 class="d-flex justify-content-between align-items-center m-4">
-  <span id="playlist-name"><%= @playlist.name %></span>
-  <% unless [Playlist::LIKE_PLAYLIST_NAME, Playlist::DISLIKE_PLAYLIST_NAME].include?(@playlist.name) %>
-    <button id="rename-button" class="btn btn-link" style="color: var(--bs-primary);">Renommer la playlist</button>
-  <% end %>
-</h1>
+<%# app/views/playlists/show.html.erb %>
 
-<% unless [Playlist::LIKE_PLAYLIST_NAME, Playlist::DISLIKE_PLAYLIST_NAME].include?(@playlist.name) %>
-  <%= form_with(model: @playlist, url: rename_playlist_path(@playlist), method: :patch, id: "rename-form", class: "d-none") do |form| %>
-    <div class="input-group mb-3">
-      <%= form.text_field :name, class: "form-control", id: "playlist-name-input" %>
-      <div class="input-group-append">
-        <%= form.submit "Enregistrer", class: "btn btn-primary btn-aurora-glow" %>
-        <button type="button" id="cancel-rename" class="btn btn-secondary btn-aurora-glow">Annuler</button>
+<div class="container mt-4 playlist-show-container">
+  <%# --- En-tête de la playlist avec formulaire de renommage --- %>
+  <h1 class="d-flex justify-content-between align-items-center m-4">
+    <span id="playlist-name"><%= @playlist.name %></span>
+    <% unless [Playlist::LIKE_PLAYLIST_NAME, Playlist::DISLIKE_PLAYLIST_NAME].include?(@playlist.name) %>
+      <button id="rename-button" class="btn btn-link" style="color: var(--bs-primary);">Renommer</button>
+    <% end %>
+  </h1>
+
+  <% unless [Playlist::LIKE_PLAYLIST_NAME, Playlist::DISLIKE_PLAYLIST_NAME].include?(@playlist.name) %>
+    <%= form_with(model: @playlist, url: rename_playlist_path(@playlist), method: :patch, id: "rename-form", class: "d-none") do |form| %>
+      <div class="input-group mb-3">
+        <%= form.text_field :name, class: "form-control", id: "playlist-name-input" %>
+        <div class="input-group-append">
+          <%= form.submit "Enregistrer", class: "btn btn-primary" %>
+          <button type="button" id="cancel-rename" class="btn btn-secondary">Annuler</button>
+        </div>
       </div>
+    <% end %>
+  <% end %>
+
+  <% is_special_playlist = [Playlist::LIKE_PLAYLIST_NAME, Playlist::DISLIKE_PLAYLIST_NAME].include?(@playlist.name) %>
+
+  <%# --- Actions en vrac (bulk actions) --- %>
+  <% unless is_special_playlist %>
+    <div class="bulk-actions mt-3 mb-3 d-flex">
+      <%= button_to "J'aime toutes les chansons", like_all_songs_playlist_items_path(playlist_id: @playlist.id), method: :post, class: "btn-aurora-like me-2" %>
+      <%= button_to "J'aime aucune des chansons", dislike_all_songs_playlist_items_path(playlist_id: @playlist.id), method: :post, class: "btn-aurora-dislike" %>
     </div>
   <% end %>
-<% end %>
 
-<% is_special_playlist = [Playlist::LIKE_PLAYLIST_NAME, Playlist::DISLIKE_PLAYLIST_NAME].include?(@playlist.name) %>
+  <%# --- Liste des morceaux de la playlist --- %>
+  <div class="playlist-items-list">
+    <% @playlist_items.each do |playlist_item| %>
+      <% track = playlist_item.track %>
 
-<% unless is_special_playlist %>
-  <div class="bulk-actions mt-3 mb-3 d-flex">
-    <%= button_to "J'aime toutes les chansons", like_all_songs_playlist_items_path(playlist_id: @playlist.id), method: :post, class: "btn-aurora-like me-2" %>
-    <%= button_to "J'aime aucune des chansons", dislike_all_songs_playlist_items_path(playlist_id: @playlist.id), method: :post, class: "btn-aurora-dislike" %>
-  </div>
-<% end %>
+      <%# Nouveau design pour chaque ligne de morceau %>
+      <div class="playlist-track-row d-flex align-items-center p-2 mb-2">
+        <div class="me-3">
+          <% cover_url = track.cover_url.presence || "https://placehold.co/64x64/2c2f36/ffffff?text=?" %>
+          <%= image_tag cover_url, alt: "Pochette de #{track.title}", class: "rounded", width: 64, height: 64, style: "object-fit: cover;" %>
+        </div>
 
-<div class="playlist-container">
-  <% @playlist_items.each do |playlist_item| %>
-    <% track = playlist_item.track %>
-    <div class="song-item d-flex justify-content-between align-items-center p-3 border-bottom">
-
-      <div class="song-cover me-3">
-        <% if track.cover_url.present? %>
-          <%= image_tag(track.cover_url, alt: "#{track.title} cover", class: "img-thumbnail", style: "width: 100px; height: 100px; object-fit: cover;") %>
-        <% else %>
-          <div class="no-cover" style="width: 100px; height: 100px; background: #ccc; display: flex; align-items: center; justify-content: center;">
-            <span>Pas de pochette</span>
-          </div>
-        <% end %>
-      </div>
-
-      <div class="song-info flex-grow-1">
-        <p class="mb-1"><strong><%= track.title %></strong> par <em><%= track.artist_name %></em></p>
-
-        <% if playlist_item.description.present? %>
-          <p class="text-muted fst-italic mb-2">
-            → <%= playlist_item.description %>
-          </p>
-        <% end %>
-        <p class="mb-2 small">Durée : <%= (track.duration / 1000).to_i %> secondes</p>
+        <div class="track-info flex-grow-1">
+          <h6 class="mb-0 text-white"><%= track.title %></h6>
+          <small class="text-muted"><%= track.artist_name %></small>
+        </div>
 
         <% if track.preview_url.present? %>
-          <div class="audio-player">
-            <audio controls preload="none" style="width: 100%;">
-              <source src="<%= track.preview_url %>" type="audio/mpeg" />
-              Votre navigateur ne supporte pas l'élément audio.
-            </audio>
+          <div class="audio-player-wrapper mx-3">
+            <audio controls controlsList="nodownload noplaybackrate" src="<%= track.preview_url %>" style="height: 30px;"></audio>
           </div>
         <% end %>
-      </div>
 
-      <div class="song-actions d-flex flex-column ms-3">
-        <% unless is_special_playlist %>
-          <%= button_to "J'aime", like_playlist_item_path(playlist_item), method: :post, class: "btn-aurora-like mb-1" %>
-          <%= button_to "J'aime pas", dislike_playlist_item_path(playlist_item), method: :post, class: "btn-aurora-dislike mb-1" %>
-        <% end %>
-        <%= button_to "Supprimer", playlist_item_path(playlist_item), method: :delete, class: "btn-aurora-delete" %>
+        <%# --- NOUVELLES ICÔNES D'ACTION --- %>
+        <div class="track-actions d-flex align-items-center gap-3">
+          <% unless is_special_playlist %>
+            <%= button_to like_playlist_item_path(playlist_item), method: :post, class: "btn-icon", title: "J'aime" do %>
+              <i class="bi bi-hand-thumbs-up"></i>
+            <% end %>
+            <%= button_to dislike_playlist_item_path(playlist_item), method: :post, class: "btn-icon", title: "Je n'aime pas" do %>
+              <i class="bi bi-hand-thumbs-down"></i>
+            <% end %>
+          <% end %>
+          <%= button_to playlist_item_path(playlist_item), method: :delete, class: "btn-icon btn-icon-delete", title: "Supprimer de la playlist", data: { "turbo-method": :delete, "turbo-confirm": "Êtes-vous sûr ?" } do %>
+            <i class="bi bi-trash"></i>
+          <% end %>
+        </div>
+        <%# --- FIN DES ICÔNES D'ACTION --- %>
       </div>
-    </div>
-  <% end %>
-</div>
+    <% end %>
+  </div>
 
-<div class="mt-4 d-flex justify-content-start">
-  <%= link_to "Générer une nouvelle playlist", new_playlist_path, class: "btn btn-primary btn-aurora-glow me-2" %>
-  <%= link_to "Retour aux playlists", playlists_path, class: "btn btn-secondary btn-aurora-glow" %>
+  <%# --- Boutons de pied de page --- %>
+  <div class="mt-4 d-flex justify-content-start">
+    <%= link_to "Générer une nouvelle playlist", new_playlist_path, class: "btn btn-primary btn-aurora-glow me-2" %>
+    <%= link_to "Retour aux playlists", playlists_path, class: "btn btn-secondary btn-aurora-glow" %>
+  </div>
 </div>
 
 <%= render "shared/bottom_navbar" %>
 
 <script>
+  // Votre script pour le renommage de la playlist
   document.addEventListener('turbo:load', () => {
     const renameButton = document.getElementById('rename-button')
     const renameForm = document.getElementById('rename-form')
