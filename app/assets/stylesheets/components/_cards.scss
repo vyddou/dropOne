@@ -105,33 +105,36 @@
     opacity: 1;
   }
 
-  // --- STYLES POUR LE SCORE DANS UN CŒUR ---
-  .album-cover-score-overlay {
+ // --- NOUVEAUX STYLES POUR LE SCORE ÉPURÉ ---
+   .album-cover-score-overlay {
     position: absolute;
     top: 10px;
     right: 10px;
-    width: 50px;
-    height: 50px;
-    display: grid;
-    place-items: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 6px 12px; // <-- Padding augmenté
+    border-radius: 16px; // Un peu plus arrondi pour s'adapter
+    font-size: 0.9rem;   // <-- Police un peu plus grande
+    font-weight: 700;    // Un peu plus gras
     z-index: 4;
+    display: flex;
+    align-items: center;
+    gap: 6px;            // Un peu plus d'espace
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 
-    .score-heart-icon {
-      grid-area: 1 / 1;
-      font-size: 2.3rem; // Légèrement réduit pour être moins imposant
-      color: rgba(220, 53, 69, 0.85);
-      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    i.bi-fire {
+      color: #ff8c00;
+      font-size: 1.1em; // <-- Icône plus grande
+      line-height: 1;
     }
 
     .score-value {
-      grid-area: 1 / 1;
-      color: white;
-      font-size: 0.9rem;
-      font-weight: bold;
-      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-      padding-bottom: 2px;
+      line-height: 1;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
     }
   }
+  // --- FIN DES NOUVEAUX STYLES ---
 } // --- FIN DE .album-art-visual-wrapper ---
 
 .album-details-section {

@@ -19,11 +19,14 @@
       <p class="album-artist-on-cover" title="<%= post.track.artist_name %>"><%= post.track.artist_name %></p>
     </div>
 
-    <%# Affichage du score dans un cœur (haut droit) %>
-    <div class="album-cover-score-overlay">
-      <i class="bi bi-heart-fill score-heart-icon"></i>
-      <span class="score-value"><%= post.try(:net_votes) || 0 %></span>
-    </div>
+    <%# --- NOUVEL AFFICHAGE DU SCORE ÉPURÉ --- %>
+    <% if post.persisted? %>
+      <div class="album-cover-score-overlay modern-score">
+        <i class="bi bi-fire"></i> <%# Nouvelle icône de flamme %>
+        <span class="score-value"><%= post.try(:net_votes) || 0 %></span>
+      </div>
+    <% end %>
+    <%# --- FIN DE L'AFFICHAGE DU SCORE --- %>
   </div>
 
   <div class="album-details-section">
@@ -33,35 +36,28 @@
 
     <div class="mt-auto">
       <div class="d-flex justify-content-between align-items-center mb-2 post-actions-wrapper">
-        <div class="d-flex align-items-center gap-3">
-          <%# --- SECTION DES VOTES MISE À JOUR AVEC DES ICÔNES --- %>
+        <div class="d-flex align-items-center gap-2">
+          <%# Boutons de vote %>
           <% deezer_id = post.track.deezer_track_id %>
-          <%# On récupère le vote de l'utilisateur actuel pour ce post une seule fois %>
-          <% current_user_vote = user_signed_in? ? current_user.vote_for(post) : nil %>
-
-          <%# Bouton J'aime avec icône %>
           <%= button_to vote_on_track_path(deezer_id, vote_type: 'hot'), method: :post, class: "btn-icon", title: "J'aime" do %>
-            <%# L'icône est remplie et a la classe .liked si le vote est "hot" %>
-            <i class="bi <%= current_user_vote&.vote_type == true ? 'bi-hand-thumbs-up-fill liked' : 'bi-hand-thumbs-up' %>"></i>
+            <i class="bi <%= user_signed_in? && current_user.vote_for(post)&.vote_type == true ? 'bi-hand-thumbs-up-fill liked' : 'bi-hand-thumbs-up' %>"></i>
           <% end %>
-
-          <%# Bouton Je n'aime pas avec icône %>
           <%= button_to vote_on_track_path(deezer_id, vote_type: 'cold'), method: :post, class: "btn-icon", title: "Je n'aime pas" do %>
-            <%# L'icône est remplie et a la classe .disliked si le vote est "cold" %>
-            <i class="bi <%= current_user_vote&.vote_type == false ? 'bi-hand-thumbs-down-fill disliked' : 'bi-hand-thumbs-down' %>"></i>
+            <i class="bi <%= user_signed_in? && current_user.vote_for(post)&.vote_type == false ? 'bi-hand-thumbs-down-fill disliked' : 'bi-hand-thumbs-down' %>"></i>
           <% end %>
-          <%# --- FIN DE LA SECTION DES VOTES --- %>
         </div>
 
-        <%# Lien vers les commentaires (reste à droite) %>
-        <%= link_to post_path(post, anchor: 'comments-section'), class: "btn-vote-comment", title: "#{post.comments.count} commentaires" do %>
-          <i class="bi bi-chat-dots-fill"></i>
-          <span><%= post.comments.count %></span>
+        <%# Lien vers les commentaires %>
+        <% if post.persisted? %>
+          <%= link_to post_path(post, anchor: 'comments-section'), class: "btn-vote-comment", title: "#{post.comments.count} commentaires" do %>
+            <i class="bi bi-chat-dots-fill"></i>
+            <span><%= post.comments.count %></span>
+          <% end %>
         <% end %>
       </div>
 
-      <%# Bouton Supprimer (uniquement pour le propriétaire du post) %>
-      <% if user_signed_in? && post.user == current_user %>
+      <%# Bouton Supprimer %>
+      <% if post.persisted? && user_signed_in? && post.user == current_user %>
         <button class="btn btn-sm btn-custom-delete w-100"
                 data-bs-toggle="modal"
                 data-bs-target="#deletePostModal-<%= post.id %>">
@@ -91,8 +87,8 @@
   </div>
 </div>
 
-<%# Modale de suppression (conservée) %>
-<% if current_user == post.user %>
+<%# Modale de suppression %>
+<% if post.persisted? && current_user == post.user %>
   <div class="modal fade" id="deletePostModal-<%= post.id %>" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content bg-dark text-white">
