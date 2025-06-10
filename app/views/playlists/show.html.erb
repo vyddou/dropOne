@@ -2,10 +2,10 @@
 
 <div class="container mt-4 playlist-show-container">
   <%# --- En-tête de la playlist avec formulaire de renommage --- %>
-  <h1 class="d-flex justify-content-between align-items-center m-4">
+  <h1 class="d-flex justify-content-between align-items-center m-4 p-2">
     <span id="playlist-name"><%= @playlist.name %></span>
     <% unless [Playlist::LIKE_PLAYLIST_NAME, Playlist::DISLIKE_PLAYLIST_NAME].include?(@playlist.name) %>
-      <button id="rename-button" class="btn btn-link" style="color: var(--bs-primary);">Renommer</button>
+      <button id="rename-button" class="btn-aurora-like me-2 mt-3 mb-3 p-2 "style="width: 100px;">Renommer</button>
     <% end %>
   </h1>
 
