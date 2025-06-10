@@ -1,18 +1,67 @@
-<h1 class="m-4">
-  Mes Playlists
-</h1>
+<%# app/views/playlists/index.html.erb %>
 
-<% if @playlists.any? %>
-  <ul class="list-group">
-    <% @playlists.each do |playlist| %>
-      <li class="list-group-item d-flex justify-content-between align-items-center">
-        <%= link_to playlist.name || "Playlist du #{playlist.generated_at.strftime('%d/%m/%Y %H:%M')}", playlist_path(playlist), class: "text-decoration-none" %>
-        <%= button_to "Supprimer", playlist_path(playlist), method: :delete, class: "btn btn-aurora-delete", form: { class: 'd-inline' } %>
-      </li>
+<div class="container mt-4 playlist-index-container">
+  <h1 class="mb-4">Mes Playlists</h1>
+
+  <div class="playlists-list">
+    <% if @playlists.any? %>
+      <% @playlists.each do |playlist| %>
+        <div class="playlist-row-wrapper">
+          <%# La modale de confirmation de suppression %>
+          <% if current_user == playlist.user %>
+            <div class="modal fade" id="deletePlaylistModal-<%= playlist.id %>" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-dark text-white">
+                  <div class="modal-header">
+                    <h5 class="modal-title">Supprimer la playlist</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                  </div>
+                  <div class="modal-body">
+                    <p>Supprimer "<strong><%= playlist.name %></strong>" ? Cette action est irréversible.</p>
+                  </div>
+                  <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <%= button_to "Supprimer", playlist_path(playlist), method: :delete, class: "btn btn-danger" %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+
+          <%# La ligne de la playlist %>
+          <div class="playlist-row d-flex align-items-center p-2 mb-2">
+            <div class="me-3 playlist-icon">
+              <i class="bi bi-music-note-list"></i>
+            </div>
+
+            <div class="playlist-info flex-grow-1">
+              <%= link_to playlist_path(playlist), class: "playlist-link" do %>
+                <h6 class="mb-0 text-white"><%= playlist.name || "Playlist du #{playlist.created_at.strftime('%d/%m/%Y')}" %></h6>
+                <small class="text-muted"><%= pluralize(playlist.tracks.count, 'titre') %></small>
+              <% end %>
+            </div>
+
+            <div class="playlist-actions">
+              <% if current_user == playlist.user %>
+                <button class="btn-icon btn-icon-delete"
+                        data-bs-toggle="modal"
+                        data-bs-target="#deletePlaylistModal-<%= playlist.id %>"
+                        title="Supprimer la playlist">
+                  <i class="bi bi-trash"></i>
+                </button>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <p class="text-muted">Vous n'avez pas encore de playlist.</p>
     <% end %>
-  </ul>
-<% else %>
-  <p>Vous n'avez pas encore de playlist générée.</p>
-<% end %>
+  </div>
 
-<%= link_to "Générer une nouvelle playlist", new_playlist_path, class: "btn btn-primary btn-aurora-glow mt-3" %>
+  <div class="mt-4">
+    <%= link_to "Générer une nouvelle playlist", new_playlist_path, class: "btn btn-primary btn-aurora-glow" %>
+  </div>
+</div>
+
+<%= render "shared/bottom_navbar" %>

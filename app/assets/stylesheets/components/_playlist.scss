@@ -31,6 +31,49 @@
   }
 }
 
+.playlist-row {
+  background-color: rgba(44, 47, 54, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  position: relative; // Pour que le lien puisse s'étendre sur toute la surface
+
+  &:hover {
+    background-color: rgba(55, 60, 69, 0.7);
+    transform: translateX(5px);
+  }
+
+  .playlist-icon i {
+    font-size: 2rem;
+    color: #aeb1b6;
+  }
+
+  .playlist-info h6 {
+    font-weight: 500;
+  }
+
+  .playlist-link {
+    text-decoration: none;
+    color: inherit;
+
+    // Astuce pour rendre toute la ligne cliquable, sauf les boutons d'action
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1; // Le lien est "en dessous" des boutons d'action
+    }
+  }
+
+  .playlist-actions {
+    position: relative;
+    z-index: 2; // Les boutons sont "au-dessus" du lien de la ligne
+  }
+}
+
 // Style de base pour les boutons-icônes
 .btn-icon {
   background: none;
