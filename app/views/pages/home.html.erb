@@ -17,7 +17,9 @@
     <div class="main-carousel-wrapper" data-controller="audio-player">
       <div class="main-carousel"> <%# Pour Swiper.js %>
         <% @carousel_items.each_with_index do |item, index| %>
-          <div class="carousel-cell" data-preview-url="<%= item.preview_url %>">
+          <div class="carousel-cell"
+               data-track-id="<%= item.db_post_object&.track&.id %>"
+               data-preview-url="<%= item.preview_url if item.origin == :deezer_suggestion %>">
             <div class="album-art-card-container">
               <div class="album-art-visual-wrapper">
                 <% cover_url = item.cover_url.presence || "https://placehold.co/280x280/0A0F1E/E0E0E0?text=#{item.title&.truncate(15)}" %>

@@ -6,6 +6,7 @@
     <% cover_url = post.track.cover_url.presence || "https://placehold.co/280x280/0A0F1E/E0E0E0?text=#{post.track.title&.truncate(15)}" %>
     <%= image_tag cover_url, alt: "Pochette de #{post.track.title}", class: "album-cover-image" %>
 
+
     <%# Bouton Play superposé %>
     <% if post.track.preview_url.present? %>
       <button class="btn-play-on-cover" aria-label="Lire l'extrait" data-action="click->audio-player#togglePlay">
@@ -53,6 +54,7 @@
   </div>
   <%# --- FIN DE LA SECTION DES ACTIONS --- %>
 
+
   <%# Bouton Supprimer (uniquement pour le propriétaire du post) %>
   <% if user_signed_in? && post.user == current_user %>
     <button class="btn btn-sm btn-aurora-delete w-100"
@@ -84,8 +86,10 @@
   </div>
 </div>
 
-<%# Modale de suppression (conservée) %>
-<% if current_user == post.user %>
+
+<% if post.persisted? && current_user == post.user %>
+  <!-- Modale de suppression -->
+
   <div class="modal fade" id="deletePostModal-<%= post.id %>" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content bg-dark text-white">

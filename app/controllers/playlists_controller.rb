@@ -82,6 +82,9 @@ class PlaylistsController < ApplicationController
       create_playlist_items_with_description(playlist, selected_tracks)
       redirect_to playlist_path(playlist), notice: notice_message
     end
+  rescue RubyLLM::RateLimitError => e
+    Rails.logger.error "[Playlist#create] Rate Limit Error: #{e.class} #{e.message}"
+    redirect_to new_playlist_path, alert: "Trop de demandes envoyées. Veuillez patienter un moment avant de réessayer."
   rescue => e
     Rails.logger.error "[Playlist#create] Erreur : #{e.class} #{e.message}\n#{e.backtrace.join("\n")}"
     redirect_to new_playlist_path, alert: "Une erreur est survenue : #{e.message}"
@@ -131,8 +134,12 @@ class PlaylistsController < ApplicationController
       Commence directement par `[` et termine par `]`. Ne donne rien d’autre.
     PROMPT
 
+    retries = 3
+    delay = 1 # Seconde initiale
+
     begin
-      chat = RubyLLM.chat
+      # chat = RubyLLM.chat
+      chat = RubyLLM.chat(model: 'google/gemini-2.0-flash-exp:free')
       response = chat.ask(prompt)
       raw = response.respond_to?(:content) ? response.content : response
       Rails.logger.info "[LLM RESPONSE] : #{raw}"
@@ -143,6 +150,17 @@ class PlaylistsController < ApplicationController
 
       json_str = raw[json_start..json_end]
       JSON.parse(json_str)
+    rescue RubyLLM::RateLimitError => e
+      if retries > 0
+        Rails.logger.warn "[LLM API] Rate limit atteint. Nouvelle tentative dans #{delay}s... (#{retries} tentatives restantes)"
+        sleep delay
+        retries -= 1
+        delay *= 2 # Backoff exponentiel
+        retry
+      else
+        Rails.logger.error "[LLM API] Erreur de rate limit après plusieurs tentatives."
+        raise e # On relance l'exception si toutes les tentatives échouent
+      end
     rescue JSON::ParserError => e
       Rails.logger.error "[LLM PARSE ERROR] #{e.message}"
       nil
@@ -166,10 +184,25 @@ class PlaylistsController < ApplicationController
       Ne donne que le nom, sans guillemets.
     PROMPT
 
+    retries = 3
+    delay = 1 # Seconde initiale
+
     begin
-      response = RubyLLM.chat.ask(prompt)
+      # response = RubyLLM.chat.ask(prompt)
+      response = RubyLLM.chat(model: 'google/gemini-2.0-flash-exp:free').ask(prompt)
       base_name = (response.respond_to?(:content) ? response.content : response).strip.gsub('"', '')
       duration_was_requested ? "#{base_name} (#{final_duration} min)" : base_name
+    rescue RubyLLM::RateLimitError => e
+      if retries > 0
+        Rails.logger.warn "[generate_playlist_name] Rate limit atteint. Nouvelle tentative dans #{delay}s... (#{retries} tentatives restantes)"
+        sleep delay
+        retries -= 1
+        delay *= 2 # Backoff exponentiel
+        retry
+      else
+        Rails.logger.error "[generate_playlist_name] Erreur de rate limit après plusieurs tentatives."
+        raise e # On relance l'exception si toutes les tentatives échouent
+      end
     rescue => e
       Rails.logger.error "[generate_playlist_name] Erreur LLM : #{e.class} #{e.message}"
       "Playlist inspirée"
