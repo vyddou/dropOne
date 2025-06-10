@@ -137,4 +137,26 @@
       transform: scale(1.15); // Légère augmentation de taille
     }
   }
+
+  // Dans votre fichier SCSS
+
+// ... (vos autres styles)
+
+// Style pour le bouton Supprimer
+.btn-custom-delete {
+  background-color: transparent; // Fond transparent
+  border: 1px solid #c8328c;   // Bordure rose/violet (ajustez la couleur si besoin)
+  color: #c8328c;            // Texte rose/violet
+  font-weight: 500;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+
+  &:hover {
+    background-color: #c8328c; // Devient plein au survol
+    color: white;            // Le texte devient blanc
+  }
+}
+
+// ... (vos autres styles)
 }
