@@ -17,18 +17,23 @@
             ) %>
       <% end %>
 
-      <%# Contenu principal cliquable %>
-      <%= link_to conversation_path(conversation), class: "d-flex flex-grow-1 align-items-center text-decoration-none" do %>
-        <div class="flex-grow-1">
-          <div class="fw-semibold fs-6 mb-1 text-primary">
+      <%# Wrapper contenu texte et heure en flex row %>
+      <%= link_to conversation_path(conversation),
+          class: "d-flex align-items-center flex-grow-1 text-decoration-none",
+          style: "min-width: 0;" do %> <%# important pour le texte tronqué %>
+
+        <%# Conteneur texte qui grandit mais ne pousse pas le bouton %>
+        <div class="flex-grow-1 me-3" style="min-width: 0;">
+          <div class="fw-semibold fs-6 mb-1 text-primary text-truncate">
             <%= other_user.username %>
           </div>
-          <div class="text-muted small text-truncate" style="max-width: 300px;">
+          <div class="text-muted small text-truncate">
             <%= last_message ? truncate(last_message.content, length: 50) : "Aucun message" %>
           </div>
         </div>
 
-        <div class="ms-3 text-muted small text-end text-nowrap" style="min-width: 75px;">
+        <%# Heure à droite avec largeur fixe %>
+        <div class="text-muted small text-end text-nowrap flex-shrink-0" style="width: 70px;">
           <% if last_message %>
             <% if last_message.created_at.to_date == Date.current %>
               <%= last_message.created_at.strftime("%H:%M") %>
@@ -39,11 +44,15 @@
         </div>
       <% end %>
 
-      <%# Ton bouton personnalisé conservé tel quel %>
-      <%= button_to "Supprimer", conversation_path(conversation),
+      <%# Bouton supprimer avec icône, taille fixe, margin-end pour ne pas coller au bord %>
+      <%= button_to conversation_path(conversation),
           method: :delete,
           data: { confirm: "Êtes-vous sûr de vouloir supprimer cette conversation ?" },
-          class: "btn btn-aurora-delete ms-3 flex-shrink-0" %>
+          class: "btn btn-aurora-delete ms-3 flex-shrink-0 d-flex align-items-center justify-content-center",
+          style: "width: 40px; height: 40px;" do %>
+        <i class="bi bi-trash"></i>
+      <% end %>
+
     </li>
   <% end %>
 </ul>

@@ -3,6 +3,9 @@ class ConversationsController < ApplicationController
 
   def index
     @conversations = current_user.conversations
+    .includes(:messages, :users)
+    .sort_by { |c| c.messages.last&.created_at || Time.at(0) }
+    .reverse
   end
 
   def show
