@@ -118,7 +118,7 @@
 
                   <%# Lien Modifier uniquement pour les posts créés par l'utilisateur actuel %>
                   <% if item.origin == :app && user_signed_in? && item.user == current_user %>
-                    <%= button_to 'Supprimer', post_path(item.db_post_object), method: :delete, data: { confirm: 'Êtes-vous sûr de vouloir supprimer ce post ?' }, class: "btn btn-sm btn-outline-secondary mt-1 w-100" %>
+                    <%= button_to 'Supprimer', post_path(item.db_post_object), method: :delete, data: { confirm: 'Êtes-vous sûr de vouloir supprimer ce post ?' }, class: "btn btn-sm btn-aurora-delete mt-1 w-100" %>
                   <% end %>
                 </div>
 
