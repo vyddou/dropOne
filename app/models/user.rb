@@ -51,4 +51,8 @@ class User < ApplicationRecord
       vote&.vote_type
     end
 
+      def vote_for(post)
+    votes.find_by(post_id: post.id)
+  end
+
 end
