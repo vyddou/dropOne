@@ -3,7 +3,7 @@
 .carousel-cell {
   display: flex;
   justify-content: center;
-  margin: 10px;
+  margin: 15px;
 }
 
 .album-art-card-container {
@@ -16,7 +16,7 @@
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   transition: transform 0.2s ease-in-out;
   width: 100%;
-  max-width: 280px;
+  max-width: 400px;
 
   &:hover {
     transform: translateY(-5px);
@@ -50,7 +50,7 @@
     .album-title-on-cover {
       font-size: 0.9rem;
       font-weight: 600;
-      margin-bottom: 2px;
+      margin-bottom: 3px;
       text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
       white-space: nowrap;
       overflow: hidden;
