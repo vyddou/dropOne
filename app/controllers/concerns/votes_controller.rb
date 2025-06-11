@@ -1,4 +1,3 @@
-# app/controllers/votes_controller.rb
 class VotesController < ApplicationController
   before_action :authenticate_user! # Seuls les utilisateurs connectés peuvent voter
 
