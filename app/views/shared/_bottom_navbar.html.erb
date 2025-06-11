@@ -1,6 +1,9 @@
+<%# app/views/shared/_bottom_navbar.html.erb %>
+
 <nav class="navbar navbar-dark bg-dark fixed-bottom bottom-navbar" id="bottom-navbar">
   <div class="container d-flex justify-content-around align-items-center">
     <% if user_signed_in? %>
+      <%# Lien Messages %>
       <%= link_to conversations_path, class: "nav-link text-white #{'active' if current_page?(conversations_path)}" do %>
         <div class="position-relative d-flex flex-column align-items-center">
           <i class="bi bi-chat-dots-fill fs-4"></i>
@@ -13,28 +16,34 @@
         </div>
       <% end %>
 
-      <%= link_to new_post_path, class: "nav-link text-white d-flex flex-column align-items-center" do %>
+      <%# Lien Ajouter %>
+      <%= link_to new_post_path, class: "nav-link text-white d-flex flex-column align-items-center #{'active' if current_page?(new_post_path)}" do %>
         <i class="bi bi-plus-circle fs-4"></i>
         <span>Ajouter</span>
       <% end %>
 
-      <!-- Bouton Playlist ajouté au centre -->
+      <%# Bouton Playlist IA %>
       <%= link_to new_playlist_path, class: "nav-link text-white d-flex flex-column align-items-center #{'active' if current_page?(new_playlist_path)}" do %>
         <i class="bi bi-music-note-beamed fs-4"></i>
         <span>IA</span>
       <% end %>
 
-      <%= link_to search_path, class: "nav-link text-white d-flex flex-column align-items-center" do %>
+      <%# --- CORRECTION ICI --- %>
+      <%# Lien Recherche avec la condition 'active' %>
+      <%= link_to search_path, class: "nav-link text-white d-flex flex-column align-items-center #{'active' if current_page?(search_path)}" do %>
         <i class="bi bi-search fs-4"></i>
         <span>Recherche</span>
       <% end %>
+      <%# --- FIN DE LA CORRECTION --- %>
 
-      <%= link_to user_path(current_user), class: "nav-link text-white d-flex flex-column align-items-center" do %>
+      <%# Lien Profil %>
+      <%= link_to user_path(current_user), class: "nav-link text-white d-flex flex-column align-items-center #{'active' if current_page?(user_path(current_user))}" do %>
         <% avatar_display_url = current_user.avatar_url.presence || "https://placehold.co/40x40/E0E0E0/000000?text=User" %>
         <%= image_tag avatar_display_url, alt: "User Avatar", class: "rounded-circle mb-1", style: "width: 40px; height: 40px; object-fit: cover;" %>
         <span>Profil</span>
       <% end %>
     <% else %>
+      <%# ... (votre code pour l'utilisateur non connecté, qui semble avoir une navbar dupliquée à l'intérieur) ... %>
       <%= link_to new_user_session_path, class: "nav-link text-white d-flex flex-column align-items-center" do %>
         <i class="bi bi-box-arrow-in-right fs-4"></i>
         <span>Login</span>
