@@ -9,6 +9,7 @@ class PostsController < ApplicationController
 
   def show
     # @post est déjà défini par le before_action :set_post
+    @comments = @post.comments.includes(:user)
   end
 
   def new

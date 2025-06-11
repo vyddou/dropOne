@@ -19,6 +19,7 @@ module DropOne
 
     config.time_zone = 'Paris'
     config.active_record.default_timezone = :local
+    config.i18n.default_locale = :fr
 
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
