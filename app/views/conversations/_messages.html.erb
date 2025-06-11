@@ -3,7 +3,7 @@
     <% messages.each do |msg| %>
       <% justify_class = msg.user == current_user ? 'justify-content-end' : 'justify-content-start' %>
       <div class="d-flex mb-3">
-        <div class="d-flex flex-column" style="max-width: 55%;">
+        <div class="d-flex flex-column w-100 w-md-75">
           <div class="d-flex align-items-center mb-1">
             <% avatar_url = msg.user.avatar_url.presence || "https://placehold.co/32x32/E0E0E0/000000?text=User" %>
             <%= link_to user_path(msg.user), class: "me-2" do %>
@@ -35,7 +35,7 @@
 
           <% if msg.user == current_user %>
             <div class="d-flex align-items-start">
-              <div class="py-1 px-3 rounded-5 bg-primary text-white" style="word-wrap: break-word; max-width: 100%;">
+              <div class="py-1 px-3 rounded-5 bg-primary text-white text-start" style="word-wrap: break-word; max-width: 100%;">
                 <%= msg.content %>
               </div>
               <%= button_to post_comment_path(conversation, msg), method: :delete, class: "btn-icon ms-2 mt-1", title: "Supprimer ce commentaire", data: { confirm: "Êtes-vous sûr de vouloir supprimer ce commentaire ?" } do %>
@@ -43,7 +43,7 @@
               <% end %>
             </div>
           <% else %>
-            <div class="py-1 px-3 rounded-5" style="word-wrap: break-word; background-color: #d40178; color: white; border: 1.5px solid #d40178;">
+            <div class="py-1 px-3 rounded-5 text-start" style="word-wrap: break-word; background-color: #d40178; color: white; border: 1.5px solid #d40178;">
               <%= msg.content %>
             </div>
           <% end %>
