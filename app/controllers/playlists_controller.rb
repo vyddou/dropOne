@@ -17,6 +17,7 @@ class PlaylistsController < ApplicationController
       return
     end
     @playlist_items = @playlist.playlist_items.includes(:track)
+    refresh_preview_urls(@playlist_items)
   end
 
   def new
@@ -92,17 +93,30 @@ class PlaylistsController < ApplicationController
 
   private
 
-  # Le prompt modifié pour générer un nombre de morceaux adapté à la durée demandée,
-  # ou une estimation raisonnable si aucune durée n'est précisée.
+  def refresh_preview_urls(playlist_items)
+    playlist_items.each do |item|
+      track = item.track
+      begin
+        url = URI("https://api.deezer.com/track/#{track.deezer_track_id}")
+        response = Net::HTTP.get(url)
+        data = JSON.parse(response)
+        track.preview_url = data["preview"] if data["preview"].present?
+      rescue => e
+        Rails.logger.warn "[refresh_preview_urls] Erreur API Deezer pour track #{track.deezer_track_id} : #{e.message}"
+        # On garde l'ancienne preview_url si erreur
+      end
+    end
+  end
+
+  # ... Le reste de tes méthodes privées inchangées ...
+
   def generate_curated_list_from_llm(user_prompt, excluded_tracks = [], requested_duration_min = nil)
     excluded_list_str = excluded_tracks.empty? ? "Aucune exclusion." : excluded_tracks.map { |t| "- #{t}" }.join("\n")
 
-    # Calcul approximatif : en moyenne un morceau dure 3.5 minutes,
-    # donc on demande environ nombre_morceaux = durée / 3.5
     estimated_tracks_count = if requested_duration_min && requested_duration_min > 0
                                [(requested_duration_min / 3.5).round, 5].max
                              else
-                               10 # par défaut si pas de durée demandée
+                               10
                              end
 
     prompt = <<~PROMPT
@@ -135,12 +149,9 @@ class PlaylistsController < ApplicationController
     PROMPT
 
     retries = 3
-    delay = 1 # Seconde initiale
+    delay = 1
 
     begin
-      # chat = RubyLLM.chat
-      # chat = RubyLLM.chat(model: 'google/gemini-2.0-flash-exp:free')
-      # chat = RubyLLM.chat(model: 'deepseek/deepseek-r1-0528:free')
       chat = RubyLLM.chat(model: 'meta-llama/llama-3.3-8b-instruct:free')
       response = chat.ask(prompt)
       raw = response.respond_to?(:content) ? response.content : response
@@ -157,11 +168,11 @@ class PlaylistsController < ApplicationController
         Rails.logger.warn "[LLM API] Rate limit atteint. Nouvelle tentative dans #{delay}s... (#{retries} tentatives restantes)"
         sleep delay
         retries -= 1
-        delay *= 2 # Backoff exponentiel
+        delay *= 2
         retry
       else
         Rails.logger.error "[LLM API] Erreur de rate limit après plusieurs tentatives."
-        raise e # On relance l'exception si toutes les tentatives échouent
+        raise e
       end
     rescue JSON::ParserError => e
       Rails.logger.error "[LLM PARSE ERROR] #{e.message}"
@@ -187,12 +198,9 @@ class PlaylistsController < ApplicationController
     PROMPT
 
     retries = 3
-    delay = 1 # Seconde initiale
+    delay = 1
 
     begin
-      # response = RubyLLM.chat.ask(prompt)
-      # response = RubyLLM.chat(model: 'google/gemini-2.0-flash-exp:free').ask(prompt)
-      # response = RubyLLM.chat(model: 'deepseek/deepseek-r1-0528:free').ask(prompt)
       response = RubyLLM.chat(model: 'meta-llama/llama-3.3-8b-instruct:free').ask(prompt)
       base_name = (response.respond_to?(:content) ? response.content : response).strip.gsub('"', '')
       duration_was_requested ? "#{base_name} (#{final_duration} min)" : base_name
@@ -201,11 +209,11 @@ class PlaylistsController < ApplicationController
         Rails.logger.warn "[generate_playlist_name] Rate limit atteint. Nouvelle tentative dans #{delay}s... (#{retries} tentatives restantes)"
         sleep delay
         retries -= 1
-        delay *= 2 # Backoff exponentiel
+        delay *= 2
         retry
       else
         Rails.logger.error "[generate_playlist_name] Erreur de rate limit après plusieurs tentatives."
-        raise e # On relance l'exception si toutes les tentatives échouent
+        raise e
       end
     rescue => e
       Rails.logger.error "[generate_playlist_name] Erreur LLM : #{e.class} #{e.message}"
