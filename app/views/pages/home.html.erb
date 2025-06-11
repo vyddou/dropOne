@@ -13,106 +13,85 @@
   <section class="unified-carousel-section w-100">
   <h2 class="section-title text-center mb-4">Les Sons du Moment</h2>
 
-  <% if @carousel_items.present? %>
+  <% if @todays_posts.present? %>
     <div class="main-carousel-wrapper" data-controller="audio-player">
       <div class="main-carousel"> <%# Pour Swiper.js %>
-        <% @carousel_items.each do |item| %>
-          <div class="carousel-cell" data-preview-url="<%= item.preview_url %>">
+        <% @todays_posts.each do |post| %>
+          <div class="carousel-cell" data-preview-url="<%= post.track.preview_url %>">
             <div class="album-art-card-container">
               <div class="album-art-visual-wrapper">
-                <% cover_url = item.cover_url.presence || "https://placehold.co/280x280/0A0F1E/E0E0E0?text=#{item.title&.truncate(15)}" %>
-                <%= image_tag cover_url, alt: "Pochette de #{item.title}", class: "album-cover-image" %>
+                <% cover_url = post.track.cover_url.presence || "https://placehold.co/280x280/0A0F1E/E0E0E0?text=#{post.track.title&.truncate(15)}" %>
+                <%= image_tag cover_url, alt: "Pochette de #{post.track.title}", class: "album-cover-image" %>
 
-                <% if item.preview_url.present? %>
-                  <button class="btn-play-on-cover" aria-label="Lire l'extrait"
-                    data-action="click->audio-player#togglePlay">
+                <% if post.track.preview_url.present? %>
+                  <button class="btn-play-on-cover" aria-label="Lire l'extrait" data-action="click->audio-player#togglePlay">
                     <i class="bi bi-play-fill"></i>
                   </button>
                 <% end %>
 
                 <div class="album-cover-text-overlay">
-                  <h5 class="album-title-on-cover" title="<%= item.title %>"><%= item.title %></h5>
-                  <p class="album-artist-on-cover" title="<%= item.artist %>"><%= item.artist %></p>
+                  <h5 class="album-title-on-cover" title="<%= post.track.title %>"><%= post.track.title %></h5>
+                  <p class="album-artist-on-cover" title="<%= post.track.artist_name %>"><%= post.track.artist_name %></p>
                 </div>
 
-                <% if item.origin == :app || item.origin == :deezer_post %>
-                  <div class="album-cover-score-overlay modern-score">
-                    <i class="bi bi-fire"></i>
-                    <span class="score-value"><%= item.net_votes %></span>
-                  </div>
-                <% end %>
+                <div class="album-cover-score-overlay modern-score">
+                  <i class="bi bi-fire"></i>
+                  <span class="score-value"><%= post.net_votes %></span>
+                </div>
               </div>
 
               <div class="album-details-section">
-                <% if item.genre.present? %>
-                  <p class="track-genre small mb-2"><span class="badge bg-secondary"><%= item.genre.capitalize %></span></p>
+                <% if post.track.genres.any? %>
+                  <p class="track-genre small mb-2"><span class="badge bg-secondary"><%= post.track.genres.first.name.capitalize %></span></p>
                 <% end %>
 
-                <% if item.origin == :app && item.description.present? %>
-                  <p class="card-text description-preview small mb-2"><%= truncate(item.description, length: 70) %></p>
+                <% if post.description.present? %>
+                  <p class="card-text description-preview small mb-2"><%= truncate(post.description, length: 70) %></p>
                 <% end %>
 
                 <div class="mt-auto">
-                  <% if item.user %>
-                    <p class="card-text mb-1">
-                      <small class="text-muted">
-                        <% if item.origin == :app %>
-                          Posté par <%= link_to item.user.username, user_path(item.user), class: "text-decoration-none" %>
-                        <% else %>
-                          Suggéré par <strong><%= item.user.username %></strong>
-                        <% end %>
-                      </small>
-                    </p>
-                  <% end %>
+                  <p class="card-text mb-1">
+                    <small class="text-muted">
+                      Posté par <%= link_to post.user.username, user_path(post.user), class: "text-decoration-none" %>
+                    </small>
+                  </p>
 
                   <div class="d-flex justify-content-between align-items-center mb-2 post-actions-wrapper">
                     <div class="d-flex align-items-center gap-2">
-                      <% deezer_id = (item.origin == :app || item.origin == :deezer_post) ? item.db_post_object.track.deezer_track_id : item.id_for_links %>
-                      <% post_to_check = item.db_post_object %>
-                      <% current_user_vote = (user_signed_in? && post_to_check) ? current_user.vote_for(post_to_check) : nil %>
+                      <% current_user_vote = user_signed_in? ? current_user.vote_for(post) : nil %>
 
-                      <%= button_to vote_on_track_path(deezer_id, vote_type: 'hot'), method: :post, class: "btn-icon", title: "J'aime" do %>
+                      <%= button_to vote_on_track_path(post.track.deezer_track_id, vote_type: 'hot'), method: :post, class: "btn-icon", title: "J'aime" do %>
                         <i class="bi <%= current_user_vote&.vote_type == true ? 'bi-hand-thumbs-up-fill liked' : 'bi-hand-thumbs-up' %>"></i>
                       <% end %>
-                      <%= button_to vote_on_track_path(deezer_id, vote_type: 'cold'), method: :post, class: "btn-icon", title: "Je n'aime pas" do %>
+                      <%= button_to vote_on_track_path(post.track.deezer_track_id, vote_type: 'cold'), method: :post, class: "btn-icon", title: "Je n'aime pas" do %>
                         <i class="bi <%= current_user_vote&.vote_type == false ? 'bi-hand-thumbs-down-fill disliked' : 'bi-hand-thumbs-down' %>"></i>
                       <% end %>
                     </div>
 
-                    <% if item.db_post_object %>
-                      <%= link_to post_path(item.db_post_object, anchor: 'comments-section'), class: "btn-vote-comment", title: "#{item.db_post_object.comments.count} commentaires" do %>
-                        <i class="bi bi-chat-dots-fill"></i>
-                        <span><%= item.db_post_object.comments.count %></span>
-                      <% end %>
+                    <%= link_to post_path(post, anchor: 'comments-section'), class: "btn-vote-comment", title: "#{post.comments.count} commentaires" do %>
+                      <i class="bi bi-chat-dots-fill"></i>
+                      <span><%= post.comments.count %></span>
                     <% end %>
                   </div>
 
-                  <%# --- MODIFICATION ICI : LE HTML DE LA MODALE A ÉTÉ RETIRÉ --- %>
-                  <% if item.origin == :app && user_signed_in? && item.user == current_user %>
+                  <% if user_signed_in? && post.user == current_user %>
                     <button class="btn btn-sm btn-custom-delete w-100"
                             data-bs-toggle="modal"
-                            data-bs-target="#deletePostModal-<%= item.db_post_object.id %>">
+                            data-bs-target="#deletePostModal-<%= post.id %>">
                       Supprimer
                     </button>
-                    <%# Le code de la modale n'est plus ici %>
                   <% end %>
                 </div>
 
                 <div class="streaming-links-container mt-auto pt-3">
                   <div class="streaming-logos-wrapper">
-                    <% if item.deezer_link.present? %>
-                      <a href="<%= item.deezer_link %>" target="_blank" rel="noopener noreferrer" class="streaming-logo deezer" title="Écouter sur Deezer">
-                        <i class="bi bi-play-circle-fill"></i>
-                      </a>
+                    <% if post.track.link_deezer.present? %>
+                      <a href="<%= post.track.link_deezer %>" target="_blank" rel="noopener noreferrer" class="streaming-logo deezer" title="Écouter sur Deezer"><i class="bi bi-play-circle-fill"></i></a>
                     <% end %>
-                    <% spotify_search_url = "https://open.spotify.com/search/#{URI.encode_www_form_component(item.title + ' ' + item.artist)}" %>
-                    <a href="<%= spotify_search_url %>" target="_blank" rel="noopener noreferrer" class="streaming-logo spotify" title="Écouter sur Spotify">
-                      <i class="bi bi-spotify"></i>
-                    </a>
-                    <% apple_music_search_url = "https://music.apple.com/us/search?term=#{URI.encode_www_form_component(item.title + ' ' + item.artist)}" %>
-                    <a href="<%= apple_music_search_url %>" target="_blank" rel="noopener noreferrer" class="streaming-logo apple" title="Écouter sur Apple Music">
-                      <i class="bi bi-apple"></i>
-                    </a>
+                    <% spotify_search_url = "https://open.spotify.com/search/#{URI.encode_www_form_component(post.track.title + ' ' + post.track.artist_name)}" %>
+                    <a href="<%= spotify_search_url %>" target="_blank" rel="noopener noreferrer" class="streaming-logo spotify" title="Écouter sur Spotify"><i class="bi bi-spotify"></i></a>
+                    <% apple_music_search_url = "https://music.apple.com/us/search?term=#{URI.encode_www_form_component(post.track.title + ' ' + post.track.artist_name)}" %>
+                    <a href="<%= apple_music_search_url %>" target="_blank" rel="noopener noreferrer" class="streaming-logo apple" title="Écouter sur Apple Music"><i class="bi bi-apple"></i></a>
                   </div>
                 </div>
               </div>
@@ -122,29 +101,26 @@
       </div>
     </div>
   <% else %>
-    <p class="text-center text-muted mt-4">Aucun son à découvrir pour le moment. Revenez plus tard ou soyez le premier à partager !</p>
+    <p class="text-center text-muted mt-4">Aucun son à découvrir pour le moment. Soyez le premier à partager !</p>
   <% end %>
 </section>
 
-</div> <%# Fermeture de .container-fluid %>
+</div>
 
-<%# --- MODIFICATION : DÉFINITION DE TOUTES LES MODALES ICI, À LA FIN DU FICHIER --- %>
-<%# On boucle à nouveau sur les items pour générer les modales en dehors du carrousel %>
-<% @carousel_items.each do |item| %>
-  <% if item.origin == :app && user_signed_in? && item.user == current_user %>
-    <div class="modal fade" id="deletePostModal-<%= item.db_post_object.id %>" tabindex="-1" aria-hidden="true">
+<%# On génère les modales de suppression à la fin %>
+<% @todays_posts.each do |post| %>
+  <% if user_signed_in? && post.user == current_user %>
+    <div class="modal fade" id="deletePostModal-<%= post.id %>" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content bg-dark text-white">
           <div class="modal-header"><h5 class="modal-title">Supprimer ce post</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button></div>
-          <div class="modal-body"><p>Supprimer "<strong><%= item.title %></strong>" ? Cette action est irréversible.</p></div>
-          <div class="modal-footer border-0"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button><%= button_to "Supprimer", post_path(item.db_post_object), method: :delete, class: "btn btn-danger" %></div>
+          <div class="modal-body"><p>Supprimer "<strong><%= post.track.title %></strong>" ? Cette action est irréversible.</p></div>
+          <div class="modal-footer border-0"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button><%= button_to "Supprimer", post_path(post), method: :delete, class: "btn btn-danger" %></div>
         </div>
       </div>
     </div>
   <% end %>
 <% end %>
-<%# --- FIN DE LA SECTION DES MODALES --- %>
-
 
 <audio id="global-audio-player" style="display: none;"></audio>
 <%= render "shared/bottom_navbar" %>
