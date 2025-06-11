@@ -59,4 +59,7 @@ Rails.application.routes.draw do
   get 'search_suggestions', to: 'search#suggestions'
 
   get "up" => "rails/health#show", as: :rails_health_check
+
+  get "webmanifest"    => "pwa#manifest"
+  get "service-worker" => "pwa#service_worker"
 end
