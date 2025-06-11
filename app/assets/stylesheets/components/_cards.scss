@@ -17,6 +17,8 @@
   transition: transform 0.2s ease-in-out;
   width: 100%;
   max-width: 280px;
+  margin-left: auto;
+  margin-right: auto;
 
   &:hover {
     transform: translateY(-5px);

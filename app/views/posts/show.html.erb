@@ -7,66 +7,15 @@
       </div>
 
       <!-- Section des commentaires -->
-      <div id="comments-section" class="comments-section">
-        <h4 class="mb-3">
-          <i class="bi bi-chat-dots-fill me-2"></i>
-          Commentaires (<%= @post.comments.count %>)
-        </h4>
-
-        <!-- Formulaire d'ajout de commentaire -->
-        <div class="comment-form-container mb-4">
-          <%= form_with model: [@post, Comment.new], local: true, class: "comment-form" do |form| %>
-            <div class="mb-3">
-              <%= form.text_area :content, 
-                  placeholder: "Écrivez votre commentaire...", 
-                  rows: 3, 
-                  class: "form-control bg-dark text-white border-secondary",
-                  required: true,
-                  maxlength: 500 %>
-              <div class="form-text text-muted small">Maximum 500 caractères</div>
-            </div>
-            <div class="d-flex justify-content-end">
-              <%= form.submit "Publier le commentaire", class: "btn btn-primary" %>
-            </div>
-          <% end %>
-        </div>
-
-        <!-- Liste des commentaires -->
-        <div class="comments-list">
-          <% if @post.comments.any? %>
-            <% @post.comments.order(created_at: :desc).each do |comment| %>
-              <div class="comment-item mb-3 p-3 bg-dark rounded border border-secondary">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                  <div class="comment-author">
-                    <strong class="text-primary">@<%= comment.user.username || comment.user.email.split('@').first %></strong>
-                    <small class="text-muted ms-2">
-                      <%= comment.created_at.strftime("%d/%m/%Y à %H:%M") %>
-                    </small>
-                  </div>
-                  <% if current_user == comment.user %>
-                    <%= button_to post_comment_path(@post, comment), 
-                        method: :delete, 
-                        class: "btn btn-sm btn-outline-danger",
-                        title: "Supprimer ce commentaire",
-                        confirm: "Êtes-vous sûr de vouloir supprimer ce commentaire ?" do %>
-                      <i class="bi bi-trash"></i>
-                    <% end %>
-                  <% end %>
-                </div>
-                <div class="comment-content">
-                  <p class="mb-0 text-white"><%= simple_format(comment.content) %></p>
-                </div>
-              </div>
-            <% end %>
-          <% else %>
-            <div class="text-center text-muted py-4">
-              <i class="bi bi-chat-dots display-4 mb-3"></i>
-              <p>Aucun commentaire pour le moment.</p>
-              <p class="small">Soyez le premier à commenter ce post !</p>
-            </div>
-          <% end %>
-        </div>
-      </div>
+             <div id="comments-section" class="comments-section">
+               <h4 class="mb-3">
+                          <i class="bi bi-chat-dots-fill me-2"></i>
+                          Commentaires
+                        </h4>
+      
+               <!-- Utilisation du partial de conversation pour les commentaires -->
+               <%= render 'conversations/messages', messages: @post.comments, conversation: @post %>
+             </div>
 
       <!-- Bouton retour -->
      <%= render "shared/bottom_navbar" %>
