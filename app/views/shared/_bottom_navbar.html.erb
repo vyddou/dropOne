@@ -1,7 +1,7 @@
 <%# app/views/shared/_bottom_navbar.html.erb %>
 
 <nav class="navbar navbar-dark bg-dark fixed-bottom bottom-navbar" id="bottom-navbar">
-  <div class="container d-flex justify-content-around align-items-center">
+  <div class="container d-flex justify-content-around align-items-flex-end">
     <% if user_signed_in? %>
       <%# Lien Messages %>
       <%= link_to conversations_path, class: "nav-link text-white #{'active' if current_page?(conversations_path)}" do %>
@@ -28,15 +28,12 @@
         <span>IA</span>
       <% end %>
 
-      <%# --- CORRECTION ICI --- %>
-      <%# Lien Recherche avec la condition 'active' %>
       <%= link_to search_path, class: "nav-link text-white d-flex flex-column align-items-center #{'active' if current_page?(search_path)}" do %>
         <i class="bi bi-search fs-4"></i>
         <span>Recherche</span>
       <% end %>
       <%# --- FIN DE LA CORRECTION --- %>
 
-      <%# Lien Profil %>
       <%= link_to user_path(current_user), class: "nav-link text-white d-flex flex-column align-items-center #{'active' if current_page?(user_path(current_user))}" do %>
         <% avatar_display_url = current_user.avatar_url.presence || "https://placehold.co/40x40/E0E0E0/000000?text=User" %>
         <%= image_tag avatar_display_url, alt: "User Avatar", class: "rounded-circle mb-1", style: "width: 40px; height: 40px; object-fit: cover;" %>
