@@ -17,8 +17,8 @@
     padding-right: 0;
     display: flex;
     justify-content: space-around;
-    align-items: center;
-    height: 60px; // ajuste la hauteur ici si besoin
+    align-items: flex-end; /* Align items to the bottom */
+    height: 60px; /* Maintain the height */
   }
 
   .nav-link {
@@ -30,21 +30,36 @@
     font-size: 0.75rem;
     transition: color 0.3s ease;
     text-align: center;
+    justify-content: flex-end; /* Align text to the bottom */
+    height: 100%; /* Ensure it takes full height of container */
+    flex: 1; /* Allow item to grow and shrink */
+    display: flex; /* Ensure flexbox behavior */
+    margin: 0 5px; /* Add some horizontal spacing between items */
+
+    i, img, span {
+      margin-top: auto; /* Push all elements to the bottom */
+    }
+
+    span {
+      margin-top: 3px; /* Add a small margin to separate text from icons/avatars */
+    }
 
     i {
       font-size: 1.5rem;
       margin-bottom: 3px;
       line-height: 1;
+      margin-top: auto; /* Push the icon to the top of the flex container */
     }
 
     img {
       width: 40px !important;
       height: 40px !important;
       object-fit: cover;
-      border-radius: 50%;
+      border-radius: 30%;
       margin-bottom: 3px;
       border: 1.5px solid transparent;
       transition: border-color 0.3s ease;
+      margin-top: auto; /* Push the image to the top of the flex container */
     }
     .bottom-navbar .nav-link i.bi-plus-circle {
     font-size: 1.6rem;  // un peu plus grand que les autres icônes
@@ -61,6 +76,20 @@
 
       i {
         color: #0d6efd;
+      }
+
+      /* Ensure all child elements inherit the active state */
+      * {
+        color: #0d6efd !important;
+      }
+
+      /* Specific styles for profile link */
+      .nav-link[href^="/users/"] {
+        color: #0d6efd !important;
+
+        img {
+          border-color: #0d6efd !important;
+        }
       }
     }
   }
