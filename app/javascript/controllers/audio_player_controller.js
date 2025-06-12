@@ -1,32 +1,36 @@
+// app/javascript/controllers/audio_player_controller.js
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = [ "playButtonIcon", "visualWrapper" ]
-
   connect() {
-    console.log("Audio Player Controller connecté!", this.element)
     this.globalAudioPlayer = document.getElementById("global-audio-player");
     this.currentlyPlayingButton = null;
     this.currentVisualWrapper = null;
 
     if (this.globalAudioPlayer) {
-      this._setupGlobalPlayerListeners();
+      // Lier le 'this' pour que les gestionnaires d'événements fonctionnent correctement
+      this.handleAudioEnd = this.handleAudioEnd.bind(this);
+      this.globalAudioPlayer.addEventListener("ended", this.handleAudioEnd);
+    } else {
+      console.error("Le lecteur audio global (#global-audio-player) est introuvable.");
     }
   }
 
-  _setupGlobalPlayerListeners() {
-    this.handleAudioEnd = this.handleAudioEnd.bind(this);
-    this.handleAudioError = this.handleAudioError.bind(this);
-
-    this.globalAudioPlayer.addEventListener("ended", this.handleAudioEnd);
-    this.globalAudioPlayer.addEventListener("error", this.handleAudioError);
+  disconnect() {
+    // Nettoie l'écouteur d'événement quand le contrôleur est retiré de la page
+    if (this.globalAudioPlayer) {
+      this.globalAudioPlayer.removeEventListener("ended", this.handleAudioEnd);
+    }
   }
 
+  // Méthode pour réinitialiser l'état du bouton de lecture
   handleAudioEnd() {
     if (this.currentlyPlayingButton) {
       const icon = this.currentlyPlayingButton.querySelector("i");
-      icon.classList.remove("bi-pause-fill");
-      icon.classList.add("bi-play-fill");
+      if (icon) {
+        icon.classList.remove("bi-pause-fill", "bi-hourglass-split");
+        icon.classList.add("bi-play-fill");
+      }
     }
     if (this.currentVisualWrapper) {
       this.currentVisualWrapper.classList.remove("is-playing");
@@ -35,101 +39,65 @@ export default class extends Controller {
     this.currentVisualWrapper = null;
   }
 
-  handleAudioError(e) {
-    console.error("Erreur de lecture audio:", e);
-    this.handleAudioEnd();
-  }
-
+  // Méthode principale appelée lors du clic
   async togglePlay(event) {
+    event.preventDefault();
     const clickedButton = event.currentTarget;
+    const cell = clickedButton.closest(".carousel-cell");
+    const trackId = cell.dataset.trackId;
+    const visualWrapper = clickedButton.closest(".album-art-visual-wrapper");
     const icon = clickedButton.querySelector("i");
 
-    // On cherche le conteneur qui a les données. Peut être .carousel-cell ou .album-art-visual-wrapper
-    const dataWrapper = clickedButton.closest("[data-track-id], [data-preview-url]");
-
-    if (!dataWrapper) {
-      console.warn("Aucun conteneur de données trouvé pour le lecteur audio.");
+    if (!trackId) {
+      console.warn("Attribut 'data-track-id' manquant sur l'élément .carousel-cell");
       return;
     }
 
-    const trackId = dataWrapper.dataset.trackId;
-    const previewUrl = dataWrapper.dataset.previewUrl;
+    const isPlayingThisTrack = this.currentlyPlayingButton === clickedButton && !this.globalAudioPlayer.paused;
 
-    // Si on clique sur le bouton qui est déjà en lecture, on met en pause.
-    if (this.currentlyPlayingButton === clickedButton && !this.globalAudioPlayer.paused) {
+    // Si on clique sur le bouton du morceau en cours de lecture -> on met en pause
+    if (isPlayingThisTrack) {
       this.globalAudioPlayer.pause();
+      icon.classList.remove("bi-pause-fill");
+      icon.classList.add("bi-play-fill");
+      visualWrapper.classList.remove("is-playing");
       return;
     }
 
-    // Si un autre bouton est cliqué, on réinitialise l'ancien.
-    if (this.currentlyPlayingButton && this.currentlyPlayingButton !== clickedButton) {
+    // Si un autre morceau jouait, on le stoppe et on réinitialise son bouton
+    if (this.currentlyPlayingButton) {
       this.handleAudioEnd();
     }
 
-    if (trackId) {
-      // --- NOUVELLE LOGIQUE API ---
-      await this.playViaApi(trackId, clickedButton, icon, dataWrapper);
-    } else if (previewUrl) {
-      // --- ANCIENNE LOGIQUE (FALLBACK) ---
-      this.playDirectUrl(previewUrl, clickedButton, icon, dataWrapper);
-    } else {
-      console.warn("Aucune source audio (trackId ou previewUrl) disponible.");
-    }
-  }
+    // Met à jour les références actuelles
+    this.currentlyPlayingButton = clickedButton;
+    this.currentVisualWrapper = visualWrapper;
 
-  async playViaApi(trackId, button, icon, wrapper) {
+    // Affiche un indicateur de chargement
     icon.classList.remove("bi-play-fill", "bi-pause-fill");
     icon.classList.add("bi-hourglass-split");
+    visualWrapper.classList.add("is-playing"); // Rend le bouton visible pendant le chargement
 
+    // Fait l'appel à notre propre API pour obtenir une URL fraîche
     try {
       const response = await fetch(`/tracks/${trackId}/preview`);
-      if (!response.ok) throw new Error(`Erreur serveur: ${response.statusText}`);
-
-      const data = await response.json();
-      const freshUrl = data.preview_url;
-
-      if (!freshUrl) {
-        console.warn("Aucune URL d'extrait disponible pour ce morceau depuis Deezer.");
-        this.handleAudioEnd();
-        icon.classList.add("bi-play-fill");
-        icon.classList.remove("bi-hourglass-split");
-        return;
+      if (!response.ok) {
+        throw new Error(`Erreur serveur : ${response.statusText}`);
       }
+      const data = await response.json();
 
-      this.globalAudioPlayer.src = freshUrl;
-      await this.globalAudioPlayer.play();
-
-      icon.classList.remove("bi-hourglass-split", "bi-play-fill");
-      icon.classList.add("bi-pause-fill");
-      wrapper.classList.add("is-playing");
-
-      this.currentlyPlayingButton = button;
-      this.currentVisualWrapper = wrapper;
-
+      if (data.preview_url) {
+        this.globalAudioPlayer.src = data.preview_url;
+        await this.globalAudioPlayer.play();
+        // Le morceau joue, on met l'icône "pause"
+        icon.classList.remove("bi-hourglass-split", "bi-play-fill");
+        icon.classList.add("bi-pause-fill");
+      } else {
+        throw new Error("URL de prévisualisation non disponible.");
+      }
     } catch (error) {
-      console.error("Impossible de récupérer ou de jouer l'extrait via API :", error);
-      this.handleAudioEnd();
-      icon.classList.add("bi-play-fill");
-      icon.classList.remove("bi-hourglass-split");
+      console.error("Impossible de récupérer ou de jouer l'extrait :", error);
+      this.handleAudioEnd(); // Réinitialise l'état en cas d'erreur
     }
-  }
-
-  playDirectUrl(url, button, icon, wrapper) {
-      console.log("Lecture URL directe:", url);
-    if (this.globalAudioPlayer.src !== url) {
-      this.globalAudioPlayer.src = url;
-    }
-
-    this.globalAudioPlayer.play().then(() => {
-          console.log("Lecture démarrée !");
-      icon.classList.remove("bi-play-fill");
-      icon.classList.add("bi-pause-fill");
-      wrapper.classList.add("is-playing");
-      this.currentlyPlayingButton = button;
-      this.currentVisualWrapper = wrapper;
-    }).catch(error => {
-      console.error("Erreur lors de la tentative de lecture directe :", error);
-      this.handleAudioEnd();
-    });
   }
 }

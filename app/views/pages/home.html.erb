@@ -17,7 +17,8 @@
     <div class="main-carousel-wrapper" data-controller="audio-player">
       <div class="main-carousel"> <%# Pour Swiper.js %>
         <% @todays_posts.each do |post| %>
-          <div class="carousel-cell" data-preview-url="<%= post.track.preview_url %>">
+          <%# --- CORRECTION ICI : On utilise post.track.id --- %>
+          <div class="carousel-cell" data-track-id="<%= post.track.id %>">
             <div class="album-art-card-container">
               <div class="album-art-visual-wrapper">
                 <% cover_url = post.track.cover_url.presence || "https://placehold.co/280x280/0A0F1E/E0E0E0?text=#{post.track.title&.truncate(15)}" %>
@@ -108,17 +109,19 @@
 </div>
 
 <%# On génère les modales de suppression à la fin %>
-<% @todays_posts.each do |post| %>
-  <% if user_signed_in? && post.user == current_user %>
-    <div class="modal fade" id="deletePostModal-<%= post.id %>" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-dark text-white">
-          <div class="modal-header"><h5 class="modal-title">Supprimer ce post</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button></div>
-          <div class="modal-body"><p>Supprimer "<strong><%= post.track.title %></strong>" ? Cette action est irréversible.</p></div>
-          <div class="modal-footer border-0"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button><%= button_to "Supprimer", post_path(post), method: :delete, class: "btn btn-danger" %></div>
+<% if @todays_posts.present? %>
+  <% @todays_posts.each do |post| %>
+    <% if user_signed_in? && post.user == current_user %>
+      <div class="modal fade" id="deletePostModal-<%= post.id %>" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content bg-dark text-white">
+            <div class="modal-header"><h5 class="modal-title">Supprimer ce post</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button></div>
+            <div class="modal-body"><p>Supprimer "<strong><%= post.track.title %></strong>" ? Cette action est irréversible.</p></div>
+            <div class="modal-footer border-0"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button><%= button_to "Supprimer", post_path(post), method: :delete, class: "btn btn-danger" %></div>
+          </div>
         </div>
       </div>
-    </div>
+    <% end %>
   <% end %>
 <% end %>
 
