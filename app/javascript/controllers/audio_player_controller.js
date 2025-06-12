@@ -43,7 +43,7 @@ export default class extends Controller {
   async togglePlay(event) {
     const clickedButton = event.currentTarget;
     const icon = clickedButton.querySelector("i");
-    
+
     // On cherche le conteneur qui a les données. Peut être .carousel-cell ou .album-art-visual-wrapper
     const dataWrapper = clickedButton.closest("[data-track-id], [data-preview-url]");
 
@@ -84,7 +84,7 @@ export default class extends Controller {
     try {
       const response = await fetch(`/tracks/${trackId}/preview`);
       if (!response.ok) throw new Error(`Erreur serveur: ${response.statusText}`);
-      
+
       const data = await response.json();
       const freshUrl = data.preview_url;
 
@@ -115,11 +115,13 @@ export default class extends Controller {
   }
 
   playDirectUrl(url, button, icon, wrapper) {
+      console.log("Lecture URL directe:", url);
     if (this.globalAudioPlayer.src !== url) {
       this.globalAudioPlayer.src = url;
     }
-    
+
     this.globalAudioPlayer.play().then(() => {
+          console.log("Lecture démarrée !");
       icon.classList.remove("bi-play-fill");
       icon.classList.add("bi-pause-fill");
       wrapper.classList.add("is-playing");
