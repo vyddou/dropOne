@@ -3,23 +3,33 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   connect() {
+    // On s'assure qu'il n'y a qu'un seul lecteur global
+    if (!document.getElementById("global-audio-player")) {
+      const audio = document.createElement("audio");
+      audio.id = "global-audio-player";
+      document.body.appendChild(audio);
+    }
     this.globalAudioPlayer = document.getElementById("global-audio-player");
+
     this.currentlyPlayingButton = null;
     this.currentVisualWrapper = null;
 
-    if (this.globalAudioPlayer) {
-      this.handleAudioEnd = this.handleAudioEnd.bind(this);
-      this.globalAudioPlayer.addEventListener("ended", this.handleAudioEnd);
-    }
+    // Lier le 'this' pour que les gestionnaires d'événements fonctionnent
+    this.handleAudioEnd = this.handleAudioEnd.bind(this);
+    this.handleAudioPause = this.handleAudioPause.bind(this);
+    this.globalAudioPlayer.addEventListener("ended", this.handleAudioEnd);
+    this.globalAudioPlayer.addEventListener("pause", this.handleAudioPause);
   }
 
   disconnect() {
     if (this.globalAudioPlayer) {
       this.globalAudioPlayer.removeEventListener("ended", this.handleAudioEnd);
+      this.globalAudioPlayer.removeEventListener("pause", this.handleAudioPause);
     }
   }
 
-  handleAudioEnd() {
+  // Gère la fin de la lecture ET la pause manuelle
+  handleAudioStateChange() {
     if (this.currentlyPlayingButton) {
       const icon = this.currentlyPlayingButton.querySelector("i");
       if (icon) {
@@ -34,60 +44,83 @@ export default class extends Controller {
     this.currentVisualWrapper = null;
   }
 
+  handleAudioEnd() {
+    this.handleAudioStateChange();
+  }
+
+  handleAudioPause() {
+    // Évite de réinitialiser si la pause est gérée par notre propre code
+    if (this.globalAudioPlayer.paused) {
+      this.handleAudioStateChange();
+    }
+  }
+
   async togglePlay(event) {
     event.preventDefault();
     const clickedButton = event.currentTarget;
-    // --- MODIFICATION ICI : On cherche le conteneur qui a le data-track-id ---
-    const cardContainer = clickedButton.closest("[data-track-id]");
-    const trackId = cardContainer ? cardContainer.dataset.trackId : null;
-
+    const dataContainer = clickedButton.closest("[data-track-id], [data-preview-url]");
     const visualWrapper = clickedButton.closest(".album-art-visual-wrapper");
     const icon = clickedButton.querySelector("i");
 
-    if (!trackId) {
-      console.warn("Attribut 'data-track-id' manquant sur un élément parent.");
-      return;
-    }
+    if (!dataContainer) return;
 
-    const isPlayingThisTrack = this.currentlyPlayingButton === clickedButton && !this.globalAudioPlayer.paused;
+    const trackId = dataContainer.dataset.trackId;
+    const previewUrl = dataContainer.dataset.previewUrl;
+
+    // Détermine si on clique sur le bouton du morceau en cours de lecture
+    // On compare soit la source actuelle, soit le bouton lui-même.
+    const isPlayingThisTrack = (this.globalAudioPlayer.currentSrc === previewUrl || this.currentlyPlayingButton === clickedButton) && !this.globalAudioPlayer.paused;
 
     if (isPlayingThisTrack) {
       this.globalAudioPlayer.pause();
-      icon.classList.remove("bi-pause-fill");
-      icon.classList.add("bi-play-fill");
-      visualWrapper.classList.remove("is-playing");
       return;
     }
 
+    // Arrête tout autre morceau qui jouait
     if (this.currentlyPlayingButton) {
-      this.handleAudioEnd();
+      this.handleAudioStateChange();
     }
 
     this.currentlyPlayingButton = clickedButton;
     this.currentVisualWrapper = visualWrapper;
 
-    icon.classList.remove("bi-play-fill", "bi-pause-fill");
+    icon.classList.remove("bi-play-fill");
     icon.classList.add("bi-hourglass-split");
     visualWrapper.classList.add("is-playing");
 
-    try {
-      const response = await fetch(`/tracks/${trackId}/preview`);
-      if (!response.ok) {
-        throw new Error(`Erreur serveur : ${response.statusText}`);
-      }
-      const data = await response.json();
+    let urlToPlay;
 
-      if (data.preview_url) {
-        this.globalAudioPlayer.src = data.preview_url;
-        await this.globalAudioPlayer.play();
-        icon.classList.remove("bi-hourglass-split", "bi-play-fill");
-        icon.classList.add("bi-pause-fill");
-      } else {
-        throw new Error("URL de prévisualisation non disponible.");
+    // Logique pour obtenir l'URL à jouer
+    if (trackId) { // Cas #1 : On a un ID de notre base de données
+      try {
+        const response = await fetch(`/tracks/${trackId}/preview`);
+        if (!response.ok) throw new Error("Preview non trouvée sur le serveur");
+        const data = await response.json();
+        urlToPlay = data.preview_url;
+      } catch (error) {
+        console.error("Impossible de récupérer l'extrait via API:", error);
+        this.handleAudioStateChange();
+        return;
       }
-    } catch (error) {
-      console.error("Impossible de récupérer ou de jouer l'extrait :", error);
-      this.handleAudioEnd();
+    } else if (previewUrl) { // Cas #2 : On a une URL directe (page de recherche)
+      urlToPlay = previewUrl;
+    }
+
+    // Joue le morceau si on a une URL
+    if (urlToPlay) {
+      this.globalAudioPlayer.src = urlToPlay;
+      this.globalAudioPlayer.play()
+        .then(() => {
+          icon.classList.remove("bi-hourglass-split", "bi-play-fill");
+          icon.classList.add("bi-pause-fill");
+        })
+        .catch(error => {
+          console.error("Erreur de lecture audio:", error);
+          this.handleAudioStateChange();
+        });
+    } else {
+      console.warn("Aucune source audio trouvée.");
+      this.handleAudioStateChange();
     }
   }
 }
