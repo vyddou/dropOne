@@ -1,55 +1,63 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>DropOne</title>
-        <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-
-    <%= favicon_link_tag "favicon.ico" %>
-
+    <%# --- Titre et Méta-données de base --- %>
+    <title><%= meta_title %></title>
+    <meta name="description" content="<%= meta_description %>"> <%# <-- Balise de description ajoutée %>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no">
-    <meta name="mobile-web-app-capable" content="yes">
-    <%= tag.link rel: "manifest", href: webmanifest_path(format: :json) %>
-    <%= tag.link rel: "icon", href: image_url("app-icon-512.png"), type: "image/png" %>
-    <%= tag.link rel: "apple-touch-icon", href: image_url("app-icon-512.png") %>
-
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <%# --- Open Graph Meta Tags (pour le partage social) --- %>
+    <meta property="og:title" content="<%= meta_title %>" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="<%= request.original_url %>" />
+    <meta property="og:image" content="<%= meta_image %>" />
+    <meta property="og:description" content="<%= meta_description %>" />
+    <meta property="og:site_name" content="DropOne" />
+    <%# --- Fin des Open Graph Meta Tags --- %>
 
-    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
-    <%= javascript_importmap_tags %>
-    <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
+    <%# --- Favicons et Icônes PWA --- %>
+    <%= favicon_link_tag 'favicon.ico' %>
+    <%= tag.link rel: "apple-touch-icon", href: image_url("apple-touch-icon.png") %>
 
-    <link rel="manifest" href="<%= asset_path 'manifest.json' %>">
+    <%# --- Manifeste PWA --- %>
+    <%= tag.link rel: "manifest", href: webmanifest_path(format: :json) %>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <%= render 'shared/ios_pwa_links' %>
+
+    <%# --- Stylesheets --- %>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+
+    <%# --- JavaScript --- %>
+    <%= javascript_importmap_tags %>
   </head>
 
   <body>
     <%= render "shared/navbar" %>
 
-    <!-- ✅ Zone d'affichage des alertes -->
+    <%# --- Zone d'affichage des alertes --- %>
     <div id="flash-container" class="px-3 flash-container" style="position: fixed; bottom: 1.5rem; left: 0; right: 0; z-index: 1080;">
       <%= render 'shared/flashes' %>
     </div>
 
-    <!-- ✅ Contenu principal -->
-    <div class="container d-flex justify-content-center" style="padding-bottom: 100px;">
-      <div class="text-center w-100">
-        <%= yield %>
-      </div>
-    </div>
+    <%# --- Contenu principal --- %>
+    <%= yield %>
 
-    <!-- ✅ Script pour auto-dismiss + placement dynamique -->
+    <%# --- Script pour auto-dismiss + placement dynamique des flashes --- %>
     <script>
-      document.addEventListener("DOMContentLoaded", () => {
+      document.addEventListener("turbo:load", () => {
         // Auto-dismiss après 10 secondes
         document.querySelectorAll('.flash-message[data-auto-dismiss="true"]').forEach((el) => {
           setTimeout(() => {
-            const bsAlert = bootstrap.Alert.getOrCreateInstance(el);
-            bsAlert.close();
+            try {
+              const bsAlert = bootstrap.Alert.getOrCreateInstance(el);
+              bsAlert.close();
+            } catch (e) {
+              // L'alerte n'existe plus, pas de problème
+            }
           }, 10000);
         });
 
