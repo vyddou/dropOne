@@ -18,6 +18,14 @@ class PlaylistsController < ApplicationController
     end
     @playlist_items = @playlist.playlist_items.includes(:track)
     refresh_preview_urls(@playlist_items)
+
+    # Load like/dislike playlists for current user
+    @like_playlist = current_user.playlists.find_by(name: Playlist::LIKE_PLAYLIST_NAME)
+    @dislike_playlist = current_user.playlists.find_by(name: Playlist::DISLIKE_PLAYLIST_NAME)
+
+    # Load like/dislike playlists for current user
+    @like_playlist = current_user.playlists.find_by(name: Playlist::LIKE_PLAYLIST_NAME)
+    @dislike_playlist = current_user.playlists.find_by(name: Playlist::DISLIKE_PLAYLIST_NAME)
   end
 
   def new

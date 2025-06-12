@@ -10,7 +10,10 @@ class PlaylistItemsController < ApplicationController
     liked_playlist = current_user.playlists.find_or_create_by(name: LIKE_PLAYLIST_NAME)
 
     result = handle_playlist_item_action(playlist_item, liked_playlist, "likée", "dislikée")
-    redirect_to playlist_item.playlist, result
+    flash.now[:notice] = result[:notice] if result[:notice]
+    respond_to do |format|
+      format.html { redirect_to playlist_item.playlist, notice: result[:notice] }
+    end
   end
 
   def dislike
@@ -18,7 +21,10 @@ class PlaylistItemsController < ApplicationController
     disliked_playlist = current_user.playlists.find_or_create_by(name: DISLIKE_PLAYLIST_NAME)
 
     result = handle_playlist_item_action(playlist_item, disliked_playlist, "dislikée", "likée")
-    redirect_to playlist_item.playlist, result
+    flash.now[:notice] = result[:notice] if result[:notice]
+    respond_to do |format|
+      format.html { redirect_to playlist_item.playlist, notice: result[:notice] }
+    end
   end
 
   def remove_from_likes
