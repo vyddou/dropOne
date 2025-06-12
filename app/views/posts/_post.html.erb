@@ -1,9 +1,9 @@
 <%# app/views/posts/_post.html.erb %>
 <%# Ce partial reçoit une variable locale 'post' %>
 
-<div class="album-art-card-container d-flex justify-content-center">
-
-  <div class="album-art-visual-wrapper" data-preview-url="<%= post.track.preview_url if post.track.preview_url.present? %>">
+<%# On ajoute data-track-id ici pour que le JS le trouve facilement %>
+<div class="album-art-card-container" data-track-id="<%= post.track.id %>">
+  <div class="album-art-visual-wrapper">
     <% cover_url = post.track.cover_url.presence || "https://placehold.co/280x280/0A0F1E/E0E0E0?text=#{post.track.title&.truncate(15)}" %>
     <%= image_tag cover_url, alt: "Pochette de #{post.track.title}", class: "album-cover-image" %>
 
@@ -20,16 +20,13 @@
       <p class="album-artist-on-cover" title="<%= post.track.artist_name %>"><%= post.track.artist_name %></p>
     </div>
 
-
-    <%# --- NOUVEL AFFICHAGE DU SCORE ÉPURÉ --- %>
+    <%# Affichage du score dans un cœur (uniquement si le post est persisté) %>
     <% if post.persisted? %>
       <div class="album-cover-score-overlay modern-score">
-        <i class="bi bi-fire"></i> <%# Nouvelle icône de flamme %>
+        <i class="bi bi-fire"></i>
         <span class="score-value"><%= post.try(:net_votes) || 0 %></span>
       </div>
     <% end %>
-    <%# --- FIN DE L'AFFICHAGE DU SCORE --- %>
-
   </div>
 
   <div class="album-details-section">
@@ -50,21 +47,16 @@
           <% end %>
         </div>
 
-
-        <%# Lien vers les commentaires %>
-
+        <%# Lien vers les commentaires (uniquement si le post est persisté) %>
         <% if post.persisted? %>
           <%= link_to post_path(post, anchor: 'comments-section'), class: "btn-vote-comment", title: "#{post.comments.count} commentaires" do %>
             <i class="bi bi-chat-dots-fill"></i>
             <span><%= post.comments.count %></span>
           <% end %>
         <% end %>
-        <%# --- FIN DE LA CORRECTION --- %>
       </div>
 
-
-      <%# Bouton Supprimer %>
-
+      <%# Bouton Supprimer (uniquement si le post est persisté et appartient à l'utilisateur) %>
       <% if post.persisted? && user_signed_in? && post.user == current_user %>
         <button class="btn btn-sm btn-custom-delete w-100"
                 data-bs-toggle="modal"
@@ -95,9 +87,7 @@
   </div>
 </div>
 
-
-<%# Modale de suppression %>
-
+<%# Modale de suppression (uniquement si le post est persisté) %>
 <% if post.persisted? && current_user == post.user %>
   <div class="modal fade" id="deletePostModal-<%= post.id %>" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
