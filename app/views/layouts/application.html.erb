@@ -7,7 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-
     <%# --- Open Graph Meta Tags (pour le partage social) --- %>
     <meta property="og:title" content="<%= meta_title %>" />
     <meta property="og:type" content="website" />
@@ -16,21 +15,17 @@
     <meta property="og:description" content="<%= meta_description %>" />
     <meta property="og:site_name" content="DropOne" />
     <%# --- Fin des Open Graph Meta Tags --- %>
-
     <%# --- Favicons et Icônes PWA --- %>
     <%= favicon_link_tag 'favicon.ico' %>
     <%= tag.link rel: "apple-touch-icon", href: image_url("apple-touch-icon.png") %>
-
     <%# --- Manifeste PWA --- %>
     <%= tag.link rel: "manifest", href: webmanifest_path(format: :json) %>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <%= render 'shared/ios_pwa_links' %>
-
     <%# --- Stylesheets --- %>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
-
     <%# --- JavaScript --- %>
     <%= javascript_importmap_tags %>
   </head>
@@ -38,26 +33,26 @@
   <body>
     <%= render "shared/navbar" %>
 
-    <%# --- Zone d'affichage des alertes --- %>
+    <!-- ✅ Zone d'affichage des alertes -->
     <div id="flash-container" class="px-3 flash-container" style="position: fixed; bottom: 1.5rem; left: 0; right: 0; z-index: 1080;">
       <%= render 'shared/flashes' %>
     </div>
 
-    <%# --- Contenu principal --- %>
-    <%= yield %>
+    <!-- ✅ Contenu principal -->
+    <div class="container d-flex justify-content-center" style="padding-bottom: 100px;">
+      <div class="text-center w-100">
+        <%= yield %>
+      </div>
+    </div>
 
-    <%# --- Script pour auto-dismiss + placement dynamique des flashes --- %>
+    <!-- ✅ Script pour auto-dismiss + placement dynamique -->
     <script>
-      document.addEventListener("turbo:load", () => {
+      document.addEventListener("DOMContentLoaded", () => {
         // Auto-dismiss après 10 secondes
         document.querySelectorAll('.flash-message[data-auto-dismiss="true"]').forEach((el) => {
           setTimeout(() => {
-            try {
-              const bsAlert = bootstrap.Alert.getOrCreateInstance(el);
-              bsAlert.close();
-            } catch (e) {
-              // L'alerte n'existe plus, pas de problème
-            }
+            const bsAlert = bootstrap.Alert.getOrCreateInstance(el);
+            bsAlert.close();
           }, 10000);
         });
 
